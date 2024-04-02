@@ -1,0 +1,28 @@
+﻿@page "/compiler"
+@using Application.Rabbit
+@inject IConfiguration Conf
+
+<PageTitle>Compiler</PageTitle>
+
+<h1>Compiler</h1>
+
+<p>Rabbit host name: @Conf["RabbitMqSend:Hostname"]</p>
+<p role="status">Current language: C#</p>
+
+<textarea @bind="_code" placeholder="Type some code here..."></textarea>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Send</button>
+
+@code {
+    
+    [Inject] IRabbitService Service { get; set; }
+    
+    private string _code = "";
+
+    private void IncrementCount()
+    {
+        Console.WriteLine($"Compiler clicked, sending code: '{_code}'");
+        Service.SendMessage(_code);
+    }
+
+}

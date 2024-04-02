@@ -1,0 +1,23 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  compilerservice:
+    build:
+      context: "H:\\RiderProjects\\VirtualProgrammingLab"
+      dockerfile: "CompilerService/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net6.0/CompilerService.dll"
+    environment:
+      DOTNET_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      NUGET_PACKAGES: "C:\\Users\\segro_c4h97pj\\.nuget\\packages"
+      NUGET_FALLBACK_PACKAGES: "C:\\Users\\segro_c4h97pj\\.nuget\\packages"
+    image: "compilerservice:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\segro_c4h97pj\\.nuget\\packages:/root/.nuget/fallbackpackages"
+    - "H:\\RiderProjects\\VirtualProgrammingLab\\CompilerService:/app:rw"
+    - "H:\\RiderProjects\\VirtualProgrammingLab:/src:rw"
+    working_dir: "/app"

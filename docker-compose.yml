@@ -1,0 +1,40 @@
+﻿services:
+  rabbit:
+    container_name: rabbitmq
+    tty: true
+    hostname: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_USER: admin
+  
+  application:
+    image: application
+    ports:
+      - "80:80"
+    build:
+      context: .
+      args:
+        MODE: ${MODE}
+      dockerfile: Application/Dockerfile
+    restart: on-failure
+    depends_on:
+      - rabbit
+    links:
+      - rabbit
+      
+  compilerservice:
+    image: compilerservice
+    build:
+      context: .
+      args:
+        MODE: ${MODE}
+      dockerfile: CompilerService/Dockerfile
+#    restart: on-failure
+    depends_on:
+      - rabbit
+    links:
+       - rabbit
