@@ -1,5 +1,8 @@
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
+using Common.Structures;
+using Humanizer;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -16,8 +19,7 @@ public class RabbitListener : BackgroundService
     {
         _logger = logger;
         _configuration = configuration;
-        // Не забудьте вынести значения "localhost" и "MyQueue"
-        // в файл конфигурации
+
         var factory = new ConnectionFactory
         {
             HostName = _configuration["RabbitMqSend:Hostname"],
@@ -26,7 +28,7 @@ public class RabbitListener : BackgroundService
         };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
-        _channel.QueueDeclare(queue: _configuration["RabbitMqSend:QueueName"], durable: false, 
+        _channel.QueueDeclare(queue: _configuration["RabbitMqSend:CompileQueueName"], durable: false, 
             exclusive: false, autoDelete: false, arguments: null);
     }
 
@@ -35,17 +37,29 @@ public class RabbitListener : BackgroundService
         stoppingToken.ThrowIfCancellationRequested();
 
         var consumer = new EventingBasicConsumer(_channel);
-        consumer.Received += (ch, ea) =>
+        consumer.Received += async (ch, ea) =>
         {
-            var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+            var request = JsonSerializer.Deserialize<CompileRequest>(ea.Body.ToArray());
 
-            _logger.Log(LogLevel.Information,$"Code received: {content}");
-            RunUser.Instance.RunCode(content);
+            if (request is null)
+            {
+                _logger.Log(LogLevel.Warning,$"Unable deserialize message: {Encoding.UTF8.GetString(ea.Body.ToArray())}");
+                _channel.BasicAck(ea.DeliveryTag, false);
+                return;
+            }
+            
+            _logger.Log(LogLevel.Information,$"Receive request to compile {request.ServiceId}:{request.SourceId}");
+            var result = await CodeRunner.Instance.RunCode(request);
+            var data = JsonSerializer.SerializeToUtf8Bytes(result);
+            _channel.BasicPublish(exchange: "",
+                routingKey: _configuration["RabbitMqSend:ResultsQueueNameFormat"].FormatWith(result.ServiceId),
+                basicProperties: null,
+                body: data);
 
             _channel.BasicAck(ea.DeliveryTag, false);
         };
 
-        _channel.BasicConsume(_configuration["RabbitMqSend:QueueName"], false, consumer);
+        _channel.BasicConsume(_configuration["RabbitMqSend:CompileQueueName"], false, consumer);
 
         return Task.CompletedTask;
     }

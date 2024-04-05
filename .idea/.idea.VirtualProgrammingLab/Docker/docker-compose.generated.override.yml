@@ -1,23 +1,24 @@
 # This is a generated file. Not intended for manual editing.
 services:
-  compilerservice:
+  application:
     build:
       context: "H:\\RiderProjects\\VirtualProgrammingLab"
-      dockerfile: "CompilerService/Dockerfile"
+      dockerfile: "Application/Dockerfile"
       target: "base"
     command: []
     entrypoint:
     - "dotnet"
-    - "/app/bin/Debug/net6.0/CompilerService.dll"
+    - "/app/bin/Debug/net6.0/Application.dll"
     environment:
-      DOTNET_ENVIRONMENT: "Development"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net6.0/Application.staticwebassets.runtime.CT.json"
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
       NUGET_PACKAGES: "C:\\Users\\segro_c4h97pj\\.nuget\\packages"
       NUGET_FALLBACK_PACKAGES: "C:\\Users\\segro_c4h97pj\\.nuget\\packages"
-    image: "compilerservice:dev"
+    image: "application:dev"
     ports: []
     volumes:
     - "C:\\Users\\segro_c4h97pj\\.nuget\\packages:/root/.nuget/fallbackpackages"
-    - "H:\\RiderProjects\\VirtualProgrammingLab\\CompilerService:/app:rw"
+    - "H:\\RiderProjects\\VirtualProgrammingLab\\Application:/app:rw"
     - "H:\\RiderProjects\\VirtualProgrammingLab:/src:rw"
     working_dir: "/app"

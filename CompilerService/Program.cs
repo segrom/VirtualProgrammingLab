@@ -1,6 +1,6 @@
 using CompilerService;
 
-var runUser = new RunUser();
+var runUser = new CodeRunner();
 
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices(

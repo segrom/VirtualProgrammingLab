@@ -9,7 +9,34 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Humanizer.Core" Version="2.8.26" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0"/>
         <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Exercise\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Exercise\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Exercise\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Exercise\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Exercise\Exercise\obj\Exercise.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="Exercise\Exercise\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="Exercise\Exercise\obj\project.packagespec.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 </Project>

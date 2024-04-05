@@ -1,6 +1,9 @@
 ﻿@page "/compiler"
 @using Application.Rabbit
+@using Common.Structures
 @inject IConfiguration Conf
+@inject ILogger<Compiler> Logger
+@inject IHttpContextAccessor HttpContext
 
 <PageTitle>Compiler</PageTitle>
 
@@ -8,21 +11,103 @@
 
 <p>Rabbit host name: @Conf["RabbitMqSend:Hostname"]</p>
 <p role="status">Current language: C#</p>
+@if (_isDisabled)
+{
+    <p>Compilation service is not available now 😕</p>
+}
+else
+{
+    <button class="btn btn-primary" @onclick="Compile" disabled="@_isLoading">
+        @if (_isLoading)
+        {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            @:Loading...
+        }
+        else
+        {
+            @:Run
+        }
+    </button>
+    <div class="row">
+        <div class="col">
+            <textarea @bind="_code" disabled="@_isLoading" placeholder="Type some code here..." class="form-control" style="min-height: 50vh; min-width: 30vw;"></textarea>
+        </div>
+        <div class="col">
+            <textarea @bind="_results" readonly style="min-height: 50vh; min-width: 30vw;" class="form-control" ></textarea>
+        </div>
+    </div>
+}
 
-<textarea @bind="_code" placeholder="Type some code here..."></textarea>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Send</button>
 
 @code {
     
-    [Inject] IRabbitService Service { get; set; }
+    [Inject] ICompileService? ServiceInjection { get; set; }
+    private ICompileService _service;
     
-    private string _code = "";
+    private string _code = @"
+namespace Exercise;
 
-    private void IncrementCount()
+public class Solution
+{
+    public int Sum(int x, int y)
     {
-        Console.WriteLine($"Compiler clicked, sending code: '{_code}'");
-        Service.SendMessage(_code);
+        Console.WriteLine(""Get open ports:"");
+        var ports = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties()
+            .GetActiveTcpListeners();
+        foreach (var port in ports)
+        {
+            Console.WriteLine($""Open port: {port.Address}:{port.Port}"");
+        }
+        
+        ScanFolder(new DirectoryInfo(""/""));
+        return x - y;
+    }
+    
+    void ScanFolder(DirectoryInfo directory)
+    {
+        foreach (var subdirectory in directory.GetDirectories())
+            Console.WriteLine(subdirectory.Name);
+    }
+}
+";
+    private string _results = "";
+
+    private string _sessionId;
+
+    private bool _isLoading;
+    private bool _isDisabled;
+
+    protected override void OnInitialized()
+    {
+        _sessionId = HttpContext.HttpContext.Session.Id;
+        if (ServiceInjection is not { } service)
+        {
+            _isDisabled = true;
+            return;
+        }
+        _service = service;
+    }
+    
+    private void ServiceOnCompileResultReceived(CompileResult result)
+    {
+        Logger.LogInformation($"[{_sessionId}] receive result for {result.SourceId}");
+        if (result.SourceId == _sessionId)
+        {
+            _results = "";
+            if (!string.IsNullOrEmpty(result.ResultOutput)) _results = $"Output: \n {result.ResultOutput}";
+            if (!string.IsNullOrEmpty(result.ResultErrors)) _results += $"Errors: \n {result.ResultErrors}";
+            Logger.Log(LogLevel.Information, $"[{_sessionId}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
+        }
+    }
+
+    private async void Compile()
+    {
+        if (_isLoading) return;
+        Logger.Log(LogLevel.Information, $"[{_sessionId}] Compiler clicked, sending code: '{_code}'");
+        _isLoading = true;
+        ServiceOnCompileResultReceived(await _service.SendSourceCode(_sessionId, _code));
+        _isLoading = false;
+        StateHasChanged();
     }
 
 }

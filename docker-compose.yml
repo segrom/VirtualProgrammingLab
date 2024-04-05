@@ -10,6 +10,11 @@
     environment:
       RABBITMQ_DEFAULT_PASS: admin
       RABBITMQ_DEFAULT_USER: admin
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
   
   application:
     image: application
@@ -18,23 +23,28 @@
     build:
       context: .
       args:
-        MODE: ${MODE}
+        MODE: ${MODE-Debug}
       dockerfile: Application/Dockerfile
     restart: on-failure
     depends_on:
       - rabbit
     links:
       - rabbit
-      
-  compilerservice:
-    image: compilerservice
+
+  csharp-compiler-service:
+    image: csharp-compiler-service
     build:
       context: .
+      no_cache: true
       args:
-        MODE: ${MODE}
+        MODE: ${MODE-Debug}
       dockerfile: CompilerService/Dockerfile
-#    restart: on-failure
+    restart: on-failure
+    privileged: true
+    pid: "host"
     depends_on:
       - rabbit
     links:
        - rabbit
+    
+    
