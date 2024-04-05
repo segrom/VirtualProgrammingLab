@@ -1,0 +1,59 @@
+/**
+ * Allows code-input elements to be used with the Prism.js line-numbers plugin, as long as the code-input element 
+ * or a parent element of it has the CSS class `line-numbers`.
+ * https://prismjs.com/plugins/line-numbers/
+ * Files: prism-line-numbers.css
+ */
+pre[class*=language-].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber
+}
+
+pre[class*=language-].line-numbers > code {
+    position: relative;
+    white-space: inherit
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em;
+    letter-spacing: -1px;
+    border-right: 0px solid rgb(55, 129, 230);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+}
+
+.line-numbers-rows > span {
+    display: block;
+    counter-increment: linenumber
+}
+
+.line-numbers-rows > span:before {
+    content: counter(linenumber);
+    color: #999;
+    display: block;
+    padding-right: .8em;
+    text-align: right
+}
+
+/* Update padding to match line-numbers plugin */
+code-input.line-numbers textarea, code-input.line-numbers.code-input_pre-element-styled pre,
+.line-numbers code-input textarea, .line-numbers code-input.code-input_pre-element-styled pre {
+    padding-top: 1em !important;
+    padding-bottom: 1em !important;
+    padding-right: 1em !important;
+    padding-left: 3.8em !important;
+}
+
+/* Remove unnecessary, interfering padding values */
+code-input.line-numbers, code-input.line-numbers.code-input_pre-element-styled code,
+.line-numbers code-input, .line-numbers code-input.code-input_pre-element-styled code {
+    padding: 0;
+}
