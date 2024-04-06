@@ -1,15 +1,13 @@
 ﻿@page "/compiler"
 @using Application.Rabbit
-@using Microsoft.AspNetCore.Components.Sections
 @using Common.Structures
-@inject IConfiguration Conf
 @inject ILogger<Compiler> Logger
 @inject IHttpContextAccessor HttpContext
 @inject IJSRuntime JsRuntime
 
-<HeadContent>
+@*<HeadContent>
 @(new MarkupString("<link rel=\"stylesheet\" href=\"css/code-input.min.css\">\n    <link href=\"css/prism.css\" rel=\"stylesheet\"/>\n    <link href=\"css/themes/prism-vsc-dark-plus.css\" rel=\"stylesheet\"/>\n    <link href=\"css/autocomplete.min.css\" rel=\"stylesheet\"/>\n    <link href=\"css/prism-line-numbers.css\" rel=\"stylesheet\"/>\n    <script src=\"js/code-input.min.js\"></script>\n    <script src=\"js/plugins/indent.min.js\"></script>\n    <script src=\"js/plugins/autocomplete.min.js\"></script>\n    <script src=\"js/plugins/auto-close-brackets.min.js\"></script> "))
-</HeadContent>
+</HeadContent>*@
 
 <PageTitle>Compiler</PageTitle>
 @if (_isDisabled)
@@ -75,7 +73,7 @@ else
             </div>
         </div>
     </div>
-    @(new MarkupString("<script src=\"js/prism.js\" ></script><script src=\"js/plugins/prism-line-numbers.js\"></script><script src=\"js/codeAreaProvider.js\"></script>"))
+    @* @(new MarkupString("<script src=\"js/prism.js\" ></script><script src=\"js/plugins/prism-line-numbers.js\"></script><script src=\"js/codeAreaProvider.js\"></script>")) *@
 }
 
 
@@ -139,6 +137,14 @@ public class Solution
             if (!string.IsNullOrEmpty(result.ResultOutput)) _results = $"Output: \n {result.ResultOutput}";
             if (!string.IsNullOrEmpty(result.ResultErrors)) _results += $"🚩Errors: \n {result.ResultErrors}";
             Logger.Log(LogLevel.Information, $"[{_sessionId}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("codeFunctions.addCodeAreaProvider");
         }
     }
 
