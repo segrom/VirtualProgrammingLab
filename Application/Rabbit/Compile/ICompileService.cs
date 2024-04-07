@@ -1,6 +1,6 @@
 ﻿using Common.Structures;
 
-namespace Application.Rabbit;
+namespace Application.Rabbit.Compile;
 
 public interface ICompileService: IDisposable
 {

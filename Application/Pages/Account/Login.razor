@@ -1,0 +1,133 @@
+﻿@page "/login"
+@layout EmptyLayout
+@attribute [AllowAnonymous]
+@using Application.Data.Account
+@using Application.Middleware
+@using Application.Shared.Layouts
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal
+@inherits LayoutComponentBase
+@inject ILogger<Login> Logger
+@inject NavigationManager NavigationManager
+@inject SignInManager<IdentityUser> SignInManager
+
+<PageTitle>Login</PageTitle>
+
+<style>
+    .validation-message {
+        max-width: 300px;
+        color: var(--bs-danger);
+    }
+</style>
+
+<div class="d-flex vh-100 align-items-center justify-content-center">
+<div class="d-grid justify-content-center">
+    <h2 class="my-3">Виртуальная <br> Лабаратория <br> Программирования</h2>
+    <EditForm class="d-grid w-100" id="loginForm" method="post" OnValidSubmit="Submit" EditContext="_editContext">
+        <DataAnnotationsValidator />
+        @if (_errors.Count > 0)
+        {
+            @foreach (var error in _errors)
+            {
+                <div class="validation-message">@error</div>
+            }
+        }
+        <legend>Вход</legend>
+        <label class="form-floating  mb-3">
+            <InputText @bind-Value="Model!.Code" class="form-control" id="login" type="text" placeholder="ST1231"/>
+            <label for="login">Код</label>
+            <ValidationMessage For="@(() => Model!.Code)"/>
+        </label>
+        <label class="form-floating mb-3">
+            <InputText  @bind-Value="Model!.Password" class="form-control" id="pass" type="password" placeholder=""/>
+            <label for="pass">Пароль</label>
+            <ValidationMessage For="@(() => Model!.Password)"/>
+        </label>
+        <button class="btn btn-primary }" disabled="@_isLoading" type="submit">
+            @if (_isLoading)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                @:Ожидайте...
+            }
+            else
+            {
+                @:Войти
+            }
+        </button>
+    </EditForm>
+</div>
+</div>
+
+@code {
+    private bool _isLoading;
+
+    private List<string> _errors = new List<string>();
+
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+    VplLoginModel? Model { get; set; }
+    
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; } = null;
+
+    private AuthenticationState _authState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _authState = await AuthState!;
+        if (_authState?.User?.Identity == null || !_authState.User.Identity.IsAuthenticated)
+        {
+            Model = new VplLoginModel();
+            _editContext = new(Model);
+            _messageStore = new(_editContext);
+            return;
+        }
+        NavigationManager.NavigateTo("/", true);
+    }
+
+
+    private async void Submit()
+    {
+        if(Model is null) return;
+        _errors.Clear();
+        _isLoading = true;
+        
+        var usr = await SignInManager.UserManager.FindByNameAsync(Model.Code);
+        if (usr == null)
+        {
+            _errors.Add("Такой пользователь не найден");
+            _isLoading = false;
+            return;
+        }
+        
+        if (!await SignInManager.CanSignInAsync(usr))
+        {
+            _errors.Add($"Вы не можете войти в пользователя {Model.Code}!");
+            _isLoading = false;
+            return;
+        }
+
+        var result = await SignInManager.CheckPasswordSignInAsync(usr, Model.Password, false);
+        
+        if (result.Succeeded)
+        {
+            Guid key = Guid.NewGuid();
+            BlazorCookieLoginMiddleware.Logins[key] = new LoginInfo { Name = Model.Code, Password = Model.Password };
+            NavigationManager.NavigateTo($"/login?key={key}", true);
+            return;
+        }
+        
+        if (result.IsLockedOut)
+        {
+            Logger.LogInformation("Lockout user {0} try to login to", Model.Code);
+            _errors.Add("Вы были забанены 🎉");
+        }
+
+        Logger.LogInformation("Failed try to login to {0}", Model.Code);
+        _errors.Add("Не удалось войти в систему. Возможно код или пароль неверны 😕");
+
+        _isLoading = false;
+    }
+
+    
+}

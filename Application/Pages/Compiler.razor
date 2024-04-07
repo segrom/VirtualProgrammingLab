@@ -1,34 +1,20 @@
 ﻿@page "/compiler"
 @using Application.Rabbit
+@using Application.Rabbit.Compile
 @using Common.Structures
+@attribute [Authorize]
 @inject ILogger<Compiler> Logger
 @inject IHttpContextAccessor HttpContext
 @inject IJSRuntime JsRuntime
-
-@*<HeadContent>
-@(new MarkupString("<link rel=\"stylesheet\" href=\"css/code-input.min.css\">\n    <link href=\"css/prism.css\" rel=\"stylesheet\"/>\n    <link href=\"css/themes/prism-vsc-dark-plus.css\" rel=\"stylesheet\"/>\n    <link href=\"css/autocomplete.min.css\" rel=\"stylesheet\"/>\n    <link href=\"css/prism-line-numbers.css\" rel=\"stylesheet\"/>\n    <script src=\"js/code-input.min.js\"></script>\n    <script src=\"js/plugins/indent.min.js\"></script>\n    <script src=\"js/plugins/autocomplete.min.js\"></script>\n    <script src=\"js/plugins/auto-close-brackets.min.js\"></script> "))
-</HeadContent>*@
 
 <PageTitle>Compiler</PageTitle>
 @if (_isDisabled)
 {
     <p class="table-dark">Compilation service is not available now 😕</p>
 }
-@*else if (_isInitializing)
-{
-    <div class="overflow-hidden justify-content-center  align-items-end p-3" style="display: flex; height: 50vh;">
-        <div class="d-flex align-items-center justify-content-between gx-4">
- 
-            <span class="spinner-border btn-dark spinner-border-lg mx-2" style="width: 3rem; height: 3rem;" role="status"
-                  aria-hidden="true"></span>
-            <h3 class="table-dark display-6 mx-2">Loading Editor...</h3>
-
-        </div>
-    </div>
-}*@
 else
 {
-    <p class="table-dark">Что бы компилировать и собрать программу нажмите кнопку "Отправить"</p>
+    <p>Что бы компилировать и собрать программу нажмите кнопку "Отправить"</p>
     <div class="col gy-1">
 
         <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
@@ -38,7 +24,7 @@ else
                     @if (_isLoading)
                     {
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        @:Loading...
+                        @:Компиляция...
                     }
                     else
                     {
@@ -73,18 +59,22 @@ else
             </div>
         </div>
     </div>
-    @* @(new MarkupString("<script src=\"js/prism.js\" ></script><script src=\"js/plugins/prism-line-numbers.js\"></script><script src=\"js/codeAreaProvider.js\"></script>")) *@
 }
 
 
 @code {
-    
-    /*[Inject]*/ ICompileService? ServiceInjection { get; set; }
-    [Inject] NavigationManager NavigationManager { get; set; }
+
+    /*[Inject]*/
+    ICompileService? ServiceInjection { get; set; }
+
+    [Inject]NavigationManager NavigationManager { get; set; }
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+
     private ICompileService _service;
-    
+
     private string _code = "";
-    private string _codeTemplate= @"namespace Exercise;
+
+    private string _codeTemplate = @"namespace Exercise;
 
 public class Solution
 {
@@ -109,17 +99,26 @@ public class Solution
     }
 }
 ";
+
     private string _results = "Logs here";
 
     private string _sessionId;
-    
+
     private bool _isLoading;
     private bool _isDisabled;
 
-    protected override void OnInitialized()
+
+    protected override async Task OnInitializedAsync()
     {
         
-        _sessionId = HttpContext.HttpContext.Session.Id;
+        /*
+        var user = (await AuthStat).User;
+        if(!user.Identity.IsAuthenticated || user.Identity.Name is null)
+        {
+            NavigationManager.NavigateTo($"/login");
+        }*/
+        
+        _sessionId = HttpContext!.HttpContext!.Session.Id;
         if (ServiceInjection is not { } service)
         {
     //_isDisabled = true;
@@ -127,7 +126,7 @@ public class Solution
         }
         _service = service;
     }
-    
+
     private void ServiceOnCompileResultReceived(CompileResult result)
     {
         Logger.LogInformation($"[{_sessionId}] receive result for {result.SourceId}");
@@ -161,9 +160,9 @@ public class Solution
 
     private void CodeUpdate(ChangeEventArgs obj)
     {
-        if(obj.Value is not string value) return;
+        if (obj.Value is not string value) return;
         _code = value;
-        Console.WriteLine("CodeUpdate: "+ _code);
+        Console.WriteLine("CodeUpdate: " + _code);
     }
 
 }
