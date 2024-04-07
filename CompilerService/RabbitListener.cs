@@ -19,12 +19,12 @@ public class RabbitListener : BackgroundService
     {
         _logger = logger;
         _configuration = configuration;
-
+        _logger.LogInformation("Login rabbit as {0}", Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"));
         var factory = new ConnectionFactory
         {
             HostName = _configuration["RabbitMqSend:Hostname"],
-            UserName = _configuration["RabbitMqSend:UserName"],
-            Password = _configuration["RabbitMqSend:Password"]
+            UserName = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"),
+            Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD")
         };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();

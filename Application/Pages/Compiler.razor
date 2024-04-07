@@ -64,7 +64,7 @@ else
 
 @code {
 
-    /*[Inject]*/
+    [Inject]
     ICompileService? ServiceInjection { get; set; }
 
     [Inject]NavigationManager NavigationManager { get; set; }
@@ -121,7 +121,7 @@ public class Solution
         _sessionId = HttpContext!.HttpContext!.Session.Id;
         if (ServiceInjection is not { } service)
         {
-    //_isDisabled = true;
+            _isDisabled = true;
             return;
         }
         _service = service;
@@ -162,7 +162,7 @@ public class Solution
     {
         if (obj.Value is not string value) return;
         _code = value;
-        Console.WriteLine("CodeUpdate: " + _code);
+        //Console.WriteLine("CodeUpdate: " + _code);
     }
 
 }

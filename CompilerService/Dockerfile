@@ -8,10 +8,10 @@ COPY ["CompilerService/CompilerService.csproj", "CompilerService/"]
 RUN dotnet restore "CompilerService/CompilerService.csproj"
 COPY . .
 WORKDIR "/src/CompilerService"
-RUN dotnet build "CompilerService.csproj" -c {MODE} -o /compiler/build
+RUN dotnet build "CompilerService.csproj" -c "$MODE" -o /compiler/build
 
 FROM build AS publish
-RUN dotnet publish "CompilerService.csproj" -c {MODE} -o /compiler/publish /p:UseAppHost=false
+RUN dotnet publish "CompilerService.csproj" -c "$MODE" -o /compiler/publish /p:UseAppHost=false
 
 FROM base AS final
 

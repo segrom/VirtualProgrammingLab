@@ -9,10 +9,10 @@ COPY ["Application/Application.csproj", "Application/"]
 RUN dotnet restore "Application/Application.csproj"
 COPY . .
 WORKDIR "/src/Application"
-RUN dotnet build "Application.csproj" -c {MODE} -o /app/build
+RUN dotnet build "Application.csproj" -c "$MODE" -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Application.csproj" -c {MODE} -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Application.csproj" -c "$MODE" -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

@@ -1,0 +1,14 @@
+﻿{
+  "Servers": {
+    "1": {
+      "Name": "application",
+      "Group": "Servers",
+      "Host": "database",
+      "Port": 5432,
+      "MaintenanceDB": "applicationdb",
+      "Username": "application",
+      "Password": "AppP4SS_wrd",
+      "SSLMode": "prefer"
+    }
+  }
+}

@@ -1,4 +1,15 @@
-﻿services:
+﻿networks:
+  db-network:
+    driver: bridge
+  rabbit-network:
+    driver: bridge
+
+volumes:
+  rabbit-data:
+  database-data:
+  pgadmin-data:
+
+services:
   rabbit:
     container_name: rabbitmq
     tty: true
@@ -7,44 +18,96 @@
       - "15672:15672"
       - "5672:5672"
     image: rabbitmq:3-management
+    volumes:
+      - rabbit-data:/var/lib/rabbitmq
     environment:
-      RABBITMQ_DEFAULT_PASS: admin
-      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: ${DEFAULT_ADMIN_PASSWORD}
+      RABBITMQ_DEFAULT_USER: ${DEFAULT_ADMIN_NAME}
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
       timeout: 30s
       retries: 3
+    restart: on-failure
+    networks: 
+      - rabbit-network
   
+  database:
+    image: postgres:latest
+    container_name: database
+    hostname: database
+    environment:
+      POSTGRES_DB: "applicationdb"
+      POSTGRES_USER: "application"
+      POSTGRES_PASSWORD: "AppP4SS_wrd"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U application -d applicationdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - db-network
+
+#  pgadmin:
+#    container_name: pgadmin_container
+#    image: dpage/pgadmin4:7.2
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: ${DEFAULT_ADMIN_EMAIL}
+#      PGADMIN_DEFAULT_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
+#      PGADMIN_CONFIG_SERVER_MODE: "False"
+#    volumes:
+#      - pgadmin-data:/var/lib/pgadmin
+#       - ./servers.json:/pgadmin4/servers.json
+#    ports:
+#      - "5050:80"
+#    restart: unless-stopped
+#    networks:
+#      - db-network
+
   application:
     image: application
     ports:
       - "80:80"
     build:
       context: .
-      args:
-        MODE: ${MODE-Debug}
       dockerfile: Application/Dockerfile
+    environment:
+      DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_NAME}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
+      MODE: ${MODE}
     restart: on-failure
     depends_on:
       - rabbit
-    links:
-      - rabbit
+      - database
+    networks:
+      - rabbit-network
+      - db-network
 
   csharp-compiler-service:
     image: csharp-compiler-service
     build:
       context: .
       no_cache: true
-      args:
-        MODE: ${MODE-Debug}
       dockerfile: CompilerService/Dockerfile
+    environment:
+      DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_NAME}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
+      MODE: ${MODE}
     restart: on-failure
     privileged: true
     pid: "host"
     depends_on:
       - rabbit
-    links:
-       - rabbit
+      - database
+    networks:
+      - rabbit-network
+      - db-network
     
     

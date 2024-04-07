@@ -9,15 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.1"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.1"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.1"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.1"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.22" />
         <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
     </ItemGroup>
 
@@ -31,6 +28,10 @@
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
       <Content Update="HtmlPages\login.html">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="HtmlPages\admin.html">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
