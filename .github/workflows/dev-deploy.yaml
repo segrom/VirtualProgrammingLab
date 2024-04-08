@@ -1,0 +1,32 @@
+﻿name: Dev Deploy App
+
+on:
+  push:
+    branches:
+      - "dev"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HOST: root@94.228.117.181
+      DEPLOY_DIRECTORY: /root/apps/vpl
+      ENV_FILE_PATH: /root/apps/vpl/config.env
+      MODE: Release
+      DEFAULT_ADMIN_EMAIL: admin@segrom.ru
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create environment file on server
+        run: |
+            touch ${{ env.ENV_FILE_PATH }} && \
+            chmod 600 ${{ env.ENV_FILE_PATH }} && \
+            echo 'MODE=${{ env.CONFIG_PATH }}' > ${{ env.ENV_FILE_PATH }} && \
+            echo 'DEFAULT_ADMIN_EMAIL=${{ env.DEFAULT_ADMIN_EMAIL }}' > ${{ env.ENV_FILE_PATH }} && \
+            echo 'DEFAULT_ADMIN_NAME=${{ secrets.DEFAULT_ADMIN_NAME }}' >> ${{ env.ENV_FILE_PATH }}"
+            echo 'DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}' >> ${{ env.ENV_FILE_PATH }}"
+      
+      - name: Build the stack
+        run: docker-compose --env-file ${{ env.ENV_FILE_PATH }} up -d
