@@ -4,13 +4,16 @@
 @using Common.Structures
 @attribute [Authorize]
 @inject ILogger<Compiler> Logger
-@inject IHttpContextAccessor HttpContext
 @inject IJSRuntime JsRuntime
 
 <PageTitle>Compiler</PageTitle>
 @if (_isDisabled)
 {
     <p class="table-dark">Compilation service is not available now 😕</p>
+    @if (!string.IsNullOrEmpty(_disabledError))
+    {
+        <p class="alert alert-danger">@_disabledError</p>
+    }
 }
 else
 {
@@ -67,8 +70,11 @@ else
     [Inject]
     ICompileService? ServiceInjection { get; set; }
 
-    [Inject]NavigationManager NavigationManager { get; set; }
-    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthStat { get; set; }
 
     private ICompileService _service;
 
@@ -102,23 +108,30 @@ public class Solution
 
     private string _results = "Logs here";
 
-    private string _sessionId;
+    private string _exerciseId = "1";
+    private string _solutionId;
 
     private bool _isLoading;
     private bool _isDisabled;
+    private string _disabledError;
 
 
     protected override async Task OnInitializedAsync()
     {
-        
-        /*
         var user = (await AuthStat).User;
-        if(!user.Identity.IsAuthenticated || user.Identity.Name is null)
+        if (!(user.Identity?.IsAuthenticated ?? false) || user.Identity.Name is null)
         {
             NavigationManager.NavigateTo($"/login");
-        }*/
-        
-        _sessionId = HttpContext!.HttpContext!.Session.Id;
+        }
+
+        if (user.Identity is null)
+        {
+            _isDisabled = true;
+            _disabledError = "Error: your account not found";
+            return;
+        }
+
+        _solutionId = $"E{_exerciseId}.S{user.Identity.Name ?? Guid.NewGuid().ToString()}";
         if (ServiceInjection is not { } service)
         {
             _isDisabled = true;
@@ -129,13 +142,13 @@ public class Solution
 
     private void ServiceOnCompileResultReceived(CompileResult result)
     {
-        Logger.LogInformation($"[{_sessionId}] receive result for {result.SourceId}");
-        if (result.SourceId == _sessionId)
+        Logger.LogInformation($"[{_solutionId}] receive result for {result.SourceId}");
+        if (result.SourceId == _solutionId)
         {
             _results = "";
             if (!string.IsNullOrEmpty(result.ResultOutput)) _results = $"Output: \n {result.ResultOutput}";
             if (!string.IsNullOrEmpty(result.ResultErrors)) _results += $"🚩Errors: \n {result.ResultErrors}";
-            Logger.Log(LogLevel.Information, $"[{_sessionId}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
+            Logger.Log(LogLevel.Information, $"[{_solutionId}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
         }
     }
 
@@ -151,9 +164,9 @@ public class Solution
     {
         if (_isLoading) return;
         Console.WriteLine(_code);
-        Logger.Log(LogLevel.Information, $"[{_sessionId}] Compiler clicked, sending code: '{_code}'");
+        Logger.Log(LogLevel.Information, $"[{_solutionId}] Compiler clicked, sending code: '{_code}'");
         _isLoading = true;
-        ServiceOnCompileResultReceived(await _service.SendSourceCode(_sessionId, _code));
+        ServiceOnCompileResultReceived(await _service.SendSourceCode(_solutionId, _code));
         _isLoading = false;
         StateHasChanged();
     }
@@ -162,7 +175,6 @@ public class Solution
     {
         if (obj.Value is not string value) return;
         _code = value;
-        //Console.WriteLine("CodeUpdate: " + _code);
+    //Console.WriteLine("CodeUpdate: " + _code);
     }
-
 }
