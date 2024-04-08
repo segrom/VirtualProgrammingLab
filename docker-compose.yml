@@ -74,7 +74,7 @@ services:
   application:
     image: application
     ports:
-      - "80:80"
+      - ${APP_PORT}:80
     build:
       context: .
       dockerfile: Application/Dockerfile
