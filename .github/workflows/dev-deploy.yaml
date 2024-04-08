@@ -19,14 +19,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Deploy to VM
+        run: |
+          sudo apt-get install -y ssh rsync
+          echo "$DEPLOY_SSH_KEY" > deploy_key.pem
+          chmod 600 deploy_key.pem
+          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "mkdir -p ${{ env.DEPLOY_DIRECTORY }}"
+          rsync -avz -e 'ssh -i deploy_key.pem -o StrictHostKeyChecking=no' --exclude='.git' ./ ${{ env.HOST }}:${{ env.DEPLOY_DIRECTORY }}
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: List workspace contents
+        run: |
+          echo "Listing deployment folder contents:"
+          ls -la ${{ github.workspace }}/deployment
+
       - name: Create environment file on server
         run: |
-            touch ${{ env.ENV_FILE_PATH }} && \
-            chmod 600 ${{ env.ENV_FILE_PATH }} && \
-            echo 'MODE=${{ env.CONFIG_PATH }}' > ${{ env.ENV_FILE_PATH }} && \
-            echo 'DEFAULT_ADMIN_EMAIL=${{ env.DEFAULT_ADMIN_EMAIL }}' > ${{ env.ENV_FILE_PATH }} && \
-            echo 'DEFAULT_ADMIN_NAME=${{ secrets.DEFAULT_ADMIN_NAME }}' >> ${{ env.ENV_FILE_PATH }}"
-            echo 'DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}' >> ${{ env.ENV_FILE_PATH }}"
+          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\
+          touch ${{ env.ENV_FILE_PATH }} && \
+          chmod 600 ${{ env.ENV_FILE_PATH }} && \
+          echo 'MODE=${{ env.CONFIG_PATH }}' > ${{ env.ENV_FILE_PATH }} && \
+          echo 'DEFAULT_ADMIN_EMAIL=${{ env.DEFAULT_ADMIN_EMAIL }}' > ${{ env.ENV_FILE_PATH }} && \
+          echo 'DEFAULT_ADMIN_NAME=${{ secrets.DEFAULT_ADMIN_NAME }}' >> ${{ env.ENV_FILE_PATH }}"
+          echo 'DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}' >> ${{ env.ENV_FILE_PATH }}"
       
       - name: Build the stack
+        run: docker-compose --env-file ${{ env.ENV_FILE_PATH }} build
+      - name: Run compose
         run: docker-compose --env-file ${{ env.ENV_FILE_PATH }} up -d
