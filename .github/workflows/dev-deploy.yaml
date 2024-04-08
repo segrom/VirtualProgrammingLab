@@ -35,10 +35,10 @@ jobs:
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\
           touch ${{ env.ENV_FILE_PATH }} && \
           chmod 600 ${{ env.ENV_FILE_PATH }} && \
-          echo 'MODE=${{ env.CONFIG_PATH }}' > ${{ env.ENV_FILE_PATH }} && \
+          echo 'MODE=${{ env.MODE }}' > ${{ env.ENV_FILE_PATH }} && \
           echo 'APP_PORT=${{ env.APP_PORT }}' >> ${{ env.ENV_FILE_PATH }} && \
           echo 'DEFAULT_ADMIN_EMAIL=${{ env.DEFAULT_ADMIN_EMAIL }}' >> ${{ env.ENV_FILE_PATH }} && \
-          echo 'DEFAULT_ADMIN_NAME=${{ secrets.DEFAULT_ADMIN_NAME }}' >> ${{ env.ENV_FILE_PATH }}&& \
+          echo 'DEFAULT_ADMIN_NAME=${{ secrets.DEFAULT_ADMIN_NAME }}' >> ${{ env.ENV_FILE_PATH }} && \
           echo 'DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}' >> ${{ env.ENV_FILE_PATH }}"
       
       - name: Build the stack
