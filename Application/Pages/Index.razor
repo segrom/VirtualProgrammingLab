@@ -1,10 +1,18 @@
 ﻿@page "/"
+@using Application.Data.Account
 @attribute [Authorize]
 
 <PageTitle>Главная</PageTitle>
 
-<h1>Это заглушка главной страницы</h1>
+<h1>Мои курсы</h1>
+<AuthorizeView Roles="@(RoleController.LecturerRole)">
 
-<text>Добро пожаловатьб</text>
+    
 
-<SurveyPrompt Title="Есть вопрос?"/>
+    <text>Добро пожаловатьб</text>
+
+
+</AuthorizeView>
+<AuthorizeView Roles="@(RoleController.StudentRole)">
+    
+</AuthorizeView>

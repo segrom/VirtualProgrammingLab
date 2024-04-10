@@ -36,5 +36,12 @@
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
     </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\ChapterEditor.html" />
+      <None Include="wwwroot\CourceEditor.html" />
+      <None Include="wwwroot\ExerciseEditor.html" />
+      <None Include="wwwroot\ExerciseVariantEditor.html" />
+    </ItemGroup>
     
 </Project>

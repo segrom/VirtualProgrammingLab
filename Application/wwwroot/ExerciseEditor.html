@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>C# Compiler</title>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
+    <link href="css/open-iconic/font/css/open-iconic-bootstrap.min.css" rel="stylesheet"/>
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"
+    />
+    <link href="css/prism.css" rel="stylesheet" />
+    <link href="css/themes/prism-vsc-dark-plus.css" rel="stylesheet" />
+    <link href="css/autocomplete.min.css" rel="stylesheet" />
+    <script src="js/code-input.min.js"></script>
+    <script src="js/plugins/indent.min.js"></script>
+    <script src="js/plugins/autocomplete.min.js"></script>
+    <script src="js/plugins/auto-close-brackets.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
+    <link rel="stylesheet" href="css/code-input.min.css">
+    <link href="css/prism-line-numbers.css" rel="stylesheet" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-black">
+    <div class="container-fluid">
+        <a class="navbar-brand  bold" href="#">Виртуальная лабаратория программирования</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link " disabled aria-current="page" href="#">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="#">Компилятор</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" disabled href="#">Курсы</a>
+                </li>
+            </ul>
+           
+        </div>
+        <div>Преподаватель</div>
+    </div>
+    
+</nav>
+
+<div class="container-md d-grid mt-2">
+    <div class="row">
+        <div class="d-flex align-items-lg-center justify-content-between">
+            <div>
+                <button class="btn btn-dark">
+                    <span class="oi oi-chevron-left mx-1" style="top: 0.13em;" aria-hidden="true"></span>
+                    Python 3 Основы
+                </button>
+            </div>
+            <h1 class="m-3">
+                <span class="oi mx-1 oi-code text-info" style="top: 0.16em;" aria-hidden="true"></span>
+                Задание №1</h1>
+        </div>
+    </div>
+    <hr>
+    <h5>Описание задания</h5>
+    <div class="row border rounded-3 m-1 p-2 overflow-auto" style="height: 30vh; min-width: 100px;">
+        <div class="col">
+            <code-input  class="container-fluid p-0 m-0 rounded-3 line-numbers " style="height: 100%" language="md" placeholder="Type code here" template="syntax-highlighted"></code-input>
+        </div>
+        
+        <div class="col">
+            <article>
+                <p class="lead">Задание №1: Строки</p>
+                <p>С помощю переменной переоразуйте строку в число</p>
+                <ul>
+                    <li>Можете использовать циклы</li>
+                    <li>Главное – не волноватся
+                    </li>
+                </ul>
+                <pre><code class="language-python">x = y ^ 2</code></pre>
+            </article>
+        </div>
+    </div>
+    <div class="my-2  d-flex justify-content-between">
+        <div class="d-flex align-items-center justify-content-center">
+            <h5>Реализации </h5>
+            <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal" ></i>
+        </div>
+        <div>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="oi mx-1 oi-plus" style="top: 0.13em" aria-hidden="true"></span>
+                    Добавить</button>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Python 3</a></li>
+                    <li><a class="dropdown-item" href="#">C#</a></li>
+                    <li><a class="dropdown-item" href="#">C++ 98</a></li>
+                    <li><a class="dropdown-item" href="#">Go</a></li>
+                </ul>
+            </div>
+            
+        </div>
+    </div>
+    <div class="d-block mt-1">
+        <div class="d-flex border border-2 rounded-3 p-1 justify-content-between align-items-center">
+            <button class="btn btn-dark">
+                Python 3
+                <span class="oi mx-1 oi-chevron-right" style="top: 0.13em;" aria-hidden="true"></span>
+            </button>
+            <div class="d-flex">
+            <div class="d-flex mx-2 justify-content-between align-items-center text-success">
+                <span class="oi mx-1 oi-circle-check" style="top: 0.13em;" aria-hidden="true"></span>
+                <strong>Шаблон</strong>
+            </div>
+            <div class="d-flex mx-2 justify-content-between align-items-center text-danger">
+                <span class="oi mx-1 oi-circle-x " style="top: 0.13em;" aria-hidden="true"></span>
+                <strong>Тесты</strong>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Шаблон метода для студента</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Редактор "Шаблон метода для студента" - место где размещается шаблон функции, которую будут проверять методы из "Проверки выполнения"
+            </div>
+        </div>
+    </div>
+</div>
+<!--<script src="_framework/blazor.server.js"></script>-->
+<script src="js/prism.js"></script>
+<script src="js/plugins/prism-line-numbers.js"></script>
+<script src="js/codeAreaProvider.js"></script>
+<script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>
