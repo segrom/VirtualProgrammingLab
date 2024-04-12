@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>C# Compiler</title>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+            integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+            crossorigin="anonymous"></script>
+    <link href="css/prism.css" rel="stylesheet" />
+    <link href="css/themes/prism-vsc-dark-plus.css" rel="stylesheet" />
+    <link href="css/autocomplete.min.css" rel="stylesheet" />
+    <script src="js/code-input.min.js"></script>
+    <script src="js/plugins/indent.min.js"></script>
+    <script src="js/plugins/autocomplete.min.js"></script>
+    <script src="js/plugins/auto-close-brackets.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <link rel="stylesheet" href="css/code-input.min.css">
+    <link href="css/prism-line-numbers.css" rel="stylesheet" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-black">
+    <div class="container-fluid">
+        <a class="navbar-brand  bold" href="#">Виртуальная лабаратория программирования</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link " disabled aria-current="page" href="#">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center justify-content-center" href="#">
+                        <i class="ph-fill ph-terminal mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                        <span>Компилятор</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" disabled href="#">Курсы</a>
+                </li>
+            </ul>
+           
+        </div>
+        <div><em class="text-secondary">ИУ-1719</em>&nbsp Гаврилов У. П.</div>
+    </div>
+    
+</nav>
+
+<div class="container-md d-grid mt-2">
+    <div class="row">
+        <div class="d-flex align-items-center justify-content-between">
+            <h1 class=" m-3">Python3 Основы </h1>
+            <div class="progress my-2" style="width: 20%">
+                <div class="progress-bar" role="progressbar" style="width: 29%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">29%</div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-3">
+            <nav id="navbar" class="navbar flex-column align-items-stretch p-3">
+                <nav class="nav nav-pills flex-column">
+                    <button class="btn btn-dark text-success align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-check-circle me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        <span>Вступление</span>
+                    </button>
+                    <button class="nav-item btn btn-dark my-1 active" href="#item-1">Переменные</button>
+                    <button class="nav-item btn btn-dark my-1 align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-code text-secondary mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                        <span>Задание №1</span>
+                    </button>
+                    
+                </nav>
+            </nav>
+        </div>
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center pt-3">
+                <h4><em class="text-secondary py-3">Глава</em> "Переменные"</h4>
+            </div>
+           
+            <article>
+                <p class="lead">Синтаксис</p>
+                <p>Синтаксис языка Python, как и сам язык, очень прост.</p>
+                <ul>
+                    <li>Конец строки является концом инструкции (точка с запятой не требуется).</li>
+                    <li>Вложенные инструкции объединяются в блоки по величине отступов. Отступ может быть любым,
+                        главное, чтобы в пределах одного вложенного блока отступ был одинаков. И про читаемость кода не
+                        забывайте. Отступ в 1 пробел, к примеру, не лучшее решение. Используйте 4 пробела (или знак
+                        табуляции, на худой конец).
+                    </li>
+                    <li>
+                        Вложенные инструкции в Python записываются в соответствии с одним и тем же шаблоном, когда
+                        основная инструкция завершается двоеточием, вслед за которым располагается вложенный блок кода,
+                        обычно с отступом под строкой основной инструкции.
+                    </li>
+                </ul>
+                <pre><code class="language-html">Основная инструкция: 
+                    Вложенный блок инструкций</code></pre>
+                <p class="lead">Несколько специальных случаев</p>
+                <ul>
+                    <li>Иногда возможно записать несколько инструкций в одной строке, разделяя их точкой с запятой:
+                        <pre><code class="language-python">a = 1; b = 2; print(a, b)</code></pre>
+                        Но не делайте это слишком часто! Помните об удобочитаемости. А лучше вообще так не делайте.
+                    </li>
+                    <li>
+                        Допустимо записывать одну инструкцию в нескольких строках. Достаточно ее заключить в пару круглых, квадратных или фигурных скобок:
+                        <pre><code class="language-python">if (a == 1 and b == 2 and 
+    c == 3 and d == 4):  # Не забываем про двоеточие
+    print('spam' * 3)</code></pre>
+                    </li>
+                </ul>
+            </article>
+            <div class="toolbar d-flex justify-content-between">
+                <button class="btn btn-outline-secondary align-items-center d-flex justify-content-center">
+                    <i class="ph ph-caret-left me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    <span>Назад</span>
+                </button>
+
+                <button class="btn btn-outline-primary align-items-center d-flex justify-content-center">
+                    <span>Далее</span>
+                    <i class="ph ph-caret-right ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--<script src="_framework/blazor.server.js"></script>-->
+<script src="js/prism.js"></script>
+<script src="js/plugins/prism-line-numbers.js"></script>
+<script src="js/codeAreaProvider.js"></script>
+<script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>
