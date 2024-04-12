@@ -4,12 +4,7 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>C# Compiler</title>
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
-    <link href="css/open-iconic/font/css/open-iconic-bootstrap.min.css" rel="stylesheet"/>
-    <link
-            rel="stylesheet"
-            type="text/css"
-            href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"
-    />
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
     <link href="css/prism.css" rel="stylesheet" />
     <link href="css/themes/prism-vsc-dark-plus.css" rel="stylesheet" />
     <link href="css/autocomplete.min.css" rel="stylesheet" />
@@ -54,14 +49,15 @@
     <div class="row">
         <div class="d-flex align-items-lg-center justify-content-between">
             <div>
-                <button class="btn btn-dark">
-                    <span class="oi oi-chevron-left mx-1" style="top: 0.13em;" aria-hidden="true"></span>
-                    Python 3 Основы
+                <button class="btn btn-dark align-items-center d-flex justify-content-center">
+                    <i class="ph ph-caret-left me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    <span>Python 3 Основы</span>
                 </button>
             </div>
-            <h1 class="m-3">
-                <span class="oi mx-1 oi-code text-info" style="top: 0.16em;" aria-hidden="true"></span>
-                Задание №1</h1>
+            <div class="align-items-center d-flex justify-content-center">
+                <i class="ph-bold ph-code me-1 text-info" style="padding-top: 0.13em; font-size: 3em;"></i>
+                <h1 class="m-3">Задание №1</h1>
+            </div>
         </div>
     </div>
     <hr>
@@ -91,9 +87,9 @@
         </div>
         <div>
             <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="oi mx-1 oi-plus" style="top: 0.13em" aria-hidden="true"></span>
-                    Добавить</button>
+                <button class="btn btn-primary dropdown-toggle align-items-center d-flex justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ph ph-plus me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    <span>Добавить</span>
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="#">Python 3</a></li>
@@ -107,17 +103,17 @@
     </div>
     <div class="d-block mt-1">
         <div class="d-flex border border-2 rounded-3 p-1 justify-content-between align-items-center">
-            <button class="btn btn-dark">
-                Python 3
-                <span class="oi mx-1 oi-chevron-right" style="top: 0.13em;" aria-hidden="true"></span>
+            <button class="btn btn-dark align-items-center d-flex justify-content-center">
+                <span>Python 3</span>
+                <i class="ph ph-caret-right ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
             </button>
             <div class="d-flex">
             <div class="d-flex mx-2 justify-content-between align-items-center text-success">
-                <span class="oi mx-1 oi-circle-check" style="top: 0.13em;" aria-hidden="true"></span>
+                <i class="ph-bold ph-check-circle me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                 <strong>Шаблон</strong>
             </div>
             <div class="d-flex mx-2 justify-content-between align-items-center text-danger">
-                <span class="oi mx-1 oi-circle-x " style="top: 0.13em;" aria-hidden="true"></span>
+                <i class="ph-bold ph-x-circle me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                 <strong>Тесты</strong>
             </div>
             </div>

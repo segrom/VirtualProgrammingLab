@@ -5,11 +5,7 @@
     <title>C# Compiler</title>
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
     <link href="css/open-iconic/font/css/open-iconic-bootstrap.min.css" rel="stylesheet"/>
-    <link
-            rel="stylesheet"
-            type="text/css"
-            href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"
-    />
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
     <link href="css/prism.css" rel="stylesheet" />
     <link href="css/themes/prism-vsc-dark-plus.css" rel="stylesheet" />
     <link href="css/autocomplete.min.css" rel="stylesheet" />
@@ -54,15 +50,15 @@
     <div class="row">
         <div class="d-flex align-items-lg-center justify-content-between">
             <div>
-                <button class="btn btn-dark">
-                    <span class="oi oi-chevron-left mx-1" style="top: 0.13em;" aria-hidden="true"></span>
-                    Задание №1
+                <button class="btn btn-dark align-items-center d-flex justify-content-center">
+                    <i class="ph ph-caret-left me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    <span>Задание №1</span>
                 </button>
             </div>
             <h1 class="m-3">
                 <i class="devicon-python-plain text-info" style="top: 0.16em;"></i>
                 Задание №1 
-                <text class="text-secondary">(Python 3)</text>
+                <span class="text-secondary">(Python 3)</span>
             </h1>
         </div>
     </div>
@@ -91,9 +87,10 @@
             <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal" ></i>
         </div>
         <div>
-        <button class="btn btn-primary">
-            <span class="oi mx-1 oi-play-circle" style="top: 0.13em" aria-hidden="true"></span>
-            Запустить</button>
+            <button class="btn btn-primary align-items-center d-flex justify-content-center">
+                <i class="ph-fill ph-play me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                <span>Запустить</span>
+            </button>
         </div>
     </div>
     <div class="row m-1" style="height: 40vh; min-width: 100px;">

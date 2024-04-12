@@ -42,6 +42,8 @@
       <None Include="wwwroot\CourceEditor.html" />
       <None Include="wwwroot\ExerciseEditor.html" />
       <None Include="wwwroot\ExerciseVariantEditor.html" />
+      <None Include="wwwroot\Groups.html" />
+      <None Include="wwwroot\index.html" />
     </ItemGroup>
     
 </Project>

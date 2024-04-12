@@ -4,7 +4,6 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>C# Compiler</title>
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
-    <link href="css/open-iconic/font/css/open-iconic-bootstrap.min.css" rel="stylesheet"/>
     <link
             rel="stylesheet"
             type="text/css"
@@ -39,10 +38,19 @@
                     <a class="nav-link " disabled aria-current="page" href="#">Главная</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="#">Компилятор</a>
+                    <a class="nav-link d-flex align-items-center justify-content-center" href="#">
+                        <i class="ph-fill ph-terminal mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                        <span>Компилятор</span>
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link disabled" disabled href="#">Курсы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link link-info d-flex align-items-center justify-content-center" href="#">
+                        <i class="ph ph-users mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                        <span>Группы</span>
+                    </a>
                 </li>
             </ul>
            
@@ -57,9 +65,10 @@
         <div class="d-flex align-items-lg-center justify-content-between">
             <h1 class=" m-3">Python3 Основы </h1>
             <div>
-                <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                    <span class="oi oi-cog mx-1" style="top: 0.13em;" aria-hidden="true"></span>
-                    Настройки
+                <button class="btn btn-dark align-items-center d-flex justify-content-center"  
+                        data-bs-toggle="modal" data-bs-target="#settingsModal">
+                    <i class="ph-fill ph-gear me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    <span>Настройки</span>
                 </button>
             </div>
         </div>
@@ -75,9 +84,10 @@
                 <nav class="nav nav-pills flex-column">
                     <button class="nav-item btn btn-dark my-1" href="#item-1">Вступление</button>
                     <button class="nav-item btn btn-dark my-1 active" href="#item-1">Переменные</button>
-                    <button class="nav-item btn btn-dark my-1">
-                        <span class="oi mx-1 oi-code text-info" style="top: 0.16em;" aria-hidden="true"></span>
-                        Задание №1</button>
+                    <button class="nav-item btn btn-dark my-1 align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-code text-info mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                        <span>Задание №1</span>
+                    </button>
                     <button class="btn btn-outline-primary mt-2">Добавить главу</button>
                 </nav>
             </nav>
@@ -86,17 +96,17 @@
             <div class="d-flex justify-content-between align-items-center p-2">
                 <h4><em class="text-secondary">Глава</em> "Переменные"</h4>
                 <div class="btn-group py-3">
-                    <button class="btn btn-primary">
-                        <span class="oi mx-1 oi-pencil" style="top: 0.13em;" aria-hidden="true"></span>
-                        Редактировать
+                    <button class="btn btn-primary align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-pencil-simple me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        <span>Редактировать</span>
                     </button>
-                    <button class="btn btn-outline-primary">
-                        <span class="oi mx-1 oi-info" style="top: 0.13em;" aria-hidden="true"></span>
-                        Переименовать
+                    <button class="btn btn-outline-primary align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-textbox me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        <span>Переименовать</span>
                     </button>
-                    <button class="btn btn-outline-danger">
-                        <span class="oi mx-1 oi-trash" style="top: 0.13em;" aria-hidden="true"></span>
-                        Удалить
+                    <button class="btn btn-outline-danger align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-trash me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        <span>Удалить</span>
                     </button>
                 </div>
             </div>
@@ -159,10 +169,11 @@
                     </div>
                 <hr>
                     <div class="mb-3 d-grid">
-                        <button type="button" class="btn btn-outline-danger text-center" id="deleteButton" data-bs-toggle="modal" data-bs-target="#confirmModal">
-                            <i class="ph ph-warning-octagon"></i>
-                            <strong>Удалить курс</strong>
-                            <i class="ph ph-warning-octagon"></i>
+                        <button type="button"  class="btn btn-outline-danger align-items-center d-flex justify-content-center"
+                                 data-bs-toggle="modal" data-bs-target="#confirmModal">
+                            <i class="ph-fill ph-warning-diamond me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                            <span>Удалить курс</span>
+                            <i class="ph-fill ph-skull ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                         </button>
                     </div>
                 
@@ -193,7 +204,7 @@
     </div>
 </div>
 
-<script src="_framework/blazor.server.js"></script>
+<!--<script src="_framework/blazor.server.js"></script>-->
 <script src="js/prism.js"></script>
 <script src="js/plugins/prism-line-numbers.js"></script>
 <script src="js/codeAreaProvider.js"></script>
