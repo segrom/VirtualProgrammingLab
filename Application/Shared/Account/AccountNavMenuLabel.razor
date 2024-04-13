@@ -1,0 +1,67 @@
+﻿@using Application.Data.Account
+@using Microsoft.AspNetCore.Identity
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject SignInManager<User> SignInManager
+@inject NavigationManager NavigationManager
+@inject UserManager<User> UserManager
+
+@if (_isLoading)
+{
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+}
+else
+{
+    <div class="dropdown">
+        <button id="userDropDown" type="button"
+                class="btn dropdown-toggle border-0 d-flex align-items-center justify-content-center"
+                data-bs-toggle="dropdown" aria-expanded="false">
+            <AuthorizeView Roles="@(RoleController.StudentRole)">
+                <i class="ph-fill ph-student mx-1"></i>
+                <div>
+                    <em class="text-secondary">@_user.Student.Group.Name</em>&nbsp @_user.Code
+                </div>
+            </AuthorizeView>
+            <AuthorizeView Roles="@(RoleController.LecturerRole)">
+                <i class="ph-fill ph-chalkboard-teacher mx-1"></i>
+                <div>
+                    <em class="text-secondary">@_user.Lecturer.Faculty</em>&nbsp @_user.GetShortName()
+                </div>
+            </AuthorizeView>
+            <AuthorizeView Roles="@(RoleController.AdminRole)">
+                <i class="ph-fill ph-crown-cross mx-1"></i>
+                <div>@_user.Code</div>
+            </AuthorizeView>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="userDropDown">
+            <li>
+                <NavLink class="dropdown-item disabled" disabled href="/profile">Профиль</NavLink>
+            </li>
+            <li>
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post">
+                    <button type="submit" class="dropdown-item">Выйти</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+}
+
+@code {
+
+    bool _isLoading;
+    User? _user;
+    AuthenticationState? _authState;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _isLoading = true;
+        _authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _user = await UserManager.GetUserAsync(_authState.User);
+        _isLoading = false;
+    }
+    
+
+}

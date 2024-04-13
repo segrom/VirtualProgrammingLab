@@ -1,0 +1,154 @@
+﻿@using Application.Data.Students
+@using Application.Services.Admin
+@using Application.Services.Search
+@inject IAdminService AdminService
+@inject ISearchService SearchService
+@inject ILogger<AdminStudentModal> Logger
+
+<!-- @ModalId Modal -->
+<div class="modal fade " id="@ModalId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <EditForm OnValidSubmit="Submit" class="modal-content" Model="Group">
+            <DataAnnotationsValidator/>
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Группа @(_model.Name)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Код</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" @bind="_model.Name">
+                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                    <ValidationMessage For="() => _model.Name"></ValidationMessage>
+                </div>
+                <p>Добавте студентов к группе</p>
+                <div class="dropdown m-4">
+                    <button class="btn btn-secondary 
+                            dropdown-toggle" type="button"
+                            id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <i class="ph-bold ph-plus"></i>
+                        Добавить
+                    </button>
+                    <ul class="dropdown-menu pt-0"
+                        aria-labelledby="dropdownMenuButton1">
+                        <input type="text"
+                               class="form-control border-0 border-bottom 
+                            shadow-none mb-2" placeholder="Поиск..."
+                               @oninput="SearchChanged">
+                        @foreach (var searchResult in _searchStudents)
+                        {
+                            <li>
+                                <button @onclick="() => AddStudentToGroup(searchResult)" class="dropdown-item" type="button">@searchResult.User.GetShortName() <em class="text-secondary">@searchResult.Group.Name</em></button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <ul class="list-group overflow-auto" style="max-height: 40vh">
+                    @foreach (var student in _model.Students)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>@student.Id</strong> @student.User.GetShortName()
+                            </div>
+                            <div class="dropdown">
+                                <button @onclick="SearchDropdownClicked" class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="ph-bold ph-dots-three-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item disabled" disabled href="#">Open</a>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item " type="button" @onclick="() => RemoveStudentFromGroup(student)">Remove</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    }
+                </ul>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                <button class="btn btn-primary" type="submit" data-bs-dismiss="modal">Сохранить</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+
+    [Parameter]
+    public StudentGroup? Group
+    {
+        get => _model;
+        set => _model = value ?? new StudentGroup();
+    }
+    [Parameter] public string ModalId { get; set; }
+    [Parameter] public Action? OnSuccess { get; set; }
+
+    private StudentGroup _model;
+
+    private List<Student> _searchStudents = new();
+    CancellationTokenSource _cancellationTokenSource = new();
+
+    private async Task Submit()
+    {
+        if(Group != null)
+        {
+            await AdminService.CreateOrUpdateGroupAsync(Group);
+            OnSuccess?.Invoke();
+        }
+    }
+    
+    private void AddStudentToGroup(Student student)
+    {
+        Group?.Students.Remove(student);
+        StateHasChanged();
+    }
+
+    private void RemoveStudentFromGroup(Student student)
+    {
+        Group?.Students.Remove(student);
+        StateHasChanged();
+    }
+
+    private async Task SearchChanged(ChangeEventArgs arg)
+    {
+        var query = arg.Value?.ToString();
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _cancellationTokenSource = new CancellationTokenSource();;
+
+        if (query is null)
+        {
+            _searchStudents = await SearchService.GetFirstStudentsAsync(30, _cancellationTokenSource.Token);
+        }
+        else
+        {
+            await Search(query);
+        }
+    }
+
+    private async Task Search(string query)
+    {
+        try
+        {
+            _searchStudents = await SearchService.SearchStudentsAsync(query, _cancellationTokenSource.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            // pass
+        }
+        
+    }
+
+    private async Task SearchDropdownClicked()
+    {
+        if(_searchStudents.Count == 0) _searchStudents = await SearchService.GetFirstStudentsAsync(30);
+    }
+
+}

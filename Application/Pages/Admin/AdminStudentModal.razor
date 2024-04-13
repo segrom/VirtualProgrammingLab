@@ -1,0 +1,102 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Application.Data.Account
+@using Application.Data.Lecturers
+@using Application.Data.Students
+@using Application.Pages.Utils
+@using Application.Services.Admin
+@using System.ComponentModel.DataAnnotations
+@inject IAdminService AdminService
+@inject ILogger<AdminStudentModal> Logger
+
+<!-- Modal -->
+<div class="modal fade " id="@ModalId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <EditForm OnValidSubmit="Submit" class="modal-content" Model="_model">
+            <DataAnnotationsValidator/>
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"> @(_isNew ? "Новый" : "") Студент @(_model.User.UserName)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Код</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" @bind="_model.User.UserName">
+                    <div id="emailHelp" class="form-text">Код студента, обычно соответствует номеру студенчческого билета.</div>
+                    <ValidationMessage For="() => _model.User.UserName"></ValidationMessage>
+                </div>
+                <div class="row mb-3">
+                    <label class="form-label">ФИО</label>
+                    <div class="col">
+                        <input type="text" class="form-control" placeholder="Имя" aria-label="Имя" @bind="_model.Student.User.Name">
+                        <ValidationMessage For="() => _model.Student.User.Name"></ValidationMessage>
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" placeholder="Отчество" aria-label="Отчество" @bind="_model.Student.User.Patronymic">
+                        <ValidationMessage For="() => _model.Student.User.Patronymic"></ValidationMessage>
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" placeholder="Фамилия" aria-label="Фамилия" @bind="_model.Student.User.Surname">
+                        <ValidationMessage For="() => _model.Student.User.Surname"></ValidationMessage>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Пароль</label>
+                    <input type="text" class="form-control" id="exampleInputPassword1" @bind="_model.Password">
+                    <ValidationMessage For="() => _model.Password"></ValidationMessage>
+                </div>
+                <div class="mb-3">
+                    <GroupSelectWithSearch @bind-Selected="_model.Student.Group"/>
+                    <ValidationMessage For="() => _model.Student.Group"></ValidationMessage>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button class="btn btn-primary" type="submit" data-bs-dismiss="modal">Сохранить</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    public class StudentModel
+    {
+        public User User => Student.User;
+        [Required]
+        public Student Student { get; set; }
+        [StringLength(20, MinimumLength = 5 )]
+        public string Password { get; set; }
+    }
+    
+    [Parameter] public string ModalId { get; set; }
+    [Parameter] public Action? OnSuccess { get; set; }
+
+    [Parameter]
+    public Student? Student
+    {
+        get => _model.Student;
+        set
+        {
+            _isNew = value is null;
+            _model = new StudentModel
+            {
+                Student = value ?? new Student
+                {
+                    User = new User()
+                }
+            };
+        }
+    }
+    
+    StudentModel _model;
+    private bool _isNew;
+
+    private async Task Submit()
+    {
+        var result =  _isNew 
+            ? await AdminService.CreateStudentWithUserAsync(_model) 
+            : await AdminService.UpdateStudentWithUserAsync(_model);
+        OnSuccess?.Invoke();
+    }
+
+}

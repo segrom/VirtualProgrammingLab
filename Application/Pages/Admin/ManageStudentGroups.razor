@@ -1,0 +1,100 @@
+﻿@page "/admin/manage-student-groups"
+@using Application.Data.Account
+@using Application.Data.Students
+@using Application.Services.Admin
+@using Application.Pages.Utils
+@attribute [Authorize(Roles = $"{RoleController.AdminRole}")]
+@inject IAdminService AdminService
+@inject ILogger<ManageUsers> Logger
+
+<div class="container">
+    <h2 class="my-3">Управление группами</h2>
+    <div class="row">
+
+        <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group me-2" role="group">
+
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#@GroupModalId" @onclick="() => _selectedGroup = null">
+                    <span class="oi oi-plus" style="top: 0.13em" aria-hidden="true"></span>
+                    Добавить
+                </button>
+            </div>
+            <div class="btn-group me-2" role="group">
+
+                <button type="button" class="btn btn-outline-primary">
+                    <span class="oi oi-magnifying-glass disabled" disabled style="top: 0.13em" aria-hidden="true"></span>
+                    Найти</button>
+            </div>
+        </div>
+        
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Код</th>
+            <th scope="col"><i class="ph-bold ph-user me-1" style="padding-top: 0.12em; font-size: 1.2em;"></i></th>
+            <th scope="col">Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (_groups is null || _groups.Length == 0)
+        {
+            <p>Нет групп</p>
+        }
+        else
+        {
+            @foreach (var group in _groups)
+            {
+                <tr>
+                    <th scope="row">@group.Id</th>
+                    <td>@group.Name</td>
+                    <td>@group.Students.Count</td>
+                    <td class="btn-group">
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#@GroupModalId" @onclick="() => _selectedGroup = group">Изменить</button>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#@ConfirmGroupDeletionModalId" @onclick="() => _selectedGroup = group" >Удалить</button>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>
+<ConfirmationModal ModalId="@ConfirmGroupDeletionModalId" Title="Подтверждение удаления" OnSuccess="OnDeletionConfirmationSuccess" OnDeny="OnDeletionConfirmationDeny" >
+    Вы уверены что хотите удалить группу <strong>@_selectedGroup?.Name</strong>?
+</ConfirmationModal>
+<AdminGroupModal ModalId="@GroupModalId" Group="@_selectedGroup" OnSuccess="Refresh"/>
+
+
+@code {
+        
+        private const string GroupModalId = "studentGroupModal";
+        private const string ConfirmGroupDeletionModalId = "confirmGroupDeletionModal";
+    
+    private StudentGroup? _selectedGroup;
+    private StudentGroup[]? _groups;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _groups = await AdminService.GetAllStudentGroupsAsync();
+    }
+
+    private async void OnDeletionConfirmationSuccess()
+    {
+        if(_selectedGroup != null) await AdminService.DeleteGroupAsync(_selectedGroup);
+        _selectedGroup = null;
+        StateHasChanged();
+    }
+
+    private void OnDeletionConfirmationDeny()
+    {
+        _selectedGroup = null;
+    }
+
+    private async void Refresh()
+    {
+        _groups = await AdminService.GetAllStudentGroupsAsync();
+        StateHasChanged();
+    }
+
+}

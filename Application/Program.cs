@@ -2,8 +2,11 @@ using Application.Areas.Identity;
 using Application.Data;
 using Application.Data.Account;
 using Application.Middleware;
+using Application.Services.Admin;
 using Application.Services.Compile;
-using Application.Services.Courses;
+using Application.Services.Lecturers;
+using Application.Services.Search;
+using Application.Services.Students;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+{
+        options.UseNpgsql(connectionString);
+});
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddIdentity<User, IdentityRole>(options =>
     {
@@ -29,7 +34,10 @@ builder.Services.AddSession();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<User>>();
-builder.Services.AddScoped<ICoursesService, CoursesService>();
+builder.Services.AddScoped<ILecturerService, LecturerService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddSingleton<ICompileService, CompileService>();
 
 var app = builder.Build();

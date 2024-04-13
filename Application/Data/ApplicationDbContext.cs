@@ -12,6 +12,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
 {
     
     public DbSet<Course> Courses { get; set; } = null!;
+    public DbSet<StudentGroup> StudentGroups { get; set; } = null!;
     public DbSet<Student> Students { get; set; } = null!;
     public DbSet<Lecturer> Lecturers { get; set; } = null!;
     public DbSet<CompileRequest> CompileRequests { get; set; } = null!;
@@ -21,4 +22,5 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
     {
         Database.EnsureCreated();
     }
+    
 }

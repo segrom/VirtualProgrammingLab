@@ -3,7 +3,16 @@
 <PageTitle>VirtualProgrammingLab</PageTitle>
 <NavMenu/>
 <div class="container overflow-hidden p-3">
-    @Body
+    <ErrorBoundary>
+        <ChildContent>
+            @Body  
+        </ChildContent>
+        <ErrorContent Context="Exception">
+            <h1>Oh! We have a problem🚩</h1>
+            <p>@Exception.Message</p>
+        </ErrorContent>
+    </ErrorBoundary>
+   
 </div>
 
 @*<div class="page">

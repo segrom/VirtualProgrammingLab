@@ -1,0 +1,77 @@
+﻿@using Application.Services.Lecturers
+@using Application.Data.Lecturers
+@using Application.Data.Courses
+@inject ILecturerService LecturerService
+@inject NavigationManager NavigationManager
+
+<div class="col gy-1">
+    <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group me-2" role="group">
+
+            <button class="btn btn-primary align-items-center d-flex justify-content-center">
+                <i class="ph ph-plus me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                <span>Новый курс</span>
+            </button>
+        </div>
+    </div>
+</div>
+<table class="table">
+    <thead>
+    <tr class="align-middle">
+        <th scope="col">Название</th>
+        <th scope="col">Статус</th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (_courses.Count > 0)
+    {
+        @foreach (var course in _courses)
+        {
+            <tr class="align-middle">
+                <th scope="row">
+                    <button @onclick="() => GoToCourse(course)" class="btn btn-dark align-items-center d-flex justify-content-center">
+                        <strong>@course.Title</strong>
+                        <i class="ph-bold ph-caret-right ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    </button>
+                </th>
+                @switch (course.Status)
+                {
+                    default:
+                    case CourseStatus.InDevelop:
+                        <td class="text-secondary">
+                            <i class=" ph-fill ph-pencil ms-1" style="padding-top: 0.2em; font-size: 1em;"></i>
+                            <strong class=" mx-1">Черновик</strong>
+                        </td>
+                        break;
+                    case CourseStatus.Published:
+                        <td class="text-success">
+                            <i class=" ph-fill ph-check-fat ms-1" style="padding-top: 0.2em; font-size: 1em;"></i>
+                            <strong class=" mx-1">Опубликован</strong>
+                        </td>
+                        break;
+                }
+            </tr>
+        }
+    }
+    else
+    {
+        <p>На вас пока не назначено ни одного курса 🛰️</p>
+    }
+    </tbody>
+</table>
+
+@code {
+    Lecturer? _lecturer;
+    List<Course> _courses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lecturer = await LecturerService.GetCurrentLecturerAsync() ?? throw new Exception("We not fount your lecturer info!");
+        _courses = await LecturerService.GetLecturerCoursesAsync(_lecturer);
+    }
+
+    private void GoToCourse(Course course)
+    {
+        NavigationManager.NavigateTo($"/course/edit/{course.Id}");
+    }
+}

@@ -70,15 +70,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="wwwroot\ChapterEditor.html" />
-      <None Include="wwwroot\CourceEditor.html" />
-      <None Include="wwwroot\ExerciseEditor.html" />
-      <None Include="wwwroot\ExerciseVariantEditor.html" />
+      <Folder Include="Migrations\" />
+    </ItemGroup>
+
+    <ItemGroup>
       <None Include="wwwroot\Groups.html" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Migrations\" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\FONT-LICENSE" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\font\css\open-iconic-bootstrap.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\font\fonts\open-iconic.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\font\fonts\open-iconic.otf" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\font\fonts\open-iconic.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\font\fonts\open-iconic.woff" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\ICON-LICENSE" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\README.md" />
     </ItemGroup>
     
 </Project>

@@ -1,0 +1,49 @@
+﻿@using Application.Data.Account
+@using Microsoft.AspNetCore.Identity
+@using Application.Pages.Utils
+@inject UserManager<User> UserManager
+@inject ILogger<ManageUsers> Logger
+
+<button class="btn btn-danger mx-1 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#@(ConfirmDeletionModalId + User.Id)">
+    @if (_isLoading)
+    {
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+    else
+    {
+        @:Удалить
+    }
+</button>
+
+<ConfirmationModal ModalId="@(ConfirmDeletionModalId + User.Id)" Title="Подтверждение удаления" OnSuccess="DeleteUser" >
+    Вы уверены что хотите удалить пользователя <strong>@User.Code</strong>?
+</ConfirmationModal>
+
+@code {
+        const string ConfirmDeletionModalId = "ConfirmDeletionModal";
+    
+    [Parameter] public User User { get; set; }
+    [Parameter] public Action? OnSuccess { get; set; }
+
+    private bool _isLoading;
+    
+    private async void DeleteUser()
+    {
+        if(User.UserName == "admin") return;
+        _isLoading = true;
+        var result = await UserManager.DeleteAsync(User);
+
+        if (result.Succeeded)
+        {
+            Logger.LogWarning("Delete userWithRoles {0}", User.UserName);
+            _isLoading = false;
+            OnSuccess?.Invoke();
+            return;
+        }
+        Logger.LogError("Failed Delete userWithRoles {0}: {1}", User.UserName, result.Errors);
+        _isLoading = false;
+    }
+
+}

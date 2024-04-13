@@ -26,7 +26,11 @@ public class User: IdentityUser
     public Lecturer? Lecturer { get; set; }
     public Student? Student { get; set; }
 
-    public User() {}
+    public User()
+    {
+        CreationDate = DateTimeOffset.Now;
+        ActivityDate = CreationDate;
+    }
 
     public User(string code, string name, string surname, string patronymic) : base(code)
     {
@@ -36,4 +40,8 @@ public class User: IdentityUser
         CreationDate = DateTimeOffset.Now;
         ActivityDate = CreationDate;
     }
+
+    public string GetShortName() => $"{Surname} {Name[0]}. {Patronymic[0]}.";
+
+    public string GetFullName() => $"{Surname} {Name} {Patronymic}";
 }

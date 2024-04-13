@@ -1,0 +1,91 @@
+﻿@using Application.Services.Students
+@using Application.Data.Students
+@using Application.Services.Search
+@inject ISearchService SearchService
+
+<div class="dropdown m-4 d-grid" style="min-width: 150px;">
+    <button class="btn btn-prima dropdown-toggle d-flex align-items-center justify-content-center" type="button"
+            id="dropdownMenuButton1"
+            @onclick="DropdownClicked"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+        @if (Selected is null)
+        {
+            <i class="ph-bold ph-users me-1"></i>
+            @:Выбор группы
+        }
+        else
+        {
+            @Selected.Name 
+            <span class="mx-2 badge text-bg-secondary align-items-center d-flex justify-content-center">
+                <i class="ph-fill ph-users-three me-2" style="padding-top: 0.12em; font-size: 1.2em;"></i>
+                <span>@Selected.Students.Count</span>
+            </span>
+        }
+    </button>
+    <ul class="dropdown-menu"
+        aria-labelledby="dropdownMenuButton1">
+        <input type="text"
+               class="form-control border-0 border-bottom 
+                            shadow-none mb-2" placeholder="Поиск..."
+               @oninput="SearchChanged">
+        @foreach (var searchResult in _groups)
+        {
+            <li>
+                <button @onclick=" () => {  Selected = searchResult; SelectedChanged.InvokeAsync(searchResult); }" class="dropdown-item d-flex align-items-center justify-content-start" type="button">
+                    @searchResult.Name
+                    <span class="mx-2 badge text-bg-secondary align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-users-three me-1" style="padding-top: 0.12em; font-size: 1.2em;"></i>
+                        <span>@searchResult.Students.Count</span>
+                    </span>
+                </button>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    
+    [Parameter] public StudentGroup? Selected { get; set; }
+    [Parameter]public EventCallback<StudentGroup?> SelectedChanged { get; set; }
+    
+    private List<StudentGroup> _groups = new();
+    
+    CancellationTokenSource _cancellationTokenSource = new();
+
+    private async void SearchChanged(ChangeEventArgs arg)
+    {
+        var query = arg.Value?.ToString();
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _cancellationTokenSource = new CancellationTokenSource();;
+
+        if (query is null)
+        {
+            _groups = await SearchService.GetFirstGroupsAsync(100, _cancellationTokenSource.Token);
+        }
+        else
+        {
+            await Search(query);
+        }
+    }
+
+    private async Task Search(string query)
+    {
+        try
+        {
+            _groups = await SearchService.SearchGroupsAsync(query, _cancellationTokenSource.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            // pass
+        }
+        
+    }
+
+    private async Task DropdownClicked()
+    {
+        if(_groups.Count == 0) _groups = await SearchService.GetFirstGroupsAsync(100);
+    }
+
+}

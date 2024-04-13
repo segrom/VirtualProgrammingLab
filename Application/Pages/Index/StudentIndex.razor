@@ -1,0 +1,67 @@
+﻿@using Application.Services.Students
+@using Microsoft.AspNetCore.Identity
+@using Application.Data.Account
+@using Application.Data.Courses
+@using Application.Data.Students
+@using Microsoft.EntityFrameworkCore
+@inject IStudentService StudentService
+@inject NavigationManager NavManager
+
+<table class="table">
+        <thead>
+        <tr class="align-middle">
+            <th scope="col">Название</th>
+            <th scope="col">Автор</th>
+            <th scope="col">Завершенность</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (_courses.Count > 0)
+        {
+            @foreach (var course in _courses)
+            {
+                <tr class="align-middle">
+                    <th scope="row">
+                        <button @onclick="() => GoToCourse(course)" class="btn btn-dark align-items-center d-flex justify-content-center">
+                            <strong>@course.Title</strong>
+                            <i class="ph ph-caret-right ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        </button>
+                    </th>
+                    <td>@course.Author.User.GetShortName()</td>
+                    <td>
+                        <div class="progress my-2">
+                            <div class="progress-bar" role="progressbar" style="width: 78%;" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100">78%</div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <p>На вас пока не назначено ни одного курса 🍬</p>
+        }
+        </tbody>
+    </table>
+@code {
+
+    Student? _student;
+    List<Course>? _courses;
+    Dictionary<Course, float> _coursesProgresses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _student = await StudentService.GetCurrentStudentAsync() ?? throw new Exception("We not fount your student info!");
+        _courses = await StudentService.GetStudentCoursesAsync(_student);
+
+        foreach (var course in _courses)
+        {
+            _coursesProgresses.Add(course, StudentService.GetStudentCourseProgressAsync(_student ,course));
+        }
+    }
+
+    private void GoToCourse(Course course)
+    {
+        NavManager.NavigateTo($"/course/{course.Id}");
+    }
+
+}
