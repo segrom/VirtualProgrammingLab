@@ -5,7 +5,7 @@ using Humanizer;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Application.Rabbit.Compile;
+namespace Application.Services.Compile;
 
 public class CompileService: ICompileService
 {

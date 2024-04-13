@@ -3,7 +3,7 @@
 @using Application.Data.Account
 @using Microsoft.EntityFrameworkCore
 @attribute [Authorize(Roles = $"{RoleController.AdminRole}")]
-@inject UserManager<IdentityUser> UserManager
+@inject UserManager<User> UserManager
 @inject ILogger<Admin> Logger
 
 <div class="container">
@@ -80,23 +80,23 @@
 
 @code {
 
-    public struct User
+    public struct UserWithRoles
     {
-        public IdentityUser Base;
+        public User Base;
         public string[] Roles;
     }
 
-    private User? _selectedUser;
+    private UserWithRoles? _selectedUser;
     
-    private User[]? _users;
+    private UserWithRoles[]? _users;
     
     protected override async Task OnInitializedAsync()
     {
         var bases = await UserManager.Users.ToArrayAsync();
-        _users = new User[bases.Length];
+        _users = new UserWithRoles[bases.Length];
         for (int i = 0; i < bases.Length; i++)
         {
-            _users[i] = new User()
+            _users[i] = new UserWithRoles()
             {
                 Base = bases[i],
                 Roles = (await UserManager.GetRolesAsync(bases[i])).ToArray()
@@ -104,17 +104,17 @@
         }
     }
 
-    private async void DeleteUser(User user)
+    private async void DeleteUser(UserWithRoles userWithRoles)
     {
-        var result = await UserManager.DeleteAsync(user.Base);
+        var result = await UserManager.DeleteAsync(userWithRoles.Base);
 
         if (result.Succeeded)
         {
-            Logger.LogWarning("Delete user {0}", user.Base.UserName);
+            Logger.LogWarning("Delete userWithRoles {0}", userWithRoles.Base.UserName);
             return;
         }
         
-        Logger.LogError("Failed Delete user {0}: {1}", user.Base.UserName, result.Errors);
+        Logger.LogError("Failed Delete userWithRoles {0}: {1}", userWithRoles.Base.UserName, result.Errors);
         StateHasChanged();
     }
 

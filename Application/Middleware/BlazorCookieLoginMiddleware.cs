@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Application.Data.Account;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Middleware;
@@ -23,7 +24,7 @@ public class BlazorCookieLoginMiddleware
         _next = next;
     }
 
-    public async Task Invoke(HttpContext context, SignInManager<IdentityUser> signInMgr)
+    public async Task Invoke(HttpContext context, SignInManager<User> signInMgr)
     {
         if (context.Request.Path == "/login" && context.Request.Query.ContainsKey("key"))
         {

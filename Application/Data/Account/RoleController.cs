@@ -9,7 +9,7 @@ public class RoleController
     public const string LecturerRole = "Lecturer";
     public const string StudentRole = "Student";
     
-    public static async Task InitializeAsync(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+    public static async Task InitializeAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
     {
         string adminUsername = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME") 
                                ?? throw new Exception("Env variable DEFAULT_ADMIN_NAME not found");
@@ -29,7 +29,7 @@ public class RoleController
         }
         if (await userManager.FindByNameAsync(adminUsername) == null)
         {
-            IdentityUser admin = new IdentityUser { UserName = adminUsername };
+            User admin = new User(adminUsername, "Админ", "Админович", "Админов");
             IdentityResult result = await userManager.CreateAsync(admin, password);
             if (result.Succeeded)
             {

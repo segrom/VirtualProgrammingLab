@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Application.Data.Account
-@inject UserManager<IdentityUser> UserManager
+@inject UserManager<User> UserManager
 @inject ILogger<AdminUserInfoModal> Logger
 
 <!-- Modal -->
@@ -62,7 +62,7 @@
     
     
     [Parameter]
-    public Admin.User? User
+    public Admin.UserWithRoles? User
     {
         set => _model = new UserFormModel(value);
     }
@@ -71,16 +71,16 @@
     private async Task Submit()
     {
         
-        IdentityUser user;
+        User user;
         if (_model.Origin is { } userBase)
         {
             user = userBase.Base;
             user.UserName = _model.Code;
-            Logger.LogInformation("User {0} updated", user.UserName);
+            Logger.LogInformation("UserWithRoles {0} updated", user.UserName);
         }
         else
         {
-            user = new IdentityUser(_model.Code);
+            user = new User(_model.Code, _model.Name, _model.Surname, _model.Patronymic);
             var result = await UserManager.CreateAsync(user, _model.Password);
             if (!result.Succeeded)
             {

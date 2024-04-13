@@ -2,7 +2,8 @@ using Application.Areas.Identity;
 using Application.Data;
 using Application.Data.Account;
 using Application.Middleware;
-using Application.Rabbit.Compile;
+using Application.Services.Compile;
+using Application.Services.Courses;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+builder.Services.AddIdentity<User, IdentityRole>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequiredLength = 5;
@@ -27,9 +28,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 builder.Services.AddSession();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-builder.Services.AddSingleton<ICompileService ,CompileService>();
-builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<User>>();
+builder.Services.AddScoped<ICoursesService, CoursesService>();
+builder.Services.AddSingleton<ICompileService, CompileService>();
 
 var app = builder.Build();
 
@@ -70,7 +71,7 @@ using (var scope = app.Services.CreateScope())
         {
             await context.Database.MigrateAsync();
         }
-        var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+        var userManager = services.GetRequiredService<UserManager<User>>();
         var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         await RoleController.InitializeAsync(userManager, rolesManager);
     }

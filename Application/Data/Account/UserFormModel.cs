@@ -12,7 +12,7 @@ public enum UserRole
 public class UserFormModel
 {
     
-    public UserFormModel(Admin.User? value = null)
+    public UserFormModel(Admin.UserWithRoles? value = null)
     {
         Origin = value;
         
@@ -27,7 +27,7 @@ public class UserFormModel
         }
     }
     
-    public Admin.User? Origin { get; set; }
+    public Admin.UserWithRoles? Origin { get; set; }
     [Required]
     [StringLength(20, MinimumLength = 5 )]
     public string Code { get; set; }

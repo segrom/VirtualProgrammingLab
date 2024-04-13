@@ -76,5 +76,9 @@
       <None Include="wwwroot\ExerciseVariantEditor.html" />
       <None Include="wwwroot\Groups.html" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
+    </ItemGroup>
     
 </Project>
