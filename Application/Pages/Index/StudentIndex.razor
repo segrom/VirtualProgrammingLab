@@ -38,14 +38,14 @@
         }
         else
         {
-            <p>На вас пока не назначено ни одного курса 🍬</p>
+            <h4>На вас пока не назначено ни одного курса 🍬</h4>
         }
         </tbody>
     </table>
 @code {
 
     Student? _student;
-    List<Course>? _courses;
+    List<Course> _courses = new();
     Dictionary<Course, float> _coursesProgresses = new();
 
     protected override async Task OnInitializedAsync()

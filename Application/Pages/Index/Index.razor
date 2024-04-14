@@ -1,11 +1,12 @@
 ﻿@page "/"
 @using Application.Data.Account
+@using Microsoft.AspNetCore.Identity
 @attribute [Authorize]
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Мои курсы</PageTitle>
 
 <h1 class="display-3 my-5">Мои курсы</h1>
+
 <AuthorizeView Roles="@(RoleController.StudentRole)">
     <StudentIndex></StudentIndex>
 </AuthorizeView>
@@ -13,12 +14,3 @@
     <LecturerIndex></LecturerIndex>
 </AuthorizeView>
 
-@code
-{
-    
-    protected override async Task OnInitializedAsync()
-    {
-        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-    }
-
-}

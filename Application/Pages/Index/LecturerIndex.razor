@@ -1,14 +1,19 @@
 ﻿@using Application.Services.Lecturers
 @using Application.Data.Lecturers
 @using Application.Data.Courses
+@using Application.Data.Account
+@using Application.Pages.Courses.Components
+@using Application.Services.Courses
+@attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
 @inject ILecturerService LecturerService
+@inject ICourseService CourseService
 @inject NavigationManager NavigationManager
 
 <div class="col gy-1">
     <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
         <div class="btn-group me-2" role="group">
 
-            <button class="btn btn-primary align-items-center d-flex justify-content-center">
+            <button class="btn btn-primary align-items-center d-flex justify-content-center" data-bs-toggle="modal" data-bs-target="#@NewCourseModalId">
                 <i class="ph ph-plus me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                 <span>Новый курс</span>
             </button>
@@ -55,21 +60,27 @@
     }
     else
     {
-        <p>На вас пока не назначено ни одного курса 🛰️</p>
+        <h4>На вас пока не назначено ни одного курса 🛰️</h4>
     }
     </tbody>
 </table>
 
+<NewCourseModal ModalId="@NewCourseModalId" Author="@_lecturer"/>
+
 @code {
+        
+        private const string NewCourseModalId = "NewCourseModal";
+    
     Lecturer? _lecturer;
     List<Course> _courses = new();
-
+    
     protected override async Task OnInitializedAsync()
     {
         _lecturer = await LecturerService.GetCurrentLecturerAsync() ?? throw new Exception("We not fount your lecturer info!");
         _courses = await LecturerService.GetLecturerCoursesAsync(_lecturer);
     }
 
+    
     private void GoToCourse(Course course)
     {
         NavigationManager.NavigateTo($"/course/edit/{course.Id}");

@@ -1,45 +1,44 @@
-﻿using System.Security.Claims;
-using Application.Data;
-using Application.Data.Account;
+﻿using Application.Data;
 using Application.Data.Courses;
 using Application.Data.Students;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Application.Services.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Students;
 
 public class StudentService: IStudentService
 {
-    private readonly AuthenticationStateProvider _authenticationStateProvider;
-    private readonly UserManager<User> _userManager;
-    private ApplicationDbContext _dbContext;
+    private IUserService _userService;
+    private IDbContextFactory<ApplicationDbContext> _dbContextFactory;
     private ILogger<StudentService> _logger;
 
-    public StudentService(AuthenticationStateProvider authenticationStateProvider, 
-        UserManager<User> userManager, ILogger<StudentService> logger, 
-        ApplicationDbContext dbContext)
+    public StudentService(IUserService userService, ILogger<StudentService> logger, 
+        IDbContextFactory<ApplicationDbContext> dbContextFactory)
     {
-        _authenticationStateProvider = authenticationStateProvider;
-        _userManager = userManager;
+        _userService = userService;
         _logger = logger;
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
     }
     
     public async Task<Student?> GetCurrentStudentAsync()
     {
-        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = await _userManager.GetUserAsync(authState.User);
-        return user.Student;
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var user = await _userService.GetCurrentUser();
+        if (user is null) return null;
+        return await dbContext.Students
+            .Include(l => l.User)
+            .FirstOrDefaultAsync(s=>s.UserId == user.Id);
     }
 
     public async Task<List<Course>> GetStudentCoursesAsync(Student student)
     {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var studentGroupId = student.GroupId;
-        return await _dbContext.Courses.Where(c => 
+        return await dbContext.Courses.Where(c => 
                 c.Groups.Any(g => g.Id == studentGroupId) 
                 && c.Status == CourseStatus.Published)
             .Include(c=>c.Chapters)
+                .ThenInclude(c=>c.StudentStates)
             .Include(c=>c.Author)
             .ToListAsync();
     }

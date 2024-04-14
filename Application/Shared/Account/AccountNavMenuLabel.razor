@@ -1,11 +1,19 @@
 ﻿@using Application.Data.Account
+@using Application.Data.Lecturers
+@using Application.Data.Students
+@using Application.Services.Lecturers
+@using Application.Services.Students
+@using Application.Services.Users
 @using Microsoft.AspNetCore.Identity
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject SignInManager<User> SignInManager
 @inject NavigationManager NavigationManager
 @inject UserManager<User> UserManager
+@inject ILecturerService LecturerService
+@inject IStudentService StudentService
+@inject IUserService UserService;
 
-@if (_isLoading)
+@if (_isLoading || _user is null)
 {
     <div class="spinner-border" role="status">
       <span class="visually-hidden">Loading...</span>
@@ -20,13 +28,13 @@ else
             <AuthorizeView Roles="@(RoleController.StudentRole)">
                 <i class="ph-fill ph-student mx-1"></i>
                 <div>
-                    <em class="text-secondary">@_user.Student.Group.Name</em>&nbsp @_user.Code
+                    <em class="text-secondary">@(_student?.Group.Name ?? "Н/Д")</em>&nbsp @_user.Code
                 </div>
             </AuthorizeView>
             <AuthorizeView Roles="@(RoleController.LecturerRole)">
                 <i class="ph-fill ph-chalkboard-teacher mx-1"></i>
                 <div>
-                    <em class="text-secondary">@_user.Lecturer.Faculty</em>&nbsp @_user.GetShortName()
+                    <em class="text-secondary">@(_lecturer?.Faculty ?? "Н/Д")</em>&nbsp @_user.GetShortName()
                 </div>
             </AuthorizeView>
             <AuthorizeView Roles="@(RoleController.AdminRole)">
@@ -49,19 +57,21 @@ else
 }
 
 @code {
-
+    
     bool _isLoading;
+    
     User? _user;
-    AuthenticationState? _authState;
+    Student? _student;
+    Lecturer? _lecturer;
 
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
         _isLoading = true;
-        _authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        _user = await UserManager.GetUserAsync(_authState.User);
+
+        _user = await UserService.GetCurrentUser();
+        _student = await StudentService.GetCurrentStudentAsync();
+        _lecturer = await LecturerService.GetCurrentLecturerAsync();
+        
         _isLoading = false;
     }
-    
-
 }

@@ -8,7 +8,7 @@
 @inject IAdminService AdminService
 @inject ILogger<AdminStudentModal> Logger
 
-<!-- Modal -->
+<!--@ModalId -->
 <div class="modal fade " id="@ModalId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <EditForm OnValidSubmit="Submit" class="modal-content" Model="_model">
@@ -74,7 +74,6 @@
     [Parameter]
     public Student? Student
     {
-        get => _model.Student;
         set
         {
             _isNew = value is null;

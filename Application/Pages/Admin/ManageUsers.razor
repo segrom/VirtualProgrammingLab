@@ -62,7 +62,7 @@
         <tr>
             <th scope="col">Код</th>
             <th scope="col">ФИО</th>
-            <th scope="col">Группа</th>
+            <th scope="col">Группа/Факультет</th>
             <th scope="col">Роль</th>
             <th scope="col">Последняя активность</th>
             <th scope="col">Действия</th>
@@ -87,6 +87,12 @@
                         {
                             <em class="text-secondary">
                                 @(user.Base.Student.Group.Name)
+                            </em>
+                        }
+                        @if (user.Base.Lecturer != null)
+                        {
+                            <em class="text-secondary">
+                                @(user.Base.Lecturer.Faculty)
                             </em>
                         }
                     </td>
@@ -134,7 +140,11 @@
 
     private async Task GetUsers()
     {
-        var bases = await UserManager.Users.ToArrayAsync();
+        var bases = await UserManager.Users
+            .Include(u => u.Student)
+                .ThenInclude(s=>s.Group)
+            .Include(u => u.Lecturer)
+            .ToArrayAsync();
         _users = new UserWithRoles[bases.Length];
         for (int i = 0; i < bases.Length; i++)
         {
