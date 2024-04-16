@@ -60,11 +60,11 @@ public class AdminService: IAdminService
     public async Task<IdentityResult> CreateLecturerWithUserAsync(AdminLecturerModal.LecturerModel model)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        var (res, user) = await CreatUserAsync(model.User, model.Password);
+        var (res, u) = await CreatUserAsync(model.User, model.Password);
         if (!res.Succeeded) return res;
         
-        await _userManager.AddToRoleAsync(user, RoleController.LecturerRole);
-        
+        await _userManager.AddToRoleAsync(u, RoleController.LecturerRole);
+        model.Lecturer.User = await dbContext.Users.FirstAsync(x => x.Id == u.Id);
         model.Lecturer = (await dbContext.Lecturers.AddAsync(model.Lecturer)).Entity;
         await dbContext.SaveChangesAsync();
         _logger.LogInformation("Created new lecturer {0} {1} {2} {3}", 
@@ -85,16 +85,17 @@ public class AdminService: IAdminService
     public async Task<IdentityResult> CreateStudentWithUserAsync(AdminStudentModal.StudentModel model)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        var (res, user) = await CreatUserAsync(model.User, model.Password);
+        var (res, u) = await CreatUserAsync(model.User, model.Password);
         if (!res.Succeeded) return res;
         
-        await _userManager.AddToRoleAsync(user, RoleController.StudentRole);
-
-        model.Student.GroupId = model.Student.Group.Id;
-        model.Student = (await dbContext.Students.AddAsync(model.Student)).Entity;
+        await _userManager.AddToRoleAsync(u, RoleController.StudentRole);
+        
+        model.Student.User = await dbContext.Users.FirstAsync(x => x.Id == u.Id);
+        model.Student.Group = await dbContext.StudentGroups.FirstAsync(x => x.Id == model.Student.Group.Id);
+        var result = (await dbContext.Students.AddAsync(model.Student)).Entity;
         await dbContext.SaveChangesAsync();
         _logger.LogInformation("Created new student {0} [{1}] {2}", 
-            model.Student.Id, model.Student.Group.Name, model.Student.User.GetFullName() );
+            result.Id, result.Group.Name, result.User.GetFullName() );
         return res;
     }
 

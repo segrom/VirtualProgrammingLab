@@ -45,7 +45,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
-                    <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit">
+                    <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit" data-bs-dismiss="modal">
                         @if (_isLoading)
                         {
                             <div class="spinner-border spinner-border-sm" role="status">
@@ -83,6 +83,7 @@
         if(Author is null) return;
         _isLoading = true;
         _model.AuthorId = Author.Id;
+        _model.Author = Author;
         _model.Status = CourseStatus.InDevelop;
         var result = await CourseService.CreateCourseAsync(_model);
         _isLoading = false;

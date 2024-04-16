@@ -19,11 +19,61 @@ public class CourseService: ICourseService
         _dbContextFactory = dbContextFactory;
     }
     
-    public async Task<Course> CreateCourseAsync(Course model)
+    public async Task<Course> CreateCourseAsync(Course course)
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
-        var entry = await context.Courses.AddAsync(model);
+
+        course.Author = await context.Lecturers.FirstAsync(x => x.Id == course.AuthorId);
+        var entry = await context.Courses.AddAsync(course);
         await context.SaveChangesAsync();
         return entry.Entity;
+    }
+
+    public async Task<Course> GetCourseAsync(int id)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var result = await context.Courses
+            .Include(c =>c.Author)
+            .Include(c =>c.Chapters)
+                .ThenInclude(c=> c.Exercise)
+            .FirstAsync(c => c.Id == id);
+        return result;
+    }
+
+    public async Task UpdateCourseAsync(Course c)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var course = await context.Courses.FirstAsync(x=> x.Id == c.Id);
+        course.Title = c.Title;
+        course.Desc = c.Desc;
+        context.Courses.Update(course);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteCourse(Course course)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        context.Courses.Remove(course);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task AddChapterToCourse(Course c, Chapter chapterModel)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        chapterModel.Body = "";
+        var course = await context.Courses.FirstAsync(x=> x.Id == c.Id);
+        chapterModel.Course = course;
+        var chapter = (await context.Chapters.AddAsync(chapterModel)).Entity;
+        
+        
+        await context.SaveChangesAsync();
+        
+        chapterModel.Course.Chapters.Add(chapter);
+        if (chapter.IsExercise)
+        {
+            var exercise = (await context.Exercises.AddAsync(new Exercise(chapter))).Entity;
+        }
+        
+        await context.SaveChangesAsync();
     }
 }

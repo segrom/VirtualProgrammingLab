@@ -14,7 +14,7 @@ public class Course
 {
     [Key] public int Id { get; set; }
 
-    [Required]
+    [Required][MinLength(4)]
     public string Title { get; set; }
     public string Desc { get; set; }
     public CourseStatus Status { get; set; }

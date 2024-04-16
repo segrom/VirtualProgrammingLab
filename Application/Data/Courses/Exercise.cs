@@ -18,6 +18,5 @@ public class Exercise
     public Exercise(Chapter chapter)
     {
         Chapter = chapter;
-        ChapterId = chapter.Id;
     }
 }
