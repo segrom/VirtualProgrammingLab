@@ -65,7 +65,6 @@ public class CourseService: ICourseService
         chapterModel.Course = course;
         var chapter = (await context.Chapters.AddAsync(chapterModel)).Entity;
         
-        
         await context.SaveChangesAsync();
         
         chapterModel.Course.Chapters.Add(chapter);
@@ -74,6 +73,16 @@ public class CourseService: ICourseService
             var exercise = (await context.Exercises.AddAsync(new Exercise(chapter))).Entity;
         }
         
+        _logger.LogInformation($"Add chapter [{chapter.Id}] {chapter.Title} to course [{course.Id}] {course.Title} with exercise = {chapter.IsExercise}");
+        await context.SaveChangesAsync();
+    }
+
+    public async Task UpdateChapterAsync(Chapter c)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var chapter = await context.Chapters.FirstAsync(x => x.Id == c.Id);
+        chapter.Body = c.Body;
+        context.Update(chapter);
         await context.SaveChangesAsync();
     }
 }

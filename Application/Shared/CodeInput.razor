@@ -1,0 +1,35 @@
+﻿@inject IJSRuntime JsRuntime 
+
+<code-input class="container-fluid p-0 m-0 rounded-3 line-numbers " style="height: 100%" language="@Language" placeholder="Type code here" template="syntax-highlighted" value="@StartCode"></code-input>
+<textarea @onchange="CodeUpdate "@oninput="CodeUpdate" id="code-provider" aria-hidden="True" hidden></textarea>
+
+ @code {
+
+  [Parameter]
+  public string Language { get; set; } = "csharp";
+
+  [Parameter]
+  public string StartCode { get; set; } = "";
+  
+  [Parameter]
+  public string Code { get; set; } = "";
+  [Parameter]
+  public EventCallback<string> CodeChanged { get; set; }
+
+  private async Task CodeUpdate(ChangeEventArgs obj)
+  {
+   if (obj.Value is not string value) return;
+   Code = value;
+   await CodeChanged.InvokeAsync(Code);
+  }
+
+  
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+   if (firstRender)
+   {
+    await JsRuntime.InvokeVoidAsync("codeFunctions.addCodeAreaProvider");
+   }
+  }
+  
+ }

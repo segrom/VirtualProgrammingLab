@@ -4,7 +4,7 @@ window.codeFunctions = {
         codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, [
             new codeInput.plugins.Indent(true, 4), // 2 spaces indentation
             new codeInput.plugins.AutoCloseBrackets(),
-            new codeInput.plugins.Autocomplete()
+            // new codeInput.plugins.Autocomplete()
         ]));
 
         let codeArea = document.querySelectorAll('code-input > textarea').item(0)
@@ -18,5 +18,10 @@ window.codeFunctions = {
             codeProvider.value = codeArea.value;
             codeProvider.dispatchEvent(new Event('change'));
         })
+    },
+    
+    parseMarkArticle: function (rawBody, elementId) {
+            document.getElementById(elementId).innerHTML =
+            marked.parse(rawBody);
     }
 }

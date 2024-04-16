@@ -10,6 +10,7 @@
 @inject ICourseService CourseService
 @inject NavigationManager NavigationManager
 @inject ILogger<CourseEdit> Logger
+@inject IJSRuntime JsRuntime
 
 <div class="container-md d-grid mt-2">
     <div class="row">
@@ -41,11 +42,11 @@
                             <button @onclick="() => SelectChapter(chapter)" class="nav-item btn btn-dark my-1 align-items-center d-flex justify-content-center @(chapter.Id == _selectedChapter?.Id ? "active" : "")">
                                 @if (chapter.IsExercise)
                                 {
-                                    <i class="ph-fill ph-code text-info mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                                    <i class="ph-fill ph-code text-info mx-1" style="padding-top: 0.2em; font-size: 1em;"></i>
                                 }
                                 else
                                 {
-                                    <i class="ph ph-article mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                                    <i class="ph ph-article mx-1" style="padding-top: 0.2em; font-size: 1em;"></i>
                                 }
                                 <span>@chapter.Title</span>
                             </button>
@@ -69,8 +70,8 @@
                 {
                 <h4><em class="text-secondary">Глава</em> "@(_selectedChapter.Title)"</h4>
                 <div class="btn-group py-3">
-                    <button class="btn btn-primary align-items-center d-flex justify-content-center">
-                        <i class="ph-fill ph-pencil-simple me-1 disabled" disabled style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    <button @onclick="GoToChapter" class="btn btn-primary align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-pencil-simple me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                         <span>Редактировать</span>
                     </button>
                     <button class="btn btn-outline-primary align-items-center d-flex justify-content-center disabled" disabled>
@@ -86,7 +87,7 @@
             </div>
             @if (_selectedChapter is not null)
             {
-                <article>
+                <article id="articlemd">
                     @_selectedChapter.Body
                 </article>
             }
@@ -123,18 +124,31 @@
         }
         if (_course.Author.Id != _lecturer.Id) throw new Exception("У вас нет доступа к редактированию этого курса ⛔");
 
-        _selectedChapter = _course.Chapters.Count > 0 ? _course.Chapters.First() : null;
+        if(_course.Chapters.Count > 0) SelectChapter(_course.Chapters.First());
     }
 
     private void SelectChapter(Chapter chapter)
     {
         _selectedChapter = chapter;
+        JsRuntime.InvokeVoidAsync("codeFunctions.parseMarkArticle", chapter.Body, "articlemd");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender && _selectedChapter != null) 
+            JsRuntime.InvokeVoidAsync("codeFunctions.parseMarkArticle", _selectedChapter.Body, "articlemd");
     }
 
     private async void UpdateChapters()
     {
         _course = await CourseService.GetCourseAsync(Id);
         _selectedChapter = _course?.Chapters.Count > 0 ? _course.Chapters.Last() : null;
+    }
+
+    private void GoToChapter()
+    {
+        if(_selectedChapter is null) return;
+        NavigationManager.NavigateTo($"/course/edit/{Id}/{_selectedChapter.Id}");
     }
 
 }

@@ -1,0 +1,122 @@
+﻿@page "/course/edit/{id:int}/{chapterId:int}"
+@using Application.Data.Account
+@using Application.Data.Courses
+@using Application.Data.Lecturers
+@using Application.Services.Courses
+@using Application.Services.Lecturers
+@attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
+@inject ILecturerService LecturerService
+@inject ICourseService CourseService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject ILogger<CourseEdit> Logger
+
+<div class="container-md d-grid mt-2">
+    <div class="row">
+        <div class="d-flex align-items-lg-center justify-content-between">
+            <div class="d-flex">
+                <a href="@($"/course/edit/{Id}")" class="btn btn-dark align-items-center d-flex justify-content-center me-2">
+                    <i class="ph ph-caret-left me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    <span>@(_course?.Title ?? "Назад")</span>
+                </a>
+                @if (_chapter is not null)
+                {
+                    <button @onclick="SaveChanges" class="btn btn-primary align-items-center d-flex justify-content-center @(_isDirty ? "" : "disabled")" disabled="@(!_isDirty)">
+                        @if (_isSaving)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span>Сохранение...</span>
+                        }
+                        else
+                        {
+                            <i class="ph-fill ph-floppy-disk-back me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                            <span>Сохранить</span>
+                        }
+                    </button>
+                }
+            </div>
+            <h1 class="m-3"><em>Глава</em> "@(_chapter?.Title ?? "")"</h1>
+        </div>
+    </div>
+    <hr >
+    <div class="row" style="height: 80vh; min-width: 500px;">
+        <div class="col-6">
+            <CodeInput StartCode="@_startCode" Language="md" @bind-Code="RawBody" />
+        </div>
+        
+        <div class="col-6">
+            @if (_chapter is not null)
+            {
+                <article id="articlemd">
+                </article>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public int ChapterId { get; set; }
+    
+    private Course? _course;
+    private Chapter? _chapter;
+    private Lecturer? _lecturer;
+
+    private string RawBody
+    {
+        get => _rawBody;
+        set
+        {
+            _rawBody = value;
+            OnBodyChanged();
+        }
+
+    }
+
+    private string _rawBody;
+    private string _startCode;
+    private bool _isDirty;
+    private bool _isSaving;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _lecturer = await LecturerService.GetCurrentLecturerAsync();
+        _course = await CourseService.GetCourseAsync(Id);
+        Logger.LogInformation($"Load course by lecturer {_lecturer.Id} {_lecturer.User.GetFullName()} - {_course.Id} {_course.Title}, chapters count: {_course.Chapters.Count}");
+        if(_course is null || _lecturer is null)
+        {
+            NavigationManager.NavigateTo("404");
+            return;
+        }
+        if (_course.Author.Id != _lecturer.Id) throw new Exception("У вас нет доступа к редактированию этого курса ⛔");
+
+        _chapter = _course.Chapters.FirstOrDefault(x => x.Id == ChapterId);
+        if (_chapter is null) throw new Exception("Такой статьи не существует ¯\\_(ツ)_/¯");
+        _startCode = _chapter.Body;
+        _rawBody = _startCode;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        OnBodyChanged();
+    }
+
+    private void OnBodyChanged()
+    {
+        if(_chapter is null) return;
+        _isDirty = true;
+        JsRuntime.InvokeVoidAsync("codeFunctions.parseMarkArticle", _rawBody, "articlemd");
+    }
+
+    private async Task SaveChanges()
+    {
+        if(_chapter is null) return;
+        _isSaving = true;
+        _chapter.Body = RawBody;
+        await CourseService.UpdateChapterAsync(_chapter);
+        _isDirty = _isSaving = false;
+    }
+
+}

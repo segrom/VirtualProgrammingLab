@@ -16,10 +16,10 @@
             crossorigin="anonymous"></script>
     <link href="css/prism.css" rel="stylesheet" />
         <link href="css/themes/prism-vsc-dark-plus.css" rel="stylesheet" />
-        <link href="css/autocomplete.min.css" rel="stylesheet" />
+        @* <link href="css/autocomplete.min.css" rel="stylesheet" /> *@
         <script src="js/code-input.min.js"></script>
         <script src="js/plugins/indent.min.js"></script>
-        <script src="js/plugins/autocomplete.min.js"></script>
+        @* <script src="js/plugins/autocomplete.min.js"></script> *@
         <script src="js/plugins/auto-close-brackets.min.js"></script>
         <link rel="stylesheet" href="css/code-input.min.css">
         <link href="css/prism-line-numbers.css" rel="stylesheet" />
@@ -42,6 +42,7 @@
     <a class="dismiss">🗙</a>
 </div>
 
+<script src="@Html.Raw("https://cdn.jsdelivr.net/npm/marked/marked.min.js")"></script>
 <script src="_framework/blazor.server.js"></script>
 <script src="js/prism.js"></script>
 <script src="js/plugins/prism-line-numbers.js"></script>

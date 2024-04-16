@@ -9,8 +9,8 @@ public class Chapter
     
     [Required]
     public string Title { get; set; }
+    [Range(0, 1000)]
     public float? Duration { get; set; }
-    [Required]
     public string Body { get; set; }
     
     [Required]

@@ -3,7 +3,6 @@
 @using Common.Structures
 @attribute [Authorize]
 @inject ILogger<Compiler> Logger
-@inject IJSRuntime JsRuntime
 
 <PageTitle>Compiler</PageTitle>
 @if (_isDisabled)
@@ -53,8 +52,8 @@ else
         <div class="row gx-6">
             <div class="flex-fill my-2" style="height: 60vh">
                 
-                <code-input class="container-fluid p-0 m-0 rounded-3 line-numbers " style="height: 100%" language="csharp" placeholder="Type code here" template="syntax-highlighted" value="@_codeTemplate"></code-input>
-                <textarea @onchange="CodeUpdate" @oninput="CodeUpdate" id="code-provider" aria-hidden="True" hidden></textarea>
+                <CodeInput @bind-Code="_code" StartCode="@_codeTemplate" />
+               
             </div>
             <div class="flex-fil" style="height: 20vh">
                 <textarea @bind="_results" class="py-2 px-4 rounded-3  code" disabled readonly style="height: 100%; width: 100%; resize: none;">log here</textarea>
@@ -152,13 +151,6 @@ public class Solution
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JsRuntime.InvokeVoidAsync("codeFunctions.addCodeAreaProvider");
-        }
-    }
 
     private async void Compile()
     {
@@ -171,10 +163,4 @@ public class Solution
         StateHasChanged();
     }
 
-    private void CodeUpdate(ChangeEventArgs obj)
-    {
-        if (obj.Value is not string value) return;
-        _code = value;
-    //Console.WriteLine("CodeUpdate: " + _code);
-    }
 }

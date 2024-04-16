@@ -12,10 +12,16 @@ a, .btn-link {
     color: #0071c1;
 }
 
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+article p {
+   white-space: pre-wrap;
+}
+
+article blockquote {
+    font-size: 1.25rem;
+    background: #FFFFFF11;
+    padding: 10px;
+    border-radius: 15px;
+    border-left: solid #FFFFFF33 5px;
 }
 
 .content {
