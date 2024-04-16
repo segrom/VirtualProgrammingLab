@@ -11,4 +11,5 @@ public interface ICourseService
     Task DeleteCourse(Course course);
     Task AddChapterToCourse(Course course, Chapter chapter);
     Task UpdateChapterAsync(Chapter chapter);
+    Task<Exercise> GetExerciseAsync(Chapter chapter);
 }

@@ -1,5 +1,6 @@
 ﻿@page "/course/edit/{id:int}/{chapterId:int}"
 @using Application.Data.Account
+@using Application.Data.Common
 @using Application.Data.Courses
 @using Application.Data.Lecturers
 @using Application.Services.Courses
@@ -7,6 +8,7 @@
 @attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
 @inject ILecturerService LecturerService
 @inject ICourseService CourseService
+@inject IExerciseService ExerciseService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject ILogger<CourseEdit> Logger
@@ -35,23 +37,103 @@
                     </button>
                 }
             </div>
-            <h1 class="m-3"><em>Глава</em> "@(_chapter?.Title ?? "")"</h1>
+            <h1 class="m-3">
+                @if (_exercise is not null)
+                {
+                    <i class="ph-bold ph-code me-1 text-info" style="padding-top: 0.13em; font-size: 1em;"></i>
+                }
+                else
+                {
+                    <em>Глава</em>
+                }
+                "@(_chapter?.Title ?? "")"
+            </h1>
         </div>
     </div>
-    <hr >
-    <div class="row" style="height: 80vh; min-width: 500px;">
-        <div class="col-6">
-            <CodeInput StartCode="@_startCode" Language="md" @bind-Code="RawBody" />
+    <hr>
+    @if (_exercise is null)
+    {
+        <div class="row" style="height: 80vh; min-width: 500px;">
+            <div class="col-6">
+                <CodeInput StartCode="@_startCode" Language="md" @bind-Code="RawBody"/>
+            </div>
+
+            <div class="col-6">
+                @if (_chapter is not null)
+                {
+                    <article id="articlemd">
+                    </article>
+                }
+            </div>
         </div>
-        
-        <div class="col-6">
-            @if (_chapter is not null)
-            {
-                <article id="articlemd">
+    }
+    else
+    {
+        <div class="row border rounded-3 m-1 p-2 overflow-auto" style="height: 30vh; min-width: 100px;">
+            <div class="col-6">
+                <CodeInput StartCode="@_startCode" Language="md" @bind-Code="RawBody"/>
+            </div>
+            <div class="col-6">
+                <article>
+                    @if (_chapter is not null)
+                    {
+                        <article id="articlemd">
+                        </article>
+                    }
                 </article>
+            </div>
+        </div>
+        <div class="my-2  d-flex justify-content-between">
+            <div class="d-flex align-items-center justify-content-center">
+                <h5>Реализации</h5>
+                <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
+            </div>
+            <div>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle align-items-center d-flex justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ph ph-plus me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        <span>Добавить</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        @if (_languages is not null)
+                        {
+                            foreach (var language in _languages)
+                            {
+                                <li>
+                                    <button class="dropdown-item" @onclick="() => CreateImplWithLanguage(language)" >@language.Name</button>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <div class="d-block mt-1">
+            @if (_exercise?.Implementations is not null)
+            {
+                @foreach (var impl in _exercise.Implementations)
+                {
+                    <div class="d-flex border border-2 rounded-3 p-1 justify-content-between align-items-center">
+                        <button @onclick="() => GoToImpl(impl)" class="btn btn-dark align-items-center d-flex justify-content-center">
+                            <span>@impl.Language.Name</span>
+                            <i class="ph ph-caret-right ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        </button>
+                        <div class="d-flex">
+                            <div class="d-flex mx-2 justify-content-between align-items-center @(impl.HasPattern() ? "text-success" : "text-danger") ">
+                                <i class="ph-bold @(impl.HasPattern() ? "ph-check-circle" : "ph-x-circle ") me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                                <strong>Шаблон</strong>
+                            </div>
+                            <div class="d-flex mx-2 justify-content-between align-items-center  @(impl.HasTests() ? "text-success" : "text-danger")">
+                                <i class="ph-bold @(impl.HasTests() ? "ph-check-circle" : "ph-x-circle ") me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                                <strong>Тесты</strong>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
         </div>
-    </div>
+    }
 </div>
 
 @code {
@@ -62,8 +144,10 @@
     
     private Course? _course;
     private Chapter? _chapter;
+    private Exercise? _exercise;
     private Lecturer? _lecturer;
-
+    private Language[]? _languages;
+    
     private string RawBody
     {
         get => _rawBody;
@@ -82,6 +166,7 @@
     
     protected override async Task OnInitializedAsync()
     {
+        _languages = await ExerciseService.GetAllLanguagesAsync();
         _lecturer = await LecturerService.GetCurrentLecturerAsync();
         _course = await CourseService.GetCourseAsync(Id);
         Logger.LogInformation($"Load course by lecturer {_lecturer.Id} {_lecturer.User.GetFullName()} - {_course.Id} {_course.Title}, chapters count: {_course.Chapters.Count}");
@@ -94,6 +179,7 @@
 
         _chapter = _course.Chapters.FirstOrDefault(x => x.Id == ChapterId);
         if (_chapter is null) throw new Exception("Такой статьи не существует ¯\\_(ツ)_/¯");
+        if (_chapter.IsExercise) _exercise = await CourseService.GetExerciseAsync(_chapter);
         _startCode = _chapter.Body;
         _rawBody = _startCode;
     }
@@ -117,6 +203,17 @@
         _chapter.Body = RawBody;
         await CourseService.UpdateChapterAsync(_chapter);
         _isDirty = _isSaving = false;
+    }
+
+    private async Task CreateImplWithLanguage(Language language)
+    {
+        if(_exercise is null) return;
+        await ExerciseService.AddImplWithLanguageAsync(_exercise.Id, language.Id);
+    }
+
+    private void GoToImpl(Impl impl)
+    {
+        NavigationManager.NavigateTo($"/course/edit/{Id}/{ChapterId}/{impl.Id}");
     }
 
 }

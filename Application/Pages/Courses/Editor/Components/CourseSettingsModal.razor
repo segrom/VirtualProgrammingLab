@@ -8,12 +8,12 @@
 <!-- @ModalId Modal -->
 <div class="modal fade" id="@ModalId" tabindex="-1" aria-labelledby="@(ModalId)Label" data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <form class="modal-content">
+        <EditForm class="modal-content"  Model="Course" OnValidSubmit="Submit">
             <div class="modal-header">
                 <h5 class="modal-title" id="@(ModalId)Label">Настройки курса</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <EditForm class="modal-body" Model="Course" OnValidSubmit="Submit">
+            <div class="modal-body">
                 <DataAnnotationsValidator/>
                 <div class="mb-3">
                     <label for="titleInput" class="form-label">Название курса</label>
@@ -37,12 +37,12 @@
                     </button>
                 </div>
 
-            </EditForm>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
                 <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Сохранить</button>
             </div>
-        </form>
+        </EditForm>
     </div>
 </div>
 <!-- Delete Modal -->

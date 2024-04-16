@@ -1,14 +1,17 @@
 ﻿
 window.codeFunctions = {
-    addCodeAreaProvider: function () {
+    addCodeAreaProvider: function (editorId) {
         codeInput.registerTemplate("syntax-highlighted", codeInput.templates.prism(Prism, [
             new codeInput.plugins.Indent(true, 4), // 2 spaces indentation
             new codeInput.plugins.AutoCloseBrackets(),
             // new codeInput.plugins.Autocomplete()
         ]));
-
-        let codeArea = document.querySelectorAll('code-input > textarea').item(0)
-        let codeProvider = document.querySelector("#code-provider");
+        
+        let codeInputId = `#CodeInput${editorId}`
+        let codeProviderId = `#Provider${editorId}`
+        
+        let codeArea = document.querySelector(`${codeInputId} > textarea`)
+        let codeProvider = document.querySelector(codeProviderId);
 
         codeArea.addEventListener('change', function () {
             codeProvider.value = codeArea.value;

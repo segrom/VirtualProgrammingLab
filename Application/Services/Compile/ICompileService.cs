@@ -1,4 +1,5 @@
-﻿using Common.Structures;
+﻿using Application.Data.Common;
+using Common.Structures;
 
 namespace Application.Services.Compile;
 

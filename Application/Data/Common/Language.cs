@@ -8,11 +8,17 @@ public class Language
     
     [Required]
     public string Name { get; set; }
+    [Required]
+    public string HighlightLabel { get; set; }
 
     public List<CompileRequest> CompileRequests { get; set; } = new();
 
-    public Language(string name)
+
+    public Language() { }
+
+    public Language(string name, string highlightLabel)
     {
         Name = name;
+        HighlightLabel = highlightLabel;
     }
 }

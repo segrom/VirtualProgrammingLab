@@ -9,7 +9,7 @@ public class Impl
     [Key] public int Id { get; set; }
 
     [Required]
-    public string PatternCode { get; set; }
+    public string PatternCode { get; set; } // Rename to more correct TemplateCode
     [Required]
     public string TestsCode { get; set; }
     
@@ -32,4 +32,7 @@ public class Impl
         Language = language;
         LanguageId = language.Id;
     }
+
+    public bool HasPattern() => !string.IsNullOrEmpty(PatternCode);
+    public bool HasTests() => !string.IsNullOrEmpty(TestsCode);
 }

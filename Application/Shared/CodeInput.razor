@@ -1,10 +1,13 @@
 ﻿@inject IJSRuntime JsRuntime 
 
-<code-input class="container-fluid p-0 m-0 rounded-3 line-numbers " style="height: 100%" language="@Language" placeholder="Type code here" template="syntax-highlighted" value="@StartCode"></code-input>
-<textarea @onchange="CodeUpdate "@oninput="CodeUpdate" id="code-provider" aria-hidden="True" hidden></textarea>
+<code-input id="CodeInput@(Index)" class="container-fluid p-0 m-0 rounded-3 line-numbers " style="height: 100%" language="@Language" placeholder="Type code here" template="syntax-highlighted" value="@StartCode"></code-input>
+<textarea @onchange="CodeUpdate "@oninput="CodeUpdate" id="Provider@(Index)" aria-hidden="True" hidden></textarea>
 
  @code {
 
+  [Parameter]
+  public string Index { get; set; } = "1";
+  
   [Parameter]
   public string Language { get; set; } = "csharp";
 
@@ -22,13 +25,12 @@
    Code = value;
    await CodeChanged.InvokeAsync(Code);
   }
-
   
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
    if (firstRender)
    {
-    await JsRuntime.InvokeVoidAsync("codeFunctions.addCodeAreaProvider");
+    await JsRuntime.InvokeVoidAsync("codeFunctions.addCodeAreaProvider", Index);
    }
   }
   

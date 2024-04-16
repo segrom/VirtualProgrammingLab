@@ -85,4 +85,13 @@ public class CourseService: ICourseService
         context.Update(chapter);
         await context.SaveChangesAsync();
     }
+
+    public async Task<Exercise> GetExerciseAsync(Chapter c)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        return await context.Exercises
+            .Include(e=>e.Implementations)
+            .ThenInclude(i=>i.Language)
+            .FirstAsync(e => e.ChapterId == c.Id);
+    }
 }

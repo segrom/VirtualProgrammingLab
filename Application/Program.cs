@@ -1,6 +1,7 @@
 using Application.Areas.Identity;
 using Application.Data;
 using Application.Data.Account;
+using Application.Data.Common;
 using Application.Middleware;
 using Application.Services.Admin;
 using Application.Services.Compile;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddSingleton<ICompileService, CompileService>();
 
 var app = builder.Build();
@@ -79,7 +81,6 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
-        context.Database.EnsureCreated();
         if (context.Database.GetPendingMigrations().Any())
         {
             await context.Database.MigrateAsync();
@@ -87,6 +88,18 @@ using (var scope = app.Services.CreateScope())
         var userManager = services.GetRequiredService<UserManager<User>>();
         var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         await RoleController.InitializeAsync(userManager, rolesManager);
+        
+        if(!context.Languages.Any())
+        {
+            var languages = new[]
+            {
+                new Language("C#", "csharp"),
+                new Language("Python 3", "py"),
+                new Language("C++", "cpp"),
+            };
+            await context.Languages.AddRangeAsync(languages);
+            await context.SaveChangesAsync();
+        }
     }
     catch (Exception ex)
     {

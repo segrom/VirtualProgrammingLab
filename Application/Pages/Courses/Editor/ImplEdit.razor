@@ -1,0 +1,175 @@
+﻿@page "/course/edit/{id:int}/{chapterId:int}/{implId:int}"
+@using Application.Data.Courses
+@using Application.Data.Lecturers
+@using Application.Services.Courses
+@using Application.Services.Lecturers
+@using Application.Data.Account
+@attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
+@inject ILecturerService LecturerService
+@inject ICourseService CourseService
+@inject IExerciseService ExerciseService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+<div class="container-md d-grid mt-2">
+    <div class="row">
+        <div class="d-flex align-items-lg-center justify-content-between">
+            <div class="d-flex">
+                <a href="@($"/course/edit/{Id}/{ChapterId}")" class="btn btn-dark align-items-center d-flex justify-content-center me-2">
+                    <i class="ph ph-caret-left me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    <span>@(_chapter?.Title ?? "Назад")</span>
+                </a>
+                @if (_chapter is not null)
+                {
+                    <button @onclick="SaveChanges" class="btn btn-primary align-items-center d-flex justify-content-center @(_isDirty ? "" : "disabled")" disabled="@(!_isDirty)">
+                        @if (_isSaving)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span>Сохранение...</span>
+                        }
+                        else
+                        {
+                            <i class="ph-fill ph-floppy-disk-back me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                            <span>Сохранить</span>
+                        }
+                    </button>
+                }
+            </div>
+            <h1 class="m-3">
+                @if (_chapter != null && _impl != null)
+                {
+                    <i class="devicon-python-plain text-info" style="top: 0.16em;"></i>
+                    @_chapter.Title
+                    <span class="text-secondary">(@(_impl.Language.Name))</span>
+                }
+            </h1>
+        </div>
+    </div>
+    <hr>
+    @if (_impl is not null)
+    {
+        <div class="row mt-2 align-middle text-center">
+            <div class="col d-flex align-items-center justify-content-center">
+                <h5>Шаблон метода для студента</h5>
+                <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
+            </div>
+            <div class="col">
+                <h5>
+                    Проверки выполнения
+                    <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
+                </h5></div>
+        </div>
+        <div class="row m-1" style="height: 35vh; min-width: 100px;">
+            <div class="col-6 border rounded-3  p-2">
+                <CodeInput Index="1" @bind-Code="PatternCode" Language="@_impl?.Language.HighlightLabel" StartCode="@_patternStart"/>
+            </div>
+            <div class="col-6 border rounded-3  p-2">
+                <CodeInput Index="2" @bind-Code="TestsCode" Language="@_impl?.Language.HighlightLabel" StartCode="@_testsStart"/>
+            </div>
+        </div>
+        <div class="my-2  d-flex justify-content-between">
+            <div class="d-flex align-items-center justify-content-center">
+                <h5>Тестовый компилятор для проверки проверки 😅 </h5>
+                <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
+            </div>
+            <div>
+                <button class="btn btn-primary align-items-center d-flex justify-content-center">
+                    <i class="ph-fill ph-play me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                    <span>Запустить</span>
+                </button>
+            </div>
+        </div>
+        <div class="row m-1" style="height: 40vh; min-width: 100px;">
+            <div class="col-6 border rounded-3 px-2 pb-3 pt-1">
+                <CodeInput Index="3" @bind-Code="DebugProgramCode" Language="@_impl?.Language.HighlightLabel"/>
+            </div>
+            <div class="col-6 border rounded-3 px-2 pb-3 pt-1">
+                <textarea @bind="@DebugProgramOutput" class="py-2 px-4 rounded-3  code" disabled readonly style="height: 100%; width: 100%; resize: none;">log here</textarea>
+            </div>
+        </div>
+    }
+    else
+    {
+        @:Пожалуйста подождите...
+    }
+</div>
+
+@code {
+    
+    // TODO add help modals
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public int ChapterId { get; set; }
+    [Parameter]
+    public int ImplId { get; set; }
+    
+    private Course? _course;
+    private Chapter? _chapter;
+    private Exercise? _exercise;
+    private Impl? _impl;
+    private Lecturer? _lecturer;
+
+    private string _patternStart, _testsStart;
+    private string _patternCode = "", _testsCode = "";
+
+    private string PatternCode
+    {
+        get => _patternCode;
+        set
+        {
+            _patternCode = value;
+            _isDirty = true;
+        }
+    }
+
+    private string TestsCode
+    {
+        get => _testsCode;
+        set
+        {
+            _testsCode = value;
+            _isDirty = true;
+        }
+        
+    }
+    private string DebugProgramCode { get; set; }
+    private string DebugProgramOutput { get; set; }
+
+    private bool _isDirty, _isSaving;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _lecturer = await LecturerService.GetCurrentLecturerAsync();
+        _course = await CourseService.GetCourseAsync(Id);
+        if(_course is null || _lecturer is null)
+        {
+            NavigationManager.NavigateTo("404");
+            return;
+        }
+        if (_course.Author.Id != _lecturer.Id) throw new Exception("У вас нет доступа к редактированию этого курса ⛔");
+        
+        _chapter = _course.Chapters.FirstOrDefault(x => x.Id == ChapterId);
+        if (_chapter is null) throw new Exception("Такой статьи не существует ¯\\_(ツ)_/¯");
+        
+        _exercise = await CourseService.GetExerciseAsync(_chapter);
+        
+        _impl = _exercise.Implementations.FirstOrDefault(i => i.Id == ImplId);
+        if (_impl is null) throw new Exception("Такой реализации не существует ¯\\_(ツ)_/¯");
+        _patternStart = _impl.PatternCode;
+        _testsStart = _impl.TestsCode;
+    }
+
+    private async Task SaveChanges()
+    {
+        if(_impl is null) return;
+        _isSaving = true;
+
+        _impl.PatternCode = PatternCode;
+        _impl.TestsCode = TestsCode;
+        
+        await ExerciseService.UpdateImplAsync(_impl);
+        _isDirty = _isSaving = false;
+    }
+
+}

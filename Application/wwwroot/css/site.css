@@ -23,7 +23,10 @@ article blockquote {
     border-radius: 15px;
     border-left: solid #FFFFFF33 5px;
 }
-
+article p img {
+    max-width: 90%;
+    border-radius: 15px;
+}
 .content {
     padding-top: 1.1rem;
 }

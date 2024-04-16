@@ -1,9 +1,13 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Application.Data;
+using Application.Data.Common;
 using Common.Structures;
 using Humanizer;
+using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using CompileRequest = Common.Structures.CompileRequest;
 
 namespace Application.Services.Compile;
 
@@ -11,6 +15,7 @@ public class CompileService: ICompileService
 {
     private event Action<CompileResult> CompileResultReceived;
     
+    private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
     private readonly ILogger<CompileService> _logger;
     private readonly IConfiguration _configuration;
     private readonly Guid _serviceQueueId;
@@ -19,10 +24,12 @@ public class CompileService: ICompileService
     
     private readonly string _resultsQueueName;
 
-    public CompileService(ILogger<CompileService> logger, IConfiguration configuration)
+    public CompileService(ILogger<CompileService> logger, IConfiguration configuration, 
+        IDbContextFactory<ApplicationDbContext> dbContextFactory)
     {
         _logger = logger;
         _configuration = configuration;
+        _dbContextFactory = dbContextFactory;
         _serviceQueueId = Guid.NewGuid();
         _resultsQueueName = _configuration["RabbitMqSend:ResultsQueueNameFormat"].FormatWith(_serviceQueueId);
         _logger.LogInformation("Login rabbit as {0}", Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"));
