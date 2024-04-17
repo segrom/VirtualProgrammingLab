@@ -26,19 +26,19 @@ else
                 class="btn dropdown-toggle border-0 d-flex align-items-center justify-content-center"
                 data-bs-toggle="dropdown" aria-expanded="false">
             <AuthorizeView Roles="@(RoleController.StudentRole)">
-                <i class="ph-fill ph-student mx-1"></i>
+                <i class="ph-fill ph-student mx-1 text-secondary"></i>
                 <div>
                     <em class="text-secondary">@(_student?.Group.Name ?? "Н/Д")</em>&nbsp @_user.Code
                 </div>
             </AuthorizeView>
             <AuthorizeView Roles="@(RoleController.LecturerRole)">
-                <i class="ph-fill ph-chalkboard-teacher mx-1"></i>
+                <i class="ph-fill ph-chalkboard-teacher mx-1 text-secondary"></i>
                 <div>
                     <em class="text-secondary">@(_lecturer?.Faculty ?? "Н/Д")</em>&nbsp @_user.GetShortName()
                 </div>
             </AuthorizeView>
             <AuthorizeView Roles="@(RoleController.AdminRole)">
-                <i class="ph-fill ph-crown-cross mx-1"></i>
+                <i class="ph-fill ph-crown-cross mx-1" style="color: #ffc107"></i>
                 <div>@_user.Code</div>
             </AuthorizeView>
         </button>

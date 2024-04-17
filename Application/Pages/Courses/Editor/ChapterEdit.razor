@@ -5,6 +5,7 @@
 @using Application.Data.Lecturers
 @using Application.Services.Courses
 @using Application.Services.Lecturers
+@using Application.Shared.Utils
 @attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
 @inject ILecturerService LecturerService
 @inject ICourseService CourseService
@@ -85,8 +86,10 @@
         </div>
         <div class="my-2  d-flex justify-content-between">
             <div class="d-flex align-items-center justify-content-center">
-                <h5>Реализации</h5>
-                <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
+                <h5>
+                    Реализации
+                    <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#@ImplHelpModalId"></i>
+                </h5>
             </div>
             <div>
                 <div class="dropdown">
@@ -114,7 +117,7 @@
             {
                 @foreach (var impl in _exercise.Implementations)
                 {
-                    <div class="d-flex border border-2 rounded-3 p-1 justify-content-between align-items-center">
+                    <div class="d-flex border border-2 rounded-3 p-1 mb-2 justify-content-between align-items-center">
                         <button @onclick="() => GoToImpl(impl)" class="btn btn-dark align-items-center d-flex justify-content-center">
                             <span>@impl.Language.Name</span>
                             <i class="ph ph-caret-right ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
@@ -136,7 +139,18 @@
     }
 </div>
 
+<InfoModal ModalId="@ImplHelpModalId">
+    <Title>
+        <i class="ph ph-info me-1" style="font-size: 1.2em;"></i>
+        <span>Справка</span>
+    </Title>
+    <Body>Реализация задания – это код шаблона для студентов и тестов, выполняемых для проверки задания на конкретном языке программирования</Body>
+</InfoModal>
+
 @code {
+
+        private const string ImplHelpModalId = "ImplHelpModal";
+    
     [Parameter]
     public int Id { get; set; }
     [Parameter]
@@ -209,6 +223,8 @@
     {
         if(_exercise is null) return;
         await ExerciseService.AddImplWithLanguageAsync(_exercise.Id, language.Id);
+        _exercise = await CourseService.GetExerciseAsync(_chapter);
+        StateHasChanged();
     }
 
     private void GoToImpl(Impl impl)

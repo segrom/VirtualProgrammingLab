@@ -2,7 +2,7 @@
 @using Application.Data.Account
 @using Application.Data.Lecturers
 @using Application.Data.Students
-@using Application.Pages.Utils
+@using Application.Shared.Utils
 @using System.ComponentModel.DataAnnotations
 @using Application.Services.Admin
 @inject IAdminService AdminService
@@ -27,16 +27,16 @@
                 <div class="row mb-3">
                     <label class="form-label">ФИО</label>
                     <div class="col">
+                        <input type="text" class="form-control" placeholder="Фамилия" aria-label="Фамилия" @bind="_model.User.Surname">
+                        <ValidationMessage For="() => _model.User.Surname"></ValidationMessage>
+                    </div>
+                    <div class="col">
                         <input type="text" class="form-control" placeholder="Имя" aria-label="Имя" @bind="_model.User.Name">
                         <ValidationMessage For="() => _model.User.Name"></ValidationMessage>
                     </div>
                     <div class="col">
                         <input type="text" class="form-control" placeholder="Отчество" aria-label="Отчество" @bind="_model.User.Patronymic">
                         <ValidationMessage For="() => _model.User.Patronymic"></ValidationMessage>
-                    </div>
-                    <div class="col">
-                        <input type="text" class="form-control" placeholder="Фамилия" aria-label="Фамилия" @bind="_model.User.Surname">
-                        <ValidationMessage For="() => _model.User.Surname"></ValidationMessage>
                     </div>
                 </div>
                 <div class="mb-3">

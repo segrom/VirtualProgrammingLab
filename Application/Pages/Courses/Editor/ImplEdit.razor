@@ -4,11 +4,15 @@
 @using Application.Services.Courses
 @using Application.Services.Lecturers
 @using Application.Data.Account
+@using Application.Services.Compile
+@using Application.Shared.Utils
 @attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
 @inject ILecturerService LecturerService
 @inject ICourseService CourseService
 @inject IExerciseService ExerciseService
+@inject ICompileService CompileService
 @inject NavigationManager NavigationManager
+@inject ILogger<ImplEdit> Logger
 @inject IJSRuntime JsRuntime
 
 <div class="container-md d-grid mt-2">
@@ -49,19 +53,22 @@
     @if (_impl is not null)
     {
         <div class="row mt-2 align-middle text-center">
-            <div class="col d-flex align-items-center justify-content-center">
-                <h5>Шаблон метода для студента</h5>
-                <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
-            </div>
-            <div class="col">
+            <div class="col-6 d-flex align-items-center justify-content-center">
                 <h5>
-                    Проверки выполнения
-                    <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
-                </h5></div>
+                    Шаблон метода
+                    <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#@TemplateHelpModalId"></i>
+                </h5>
+            </div>
+            <div class="col-6" d-flex align-items-center justify-content-center>
+                <h5>
+                    Тесты выполнения
+                    <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#@TestsHelpModalId"></i>
+                </h5>
+            </div>
         </div>
         <div class="row m-1" style="height: 35vh; min-width: 100px;">
             <div class="col-6 border rounded-3  p-2">
-                <CodeInput Index="1" @bind-Code="PatternCode" Language="@_impl?.Language.HighlightLabel" StartCode="@_patternStart"/>
+                <CodeInput Index="1" @bind-Code="TemplateCode" Language="@_impl?.Language.HighlightLabel" StartCode="@_templateStart"/>
             </div>
             <div class="col-6 border rounded-3  p-2">
                 <CodeInput Index="2" @bind-Code="TestsCode" Language="@_impl?.Language.HighlightLabel" StartCode="@_testsStart"/>
@@ -69,14 +76,24 @@
         </div>
         <div class="my-2  d-flex justify-content-between">
             <div class="d-flex align-items-center justify-content-center">
-                <h5>Тестовый компилятор для проверки проверки 😅 </h5>
-                <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
+                <h5>
+                    Тестовый компилятор для проверки проверки
+                    <i class="btn btn-dark ph ph-question m-1 p-1" data-bs-toggle="modal" data-bs-target="#@DebugHelpModalId"></i>
+                </h5>
             </div>
             <div>
-                <button class="btn btn-primary align-items-center d-flex justify-content-center">
-                    <i class="ph-fill ph-play me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
-                    <span>Запустить</span>
-                </button>
+                <button @onclick="Compile" disabled="@(_isLoading)" type="button" class="btn btn-primary align-items-center d-flex justify-content-center"> 
+                                    @if (_isLoading)
+                                    {
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span>Компиляция...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="ph-fill ph-play me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                                        <span>Запустить</span>
+                                    }
+                                </button>
             </div>
         </div>
         <div class="row m-1" style="height: 40vh; min-width: 100px;">
@@ -94,9 +111,42 @@
     }
 </div>
 
+<InfoModal ModalId="@TemplateHelpModalId">
+    <Title>
+        <i class="ph ph-info me-1" style="font-size: 1.2em;"></i>
+        <span>Справка</span>
+    </Title>
+    <Body>
+    Шаблон метода - это код, который будет на старте у студента. В нем должна быть объявлена функция, которая будет потом вызыватся в тестах. <br/>
+    <strong class="text-danger">⚠️ Не рекомендуется изменять что либо кроме сигнатуры и тела функции.</strong>
+    </Body>
+</InfoModal>
+
+<InfoModal ModalId="@TestsHelpModalId">
+    <Title>
+        <i class="ph ph-info me-1" style="font-size: 1.2em;"></i>
+        <span>Справка</span>
+    </Title>
+    <Body>
+    Тесты выполнения - это код unit тестов, которые будут выполнятся после компиляции решения студента, и на основе которых будет понятно - верное решение или нет. <br/>
+    <strong class="text-danger">⚠️ Не рекомендуется изменять что либо кроме тела функции с выполнеными тестами.</strong>
+    </Body>
+</InfoModal>
+
+<InfoModal ModalId="@DebugHelpModalId">
+    <Title>
+        <i class="ph ph-info me-1" style="font-size: 1.2em;"></i>
+        <span>Справка</span>
+    </Title>
+    <Body>Тестовый компилятор - тут вы можете написать свое решение задачи, и проверить корректность работы тестов.</Body>
+</InfoModal>
+
 @code {
     
-    // TODO add help modals
+        private const string TemplateHelpModalId = "TemplateHelpModal";
+        private const string TestsHelpModalId = "TestsHelpModal";
+        private const string DebugHelpModalId = "DebugHelpModal";
+    
     [Parameter]
     public int Id { get; set; }
     [Parameter]
@@ -110,15 +160,17 @@
     private Impl? _impl;
     private Lecturer? _lecturer;
 
-    private string _patternStart, _testsStart;
-    private string _patternCode = "", _testsCode = "";
+    private string _templateStart, _testsStart;
+    private string _templateCode = "", _testsCode = "";
 
-    private string PatternCode
+    private bool _isLoading;
+
+    private string TemplateCode
     {
-        get => _patternCode;
+        get => _templateCode;
         set
         {
-            _patternCode = value;
+            _templateCode = value;
             _isDirty = true;
         }
     }
@@ -156,7 +208,7 @@
         
         _impl = _exercise.Implementations.FirstOrDefault(i => i.Id == ImplId);
         if (_impl is null) throw new Exception("Такой реализации не существует ¯\\_(ツ)_/¯");
-        _patternStart = _impl.PatternCode;
+        _templateStart = _impl.TemplateCode;
         _testsStart = _impl.TestsCode;
     }
 
@@ -165,11 +217,25 @@
         if(_impl is null) return;
         _isSaving = true;
 
-        _impl.PatternCode = PatternCode;
+        _impl.TemplateCode = TemplateCode;
         _impl.TestsCode = TestsCode;
         
         await ExerciseService.UpdateImplAsync(_impl);
         _isDirty = _isSaving = false;
+    }
+
+    private async Task Compile()
+    {
+        if (_impl is null || _lecturer is null || _isLoading) return;
+        _isLoading = true;
+        var request = await ExerciseService.NewDebugCompileRequest(_impl, _lecturer.User, DebugProgramCode);
+        var result = await CompileService.QueueCompileRequest(request);
+        _isLoading = false;
+        DebugProgramOutput = "";
+        if (!string.IsNullOrEmpty(result.ResultOutput)) DebugProgramOutput = $"Output: \n {result.ResultOutput}";
+        if (!string.IsNullOrEmpty(result.ResultErrors)) DebugProgramOutput += $"🚩Errors: \n {result.ResultErrors}";
+        Logger.Log(LogLevel.Information, $"CR_ID[{request.Id}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
+        await ExerciseService.UpdateCompileRequest(result); // TODO: actually make independent service to process compile results and apply it to compile requests in db
     }
 
 }

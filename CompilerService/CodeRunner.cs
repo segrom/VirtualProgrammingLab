@@ -60,17 +60,21 @@ public class CodeRunner
         if(e.InnerException != null) LogError(e.InnerException, ++deep);
     }
     
-    public async Task<CompileResult> RunCode(CompileRequest request)
+    public async Task<QueueCompileResult> RunCode(QueueCompileRequest request)
     {
-        var filepath = Path.Join(Homedir, "exercise/Solution.cs");
+        var solutionFilepath = Path.Join(Homedir, "exercise/Solution.cs");
+        var testsFilepath = Path.Join(Homedir, "exercise/Tests.cs");
         var solutionPath = Path.Join(Homedir, "exercise/Exercise.csproj");
-        await File.WriteAllTextAsync(filepath, request.Code);
+        await File.WriteAllTextAsync(solutionFilepath, request.Solution);
+        await File.WriteAllTextAsync(testsFilepath, request.Tests);
         
         Console.WriteLine("[START WITH RUNNER USER PROJ]");
+        var sw = Stopwatch.StartNew();
         var (output, errors) = await RunCommand("unshare", $"-n runuser -u {Username} -- dotnet run --project {solutionPath}");
+        var duration = sw.Elapsed;
         Console.WriteLine("[STOP PROJ]");
 
-        return new CompileResult(request.ServiceId, request.SourceId, output, errors);
+        return new QueueCompileResult(request.ServiceId, request.CompileRequestId, output, errors, DateTimeOffset.Now, duration);
 
     }
 }

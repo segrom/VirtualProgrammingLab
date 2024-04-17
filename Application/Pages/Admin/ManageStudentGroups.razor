@@ -2,7 +2,7 @@
 @using Application.Data.Account
 @using Application.Data.Students
 @using Application.Services.Admin
-@using Application.Pages.Utils
+@using Application.Shared.Utils
 @attribute [Authorize(Roles = $"{RoleController.AdminRole}")]
 @inject IAdminService AdminService
 @inject ILogger<ManageUsers> Logger

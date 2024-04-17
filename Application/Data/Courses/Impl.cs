@@ -9,7 +9,7 @@ public class Impl
     [Key] public int Id { get; set; }
 
     [Required]
-    public string PatternCode { get; set; } // Rename to more correct TemplateCode
+    public string TemplateCode { get; set; } // Rename to more correct TemplateCode
     [Required]
     public string TestsCode { get; set; }
     
@@ -23,9 +23,9 @@ public class Impl
 
     public Impl() {}
 
-    public Impl(Language language, string patternCode, string testsCode, Exercise exercise)
+    public Impl(Language language, string templateCode, string testsCode, Exercise exercise)
     {
-        PatternCode = patternCode;
+        TemplateCode = templateCode;
         TestsCode = testsCode;
         Exercise = exercise;
         ExerciseId = exercise.Id;
@@ -33,6 +33,6 @@ public class Impl
         LanguageId = language.Id;
     }
 
-    public bool HasPattern() => !string.IsNullOrEmpty(PatternCode);
-    public bool HasTests() => !string.IsNullOrEmpty(TestsCode);
+    public bool HasPattern() => !string.IsNullOrEmpty(TemplateCode) && TemplateCode!=Language.DefaultTemplateCode;
+    public bool HasTests() => !string.IsNullOrEmpty(TestsCode) && TestsCode!=Language.DefaultTestsCode;
 }

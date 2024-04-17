@@ -21,7 +21,7 @@ else
         <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group me-2" role="group">
 
-                <button @onclick="Compile" disabled="@_isLoading" type="button" class="btn btn-primary">
+                <button @onclick="Compile" disabled="@(_isLoading || true)" type="button" class="btn btn-primary"> 
                     @if (_isLoading)
                     {
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -139,16 +139,16 @@ public class Solution
         _code = _codeTemplate;
     }
 
-    private void ServiceOnCompileResultReceived(CompileResult result)
+    private void ServiceOnCompileResultReceived(QueueCompileResult result)
     {
-        Logger.LogInformation($"[{_solutionId}] receive result for {result.SourceId}");
-        if (result.SourceId == _solutionId)
+        Logger.LogInformation($"[{_solutionId}] receive result for {result.CompileRequestId}");
+        /*if (result.CompileRequestId == _solutionId)
         {
             _results = "";
             if (!string.IsNullOrEmpty(result.ResultOutput)) _results = $"Output: \n {result.ResultOutput}";
             if (!string.IsNullOrEmpty(result.ResultErrors)) _results += $"🚩Errors: \n {result.ResultErrors}";
             Logger.Log(LogLevel.Information, $"[{_solutionId}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
-        }
+        }*/
     }
 
 
@@ -158,7 +158,7 @@ public class Solution
         Console.WriteLine(_code);
         Logger.Log(LogLevel.Information, $"[{_solutionId}] Compiler clicked, sending code: '{_code}'");
         _isLoading = true;
-        ServiceOnCompileResultReceived(await _service.SendSourceCode(_solutionId, _code));
+        //ServiceOnCompileResultReceived(await _service.SendSourceCode(_solutionId, _code));
         _isLoading = false;
         StateHasChanged();
     }

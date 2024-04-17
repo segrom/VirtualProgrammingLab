@@ -2,7 +2,12 @@
 
 using Exercise;
 
-Console.WriteLine("Start Exercise");
+Console.WriteLine("[Start Exercise]");
 var solution = new Solution();
-Console.WriteLine(solution.Sum(10, 10));
-Console.WriteLine("End Exercise");
+var tests = new Tests();
+
+Console.WriteLine(tests.Run(solution) 
+    ? "[Exercise Complete!]" 
+    : "[Exercise Failed!]");
+
+Console.WriteLine("[End Exercise]");

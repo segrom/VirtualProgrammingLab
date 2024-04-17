@@ -16,12 +16,15 @@ public class CompileRequest
 
     [Required]
     public string Code { get; set; }
+    [Required]
+    public string Tests { get; set; }
     public string? Output { get; set; }
     public string? Errors { get; set; }
     public CompileRequestStatus Status { get; set; }
 
     public DateTimeOffset CreationTime { get; set; }
     public DateTimeOffset? FinishTime { get; set; }
+    public TimeSpan? Duration { get; set; }
     
     public string UserId { get; set; }
     [Required][ForeignKey("UserId")]
@@ -35,7 +38,10 @@ public class CompileRequest
     [ForeignKey("ExerciseStateId")] 
     public ExerciseState? ExerciseState { get; set; }
 
-    public CompileRequest() { }
+    public CompileRequest()
+    {
+        CreationTime = DateTimeOffset.Now;
+    }
 
     public CompileRequest(string code, User user, Language language)
     {

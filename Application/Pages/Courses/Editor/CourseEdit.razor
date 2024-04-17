@@ -42,11 +42,11 @@
                             <button @onclick="() => SelectChapter(chapter)" class="nav-item btn btn-dark my-1 align-items-center d-flex justify-content-center @(chapter.Id == _selectedChapter?.Id ? "active" : "")">
                                 @if (chapter.IsExercise)
                                 {
-                                    <i class="ph-fill ph-code text-info mx-1" style="padding-top: 0.2em; font-size: 1em;"></i>
+                                    <i class="ph-fill ph-code text-info mx-1" style="padding-top: 0.1em; font-size: 1em;"></i>
                                 }
                                 else
                                 {
-                                    <i class="ph ph-article mx-1" style="padding-top: 0.2em; font-size: 1em;"></i>
+                                    <i class="ph ph-article mx-1" style="padding-top: 0.1em; font-size: 1em;"></i>
                                 }
                                 <span>@chapter.Title</span>
                             </button>
@@ -64,7 +64,15 @@
             <div class="d-flex justify-content-between align-items-center p-2">
                 @if (_selectedChapter is null)
                 {
-                    <p class="lead">Создайте первую главу с помощю кноки "Добавить главу"</p>
+                    if (_course?.Chapters?.Count > 0)
+                    {
+                        <p class="lead text-secondary">Выберите главу которую хотели бы отредактировать</p>
+                    }
+                    else
+                    {
+                        <p class="lead text-secondary">Создайте первую главу с помощью кнпоки "Добавить главу"</p>
+                    }
+                    
                 }
                 else
                 {
@@ -102,7 +110,7 @@
 
         private const string NewChapterModalId = "NewChapterModal";
         private const string CourseSettingsModalId = "CourseSettingsModal";
-    
+
     [Parameter]
     public int Id { get; set; }
 
@@ -110,7 +118,6 @@
     private Lecturer? _lecturer;
 
     private Chapter? _selectedChapter;
-    
 
     protected override async Task OnInitializedAsync()
     {
@@ -123,8 +130,6 @@
             return;
         }
         if (_course.Author.Id != _lecturer.Id) throw new Exception("У вас нет доступа к редактированию этого курса ⛔");
-
-        if(_course.Chapters.Count > 0) SelectChapter(_course.Chapters.First());
     }
 
     private void SelectChapter(Chapter chapter)
@@ -143,6 +148,7 @@
     {
         _course = await CourseService.GetCourseAsync(Id);
         _selectedChapter = _course?.Chapters.Count > 0 ? _course.Chapters.Last() : null;
+        StateHasChanged();
     }
 
     private void GoToChapter()

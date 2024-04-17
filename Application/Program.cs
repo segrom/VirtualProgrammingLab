@@ -81,6 +81,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
+        await context.Database.EnsureCreatedAsync();
         if (context.Database.GetPendingMigrations().Any())
         {
             await context.Database.MigrateAsync();
@@ -93,7 +94,35 @@ using (var scope = app.Services.CreateScope())
         {
             var languages = new[]
             {
-                new Language("C#", "csharp"),
+                new Language("C#", "csharp")
+                {
+                    DefaultTemplateCode = 
+@"namespace Exercise;
+
+public class Solution
+{
+    public int Sum(int x, int y)
+    {
+        return x * y;
+    }
+}",
+                    DefaultTestsCode = 
+@"namespace Exercise;
+
+public class Tests
+{
+    public bool Run(Solution solution)
+    {
+        var result = solution.Sum(10, 55);
+        if (result != 65) return false;
+        
+        result = solution.Sum(-2, 0);
+        if (result != -2) return false;
+
+        return true;
+    }
+}"
+                },
                 new Language("Python 3", "py"),
                 new Language("C++", "cpp"),
             };

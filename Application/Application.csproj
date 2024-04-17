@@ -87,6 +87,15 @@
       <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\font\fonts\open-iconic.woff" />
       <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\ICON-LICENSE" />
       <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\README.md" />
+      <_ContentIncludedByDefault Remove="Pages\Utils\BaseModal.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Utils\ConfirmationModal.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Utils\GroupSelectWithSearch.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Shared\Utils\BaseModal.razor" />
+      <AdditionalFiles Include="Shared\Utils\ConfirmationModal.razor" />
+      <AdditionalFiles Include="Shared\Utils\GroupSelectWithSearch.razor" />
     </ItemGroup>
     
 </Project>

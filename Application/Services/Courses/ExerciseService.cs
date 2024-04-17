@@ -1,6 +1,8 @@
 ﻿using Application.Data;
+using Application.Data.Account;
 using Application.Data.Common;
 using Application.Data.Courses;
+using Common.Structures;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Courses;
@@ -31,8 +33,8 @@ public class ExerciseService: IExerciseService
 
         var impl = new Impl()
         {
-            PatternCode = "",
-            TestsCode = "",
+            TemplateCode = language.DefaultTemplateCode ?? "",
+            TestsCode = language.DefaultTestsCode ?? "",
             Exercise = exercise,
             Language = language
         };
@@ -46,9 +48,44 @@ public class ExerciseService: IExerciseService
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
         var impl = await context.Impls.FirstAsync(x => x.Id == i.Id);
-        impl.PatternCode = i.PatternCode;
+        impl.TemplateCode = i.TemplateCode;
         impl.TestsCode = i.TestsCode;
         context.Update(impl);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task<CompileRequest> NewDebugCompileRequest(Impl impl, User lecturerUser, string debugProgramCode)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var language = await context.Languages.FirstAsync(l=>l.Id == impl.LanguageId);
+        var user = await context.Users.FirstAsync(e=>e.Id == lecturerUser.Id);
+
+        var request = await context.CompileRequests.AddAsync(
+            new CompileRequest()
+            {
+                Code = debugProgramCode,
+                Language = language,
+                User = user,
+                Status = CompileRequestStatus.Queued,
+                Tests = impl.TestsCode,
+            });
+        await context.SaveChangesAsync();
+        return request.Entity;
+    }
+
+    public async Task UpdateCompileRequest(QueueCompileResult result)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var request = await context.CompileRequests.FirstAsync(l=>l.Id == result.CompileRequestId);
+        request.Status = string.IsNullOrEmpty(result.ResultErrors)
+            ? CompileRequestStatus.Finished
+            : CompileRequestStatus.FinishedWithErrors;
+        request.Output = result.ResultOutput;
+        request.Errors = result.ResultErrors;
+        request.FinishTime = result.FinishTime;
+        request.FinishTime = result.FinishTime;
+        request.Duration = result.Duration;
+        context.Update(request);
         await context.SaveChangesAsync();
     }
 }

@@ -7,13 +7,12 @@ using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using CompileRequest = Common.Structures.CompileRequest;
 
 namespace Application.Services.Compile;
 
 public class CompileService: ICompileService
 {
-    private event Action<CompileResult> CompileResultReceived;
+    private event Action<QueueCompileResult> CompileResultReceived;
     
     private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
     private readonly ILogger<CompileService> _logger;
@@ -49,13 +48,13 @@ public class CompileService: ICompileService
         StartAsync();
     }
 
-    public async Task<CompileResult> SendSourceCode(string sourceId, string code)
+    public async Task<QueueCompileResult> QueueCompileRequest(CompileRequest compileRequest)
     {
-        var request = new CompileRequest(
-            _serviceQueueId,
-            sourceId,
-            code
-            );
+        var request = new QueueCompileRequest(
+            _serviceQueueId, 
+            compileRequest.Id, 
+            compileRequest.Code,
+            compileRequest.Tests);
         var body = JsonSerializer.SerializeToUtf8Bytes(request);
 
         _channel.BasicPublish(exchange: "",
@@ -64,11 +63,11 @@ public class CompileService: ICompileService
             body: body);
         _logger.Log(LogLevel.Information,$"Send source code (to queue {_configuration["RabbitMqSend:CompileQueueName"]}) {body}");
 
-        CompileResult? result = null;
+        QueueCompileResult? result = null;
 
         CompileResultReceived += r =>
         {
-            if (r.SourceId != sourceId) return;
+            if (r.CompileRequestId != compileRequest.Id) return;
             result = r;
         };
 
@@ -87,7 +86,7 @@ public class CompileService: ICompileService
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += (ch, ea) =>
         {
-            var result = JsonSerializer.Deserialize<CompileResult>(ea.Body.ToArray());
+            var result = JsonSerializer.Deserialize<QueueCompileResult>(ea.Body.ToArray());
 
             if (result is null)
             {

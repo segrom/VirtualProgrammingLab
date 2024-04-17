@@ -1,17 +1,13 @@
-﻿@namespace Application.Pages.Utils
-<!-- @ModalId Modal -->
+﻿<!-- @ModalId -->
 <div class="modal fade" id="@ModalId" tabindex="-1" aria-labelledby="@(ModalId)Label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger" id="@(ModalId)Label">@Header</h5>
+            <div class="modal-header d-flex align-items-center justify-content-center">
+                <h5 class="modal-title" id="@(ModalId)Label">@Title</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 @Body
-            </div>
-            <div class="modal-footer">
-                @Footer
             </div>
         </div>
     </div>
@@ -22,11 +18,8 @@
     [Parameter] public string ModalId { get; set; }
     
     [Parameter]
-    public RenderFragment Header { get; set; }
+    public RenderFragment Title { get; set; }
     
     [Parameter]
     public RenderFragment Body { get; set; }
-    
-    [Parameter]
-    public RenderFragment Footer { get; set; }
-} 
+}

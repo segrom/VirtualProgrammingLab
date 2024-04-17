@@ -39,7 +39,7 @@ public class RabbitListener : BackgroundService
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += async (ch, ea) =>
         {
-            var request = JsonSerializer.Deserialize<CompileRequest>(ea.Body.ToArray());
+            var request = JsonSerializer.Deserialize<QueueCompileRequest>(ea.Body.ToArray());
 
             if (request is null)
             {
@@ -48,7 +48,7 @@ public class RabbitListener : BackgroundService
                 return;
             }
             
-            _logger.Log(LogLevel.Information,$"Receive request to compile {request.ServiceId}:{request.SourceId}");
+            _logger.Log(LogLevel.Information,$"Receive request to compile {request.ServiceId}:{request.CompileRequestId}");
             var result = await CodeRunner.Instance.RunCode(request);
             var data = JsonSerializer.SerializeToUtf8Bytes(result);
             _channel.BasicPublish(exchange: "",
