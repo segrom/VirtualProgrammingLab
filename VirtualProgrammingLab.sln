@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompilerService", "CompilerService\CompilerService.csproj", "{CBA951F8-A3CC-4066-A2B3-55AC99715B5F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsharpCompilerService", "CsharpCompilerService\CsharpCompilerService.csproj", "{CBA951F8-A3CC-4066-A2B3-55AC99715B5F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AF66B003-72C1-4D11-AB25-D4F0D4CFF2FC}"
 	ProjectSection(SolutionItems) = preProject
@@ -8,8 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{B78BA062-6B9C-42CD-8075-747E8450B2E0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exercise", "CompilerService\Exercise\Exercise.csproj", "{A237A378-7420-45FA-BF3C-93F2B5AA0F18}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{DAA20C7E-2D74-4C7F-AFA8-82EB05593A21}"
 EndProject
@@ -27,10 +25,6 @@ Global
 		{B78BA062-6B9C-42CD-8075-747E8450B2E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B78BA062-6B9C-42CD-8075-747E8450B2E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B78BA062-6B9C-42CD-8075-747E8450B2E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A237A378-7420-45FA-BF3C-93F2B5AA0F18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A237A378-7420-45FA-BF3C-93F2B5AA0F18}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A237A378-7420-45FA-BF3C-93F2B5AA0F18}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A237A378-7420-45FA-BF3C-93F2B5AA0F18}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DAA20C7E-2D74-4C7F-AFA8-82EB05593A21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DAA20C7E-2D74-4C7F-AFA8-82EB05593A21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAA20C7E-2D74-4C7F-AFA8-82EB05593A21}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -4,14 +4,14 @@ EXPOSE 3300
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["CompilerService/CompilerService.csproj", "CompilerService/"]
+COPY ["CsharpCompilerService/CsharpCompilerService.csproj", "CsharpCompilerService/"]
 RUN dotnet restore "CompilerService/CompilerService.csproj"
 COPY . .
-WORKDIR "/src/CompilerService"
-RUN dotnet build "CompilerService.csproj" -c "$MODE" -o /compiler/build
+WORKDIR "/src/CsharpCompilerService"
+RUN dotnet build "CsharpCompilerService.csproj" -c "$MODE" -o /compiler/build
 
 FROM build AS publish
-RUN dotnet publish "CompilerService.csproj" -c "$MODE" -o /compiler/publish /p:UseAppHost=false
+RUN dotnet publish "CsharpCompilerService.csproj" -c "$MODE" -o /compiler/publish /p:UseAppHost=false
 
 FROM base AS final
 
@@ -30,4 +30,4 @@ RUN chown -R runner /home/runner/
 WORKDIR /compiler
 COPY --from=publish /compiler/publish .
 
-ENTRYPOINT ["dotnet", "CompilerService.dll"]
+ENTRYPOINT ["dotnet", "CsharpCompilerService.dll"]

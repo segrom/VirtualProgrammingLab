@@ -95,7 +95,7 @@ services:
     build:
       context: .
       no_cache: true
-      dockerfile: CompilerService/Dockerfile
+      dockerfile: CsharpCompilerService/Dockerfile
     environment:
       DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_NAME}
       DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}

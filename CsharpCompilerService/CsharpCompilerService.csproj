@@ -6,6 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-CompilerService-3E9C7C4B-F49A-4B6A-9B0D-0DEE92E36A64</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <AssemblyName>CsharpCompilerService</AssemblyName>
+        <RootNamespace>CsharpCompilerService</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
