@@ -61,7 +61,7 @@ public class ExerciseService: IExerciseService
         var user = await context.Users.FirstAsync(e=>e.Id == lecturerUser.Id);
 
         var request = await context.CompileRequests.AddAsync(
-            new CompileRequest()
+            new CompileRequest
             {
                 Code = debugProgramCode,
                 Language = language,
@@ -86,6 +86,14 @@ public class ExerciseService: IExerciseService
         request.FinishTime = result.FinishTime;
         request.Duration = result.Duration;
         context.Update(request);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteImplAsync(Impl i)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var impl = await context.Impls.FirstAsync(x=>x.Id == i.Id);
+        context.Impls.Remove(impl);
         await context.SaveChangesAsync();
     }
 }

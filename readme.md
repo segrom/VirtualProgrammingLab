@@ -1,4 +1,6 @@
 ﻿# Виртуальная лаборатория программирования
 
 ### Todo
--[ ] Mange modals by JsInterop [source](https://stackoverflow.com/questions/77453833/bootstrap-modal-on-blazor-stopped-working-on-net-8-rc2-using-jsinterop-to-open)
+- [ ] Mange modals by JsInterop [source](https://stackoverflow.com/questions/77453833/bootstrap-modal-on-blazor-stopped-working-on-net-8-rc2-using-jsinterop-to-open)
+- [ ] Make services more independent from input data structures, more restfull...
+- [ ] Write own simple framework for tests...

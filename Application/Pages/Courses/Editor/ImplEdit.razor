@@ -67,14 +67,14 @@
             </div>
         </div>
         <div class="row m-1" style="height: 35vh; min-width: 100px;">
-            <div class="col-6 border rounded-3  p-2">
-                <CodeInput Index="1" @bind-Code="TemplateCode" Language="@_impl?.Language.HighlightLabel" StartCode="@_templateStart"/>
+            <div class="col-6 rounded-3  p-2">
+                <CodeInput Index="1" @bind-Code="TemplateCode" Language="@_impl?.Language.HighlightLabel" HeightInVh="35" StartCode="@_templateStart"/>
             </div>
-            <div class="col-6 border rounded-3  p-2">
-                <CodeInput Index="2" @bind-Code="TestsCode" Language="@_impl?.Language.HighlightLabel" StartCode="@_testsStart"/>
+            <div class="col-6 rounded-3  p-2">
+                <CodeInput Index="2" @bind-Code="TestsCode" Language="@_impl?.Language.HighlightLabel"  HeightInVh="35" StartCode="@_testsStart"/>
             </div>
         </div>
-        <div class="my-2  d-flex justify-content-between">
+        <div class="my-4  d-flex justify-content-between">
             <div class="d-flex align-items-center justify-content-center">
                 <h5>
                     Тестовый компилятор для проверки проверки
@@ -85,7 +85,7 @@
                 <button @onclick="Compile" disabled="@(_isLoading)" type="button" class="btn btn-primary align-items-center d-flex justify-content-center"> 
                                     @if (_isLoading)
                                     {
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                                         <span>Компиляция...</span>
                                     }
                                     else
@@ -97,11 +97,11 @@
             </div>
         </div>
         <div class="row m-1" style="height: 40vh; min-width: 100px;">
-            <div class="col-6 border rounded-3 px-2 pb-3 pt-1">
-                <CodeInput Index="3" @bind-Code="DebugProgramCode" Language="@_impl?.Language.HighlightLabel"/>
+            <div class="col-6 rounded-3 px-2 pb-3 pt-1">
+                <CodeInput Index="3" @bind-Code="DebugProgramCode" HeightInVh="40" Language="@_impl?.Language.HighlightLabel"/>
             </div>
-            <div class="col-6 border rounded-3 px-2 pb-3 pt-1">
-                <textarea @bind="@DebugProgramOutput" class="py-2 px-4 rounded-3  code" disabled readonly style="height: 100%; width: 100%; resize: none;">log here</textarea>
+            <div class="col-6 rounded-3 px-2 pb-3 pt-1">
+                <textarea @bind="@DebugProgramOutput" class="py-2 px-4 rounded-3  code" disabled readonly style="height: 40vh; width: 100%; resize: none;">log here</textarea>
             </div>
         </div>
     }
@@ -229,11 +229,12 @@
         if (_impl is null || _lecturer is null || _isLoading) return;
         _isLoading = true;
         var request = await ExerciseService.NewDebugCompileRequest(_impl, _lecturer.User, DebugProgramCode);
+        Logger.Log(LogLevel.Information, $"Create compileRequest [{request.Id}] \n with code: {request.Code} \n and tests: {request.Tests}");
         var result = await CompileService.QueueCompileRequest(request);
         _isLoading = false;
         DebugProgramOutput = "";
-        if (!string.IsNullOrEmpty(result.ResultOutput)) DebugProgramOutput = $"Output: \n {result.ResultOutput}";
-        if (!string.IsNullOrEmpty(result.ResultErrors)) DebugProgramOutput += $"🚩Errors: \n {result.ResultErrors}";
+        if (!string.IsNullOrEmpty(result.ResultOutput)) DebugProgramOutput = $"Output: \n{result.ResultOutput}";
+        if (!string.IsNullOrEmpty(result.ResultErrors)) DebugProgramOutput += $"🚩Errors: \n{result.ResultErrors}";
         Logger.Log(LogLevel.Information, $"CR_ID[{request.Id}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
         await ExerciseService.UpdateCompileRequest(result); // TODO: actually make independent service to process compile results and apply it to compile requests in db
     }

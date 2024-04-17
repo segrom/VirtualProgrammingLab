@@ -16,6 +16,7 @@ public class Course
 
     [Required][MinLength(4)]
     public string Title { get; set; }
+    [Required]
     public string Desc { get; set; }
     public CourseStatus Status { get; set; }
     

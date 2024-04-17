@@ -124,13 +124,17 @@
                         </button>
                         <div class="d-flex">
                             <div class="d-flex mx-2 justify-content-between align-items-center @(impl.HasPattern() ? "text-success" : "text-danger") ">
-                                <i class="ph-bold @(impl.HasPattern() ? "ph-check-circle" : "ph-x-circle ") me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                                <i class="ph-bold @(impl.HasPattern() ? "ph-check-circle" : "ph-x-circle ") me-1" style=" font-size: 1.2em;"></i>
                                 <strong>Шаблон</strong>
                             </div>
                             <div class="d-flex mx-2 justify-content-between align-items-center  @(impl.HasTests() ? "text-success" : "text-danger")">
-                                <i class="ph-bold @(impl.HasTests() ? "ph-check-circle" : "ph-x-circle ") me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                                <i class="ph-bold @(impl.HasTests() ? "ph-check-circle" : "ph-x-circle ") me-1" style=" font-size: 1.2em;"></i>
                                 <strong>Тесты</strong>
                             </div>
+                            <button @onclick="() => _selectedImpl = impl" class="btn btn-outline-danger align-items-center d-flex justify-content-center" data-bs-toggle="modal" data-bs-target="#@DeleteImplModalId">
+                                <i class="ph ph-trash-simple me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                                <span>Удалить</span>
+                            </button>
                         </div>
                     </div>
                 }
@@ -146,10 +150,17 @@
     </Title>
     <Body>Реализация задания – это код шаблона для студентов и тестов, выполняемых для проверки задания на конкретном языке программирования</Body>
 </InfoModal>
+<ConfirmationModal Title="Внимание" ModalId="@DeleteImplModalId" OnSuccess="() => DeleteSelectedImpl()">
+    
+    <p>
+        Вы уверены что хотите удалить реализацию задания <strong>@(_chapter?.Title ?? "")</strong> на языке <strong>@(_selectedImpl?.Language.Name ?? "")</strong> ?
+    </p>
+</ConfirmationModal>
 
 @code {
 
         private const string ImplHelpModalId = "ImplHelpModal";
+        private const string DeleteImplModalId = "DeleteImplModal";
     
     [Parameter]
     public int Id { get; set; }
@@ -161,6 +172,8 @@
     private Exercise? _exercise;
     private Lecturer? _lecturer;
     private Language[]? _languages;
+    
+    private Impl? _selectedImpl;
     
     private string RawBody
     {
@@ -230,6 +243,14 @@
     private void GoToImpl(Impl impl)
     {
         NavigationManager.NavigateTo($"/course/edit/{Id}/{ChapterId}/{impl.Id}");
+    }
+
+    private async Task DeleteSelectedImpl()
+    {
+        if(_exercise is null || _selectedImpl is null) return;
+        await ExerciseService.DeleteImplAsync(_selectedImpl);
+        _exercise = await CourseService.GetExerciseAsync(_chapter);
+        StateHasChanged();
     }
 
 }

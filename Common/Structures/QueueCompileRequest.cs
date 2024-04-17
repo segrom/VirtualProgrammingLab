@@ -15,6 +15,7 @@ public record QueueCompileRequest
     {
         ServiceId = serviceId;
         CompileRequestId = compileRequestId;
+        Solution = solution;
         Tests = tests;
     }
 }

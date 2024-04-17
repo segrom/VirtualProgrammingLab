@@ -12,4 +12,5 @@ public interface IExerciseService
     Task UpdateImplAsync(Impl impl);
     Task<CompileRequest> NewDebugCompileRequest(Impl impl, User lecturerUser, string debugProgramCode);
     Task UpdateCompileRequest(QueueCompileResult result);
+    Task DeleteImplAsync(Impl impl);
 }

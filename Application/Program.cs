@@ -81,11 +81,11 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
-        await context.Database.EnsureCreatedAsync();
+        /*await context.Database.EnsureCreatedAsync();
         if (context.Database.GetPendingMigrations().Any())
         {
             await context.Database.MigrateAsync();
-        }
+        }*/
         var userManager = services.GetRequiredService<UserManager<User>>();
         var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         await RoleController.InitializeAsync(userManager, rolesManager);
