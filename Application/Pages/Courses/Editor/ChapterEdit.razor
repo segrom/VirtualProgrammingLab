@@ -150,8 +150,7 @@
     </Title>
     <Body>Реализация задания – это код шаблона для студентов и тестов, выполняемых для проверки задания на конкретном языке программирования</Body>
 </InfoModal>
-<ConfirmationModal Title="Внимание" ModalId="@DeleteImplModalId" OnSuccess="() => DeleteSelectedImpl()">
-    
+<ConfirmationModal Title="Внимание" ModalId="@DeleteImplModalId">
     <p>
         Вы уверены что хотите удалить реализацию задания <strong>@(_chapter?.Title ?? "")</strong> на языке <strong>@(_selectedImpl?.Language.Name ?? "")</strong> ?
     </p>

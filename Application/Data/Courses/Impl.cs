@@ -33,6 +33,6 @@ public class Impl
         LanguageId = language.Id;
     }
 
-    public bool HasPattern() => !string.IsNullOrEmpty(TemplateCode) && TemplateCode!=Language.DefaultTemplateCode;
-    public bool HasTests() => !string.IsNullOrEmpty(TestsCode) && TestsCode!=Language.DefaultTestsCode;
+    public bool HasPattern() => !string.IsNullOrEmpty(TemplateCode) && !TemplateCode.Equals(Language.DefaultTemplateCode);
+    public bool HasTests() => !string.IsNullOrEmpty(TestsCode) && !TestsCode.Equals(Language.DefaultTestsCode);
 }

@@ -2,12 +2,25 @@
 
 using Exercise;
 
-Console.WriteLine("[Start Exercise]");
+
+Console.WriteLine("[Start exercise]");
 var solution = new Solution();
 var tests = new Tests();
 
-Console.WriteLine(tests.Run(solution) 
-    ? "[Exercise Complete!]" 
-    : "[Exercise Failed!]");
+try
+{
+    tests.Run(solution);
+    Console.WriteLine("[Exercise completed!]" );
+}
+catch (ExerciseException e)
+{
+    Console.WriteLine($"Test failed: {e.Message}");
+    Console.WriteLine("[Exercise failed!]");
+}
+finally
+{
+    Console.WriteLine("[End exercise]");
+}
 
-Console.WriteLine("[End Exercise]");
+
+
