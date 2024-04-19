@@ -36,6 +36,9 @@ public class CourseService: ICourseService
             .Include(c =>c.Author)
             .Include(c =>c.Chapters)
                 .ThenInclude(c=> c.Exercise)
+                .ThenInclude(e=>e.Implementations)
+                .ThenInclude(i=>i.Language)
+            .Include(c=>c.Groups)
             .FirstAsync(c => c.Id == id);
         return result;
     }
@@ -93,5 +96,14 @@ public class CourseService: ICourseService
             .Include(e=>e.Implementations)
             .ThenInclude(i=>i.Language)
             .FirstAsync(e => e.ChapterId == c.Id);
+    }
+
+    public async Task ChangeCourseState(Course c, CourseStatus state)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var course = await context.Courses.FirstAsync(x => x.Id == c.Id);
+        course.Status = state;
+        context.Update(course);
+        await context.SaveChangesAsync();
     }
 }

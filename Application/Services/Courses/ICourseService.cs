@@ -12,4 +12,5 @@ public interface ICourseService
     Task AddChapterToCourse(Course course, Chapter chapter);
     Task UpdateChapterAsync(Chapter chapter);
     Task<Exercise> GetExerciseAsync(Chapter chapter);
+    Task ChangeCourseState(Course course, CourseStatus published);
 }

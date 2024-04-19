@@ -1,0 +1,77 @@
+﻿@using Application.Data.Courses
+@using Application.Data.Students
+@using Application.Services.Lecturers
+@using Application.Shared.Utils
+@inject ILecturerService LecturerService
+<!-- Modal -->
+<div class="modal fade" id="@ModalId" tabindex="-1" aria-labelledby="@(ModalId)Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="@(ModalId)Label">Добавление групп к курсам</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Выберете группы, которые нужно добавить к курсам: <br> <strong>@(string.Join(", ", Courses.Select(c=>c.Title)))</strong></p>
+                
+                <GroupSelectWithSearch Text="Добавить группу" SelectedChanged="AddGroup" />
+                
+                <ul class="list-group overflow-auto" style="max-height: 40vh">
+                    @foreach (var group in _groups)
+                    {
+                        <li class="list-group-item">
+                            <div class="dropend">
+                                <button class="btn btn-dark dropdown-toggle align-items-center d-flex justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div>@group.Name</div>
+                                    <i class="ph-bold ph-dots-three-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item disabled" disabled href="#">Open</a>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item text-danger" @onclick="() => RemoveGroup(group)">Remove</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                <button @onclick="Apply" type="submit" class="btn btn-primary"  data-bs-dismiss="modal">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string ModalId { get; set; }
+
+    [Parameter]
+    public List<Course> Courses { get; set; } = new();
+    
+    private List<StudentGroup> _groups = new();
+
+    private void AddGroup(StudentGroup? group)
+    {
+        if (group is null) return;
+        _groups.Add(group);
+    }
+
+    private void RemoveGroup(StudentGroup group)
+    {
+        _groups.Remove(group);
+    }
+
+    private async Task Apply()
+    {
+        foreach (var group in _groups)
+        {
+            await LecturerService.AddCoursesToGroup(Courses, group);
+        }
+        
+    }
+
+}

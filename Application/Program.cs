@@ -81,8 +81,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
-        /*await context.Database.EnsureCreatedAsync();
-        if (context.Database.GetPendingMigrations().Any())
+        await context.Database.EnsureCreatedAsync();
+        /*if (context.Database.GetPendingMigrations().Any())
         {
             await context.Database.MigrateAsync();
         }*/

@@ -1,7 +1,7 @@
 ﻿{
   "Servers": {
     "1": {
-      "Name": "application",
+      "Name": "VPL",
       "Group": "Servers",
       "Host": "database",
       "Port": 5432,

@@ -1,6 +1,5 @@
 ﻿using Application.Data;
 using Application.Data.Account;
-using Application.Data.Lecturers;
 using Application.Data.Students;
 using Application.Pages.Admin;
 using Microsoft.AspNetCore.Identity;

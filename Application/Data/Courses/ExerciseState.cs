@@ -20,20 +20,15 @@ public class ExerciseState
     [ForeignKey("StudentId")] 
     public Student Student { get; set; }
     
-    public int LanguageId { get; set; }
-    [ForeignKey("LanguageId")] 
-    public Language Language { get; set; }
+    public int ExerciseId { get; set; }
+    [ForeignKey("ExerciseId")] 
+    public Exercise Exercise { get; set; }
+    
+    public int ImplId { get; set; }
+    [ForeignKey("ImplId")] 
+    public Impl Impl { get; set; }
 
     public List<CompileRequest> CompileRequests { get; set; } = new();
 
     public ExerciseState() {}
-
-    public ExerciseState(Student student, Language language)
-    {
-        Student = student;
-        StudentId = student.Id;
-        Language = language;
-        LanguageId = language.Id;
-        Status = ExerciseStatus.Started;
-    }
 }

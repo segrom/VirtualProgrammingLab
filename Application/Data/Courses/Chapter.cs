@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Application.Data.Students;
 
 namespace Application.Data.Courses;
 
@@ -31,5 +32,10 @@ public class Chapter
         Body = body;
         Course = course;
         CourseId = course.Id;
+    }
+
+    public ChapterStudentState? StudentState(Student student)
+    {
+        return StudentStates?.FirstOrDefault(s => s.StudentId == student.Id);
     }
 }

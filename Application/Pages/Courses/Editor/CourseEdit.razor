@@ -16,6 +16,10 @@
     <div class="row">
         <div class="d-flex align-items-lg-center justify-content-between">
             <h1 class=" m-3">@(_course?.Title??"Course not found")</h1>
+            @if (_course?.Status == CourseStatus.Published)
+            {
+                <em> Не рекомендуется редактировать этот курс, т.к. он <strong class="text-info">опубликован</strong> </em>
+            }
             <div>
                 <button class="btn btn-dark align-items-center d-flex justify-content-center"  
                         data-bs-toggle="modal" data-bs-target="#@CourseSettingsModalId">
