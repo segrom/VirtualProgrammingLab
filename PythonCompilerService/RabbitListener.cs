@@ -5,7 +5,7 @@ using Humanizer;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace CsharpCompilerService;
+namespace PythonCompilerService;
 
 public class RabbitListener : BackgroundService
 {
@@ -21,7 +21,7 @@ public class RabbitListener : BackgroundService
         _logger = logger;
         _configuration = configuration;
         _logger.LogInformation("Login rabbit as {0}", Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"));
-        _inputQueueName = Environment.GetEnvironmentVariable("INPUT_QUEUE_NAME_FORMAT").FormatWith("csharp");
+        _inputQueueName = Environment.GetEnvironmentVariable("INPUT_QUEUE_NAME_FORMAT").FormatWith("py");
         var factory = new ConnectionFactory
         {
             HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
@@ -64,7 +64,7 @@ public class RabbitListener : BackgroundService
                 basicProperties: null,
                 body: data);
             _channel.BasicPublish(exchange: "",
-                routingKey: Environment.GetEnvironmentVariable("COMPILE_RESULTS_UPDATE_QUEUE_NAME"), // TODO: Make bg service for that
+                routingKey: Environment.GetEnvironmentVariable("COMPILE_RESULTS_UPDATE_QUEUE_NAME"),
                 basicProperties: null,
                 body: data);
 

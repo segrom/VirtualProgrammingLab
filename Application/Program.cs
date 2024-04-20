@@ -134,7 +134,44 @@ public class Tests
     }
 }"
                 },
-                new Language("Python 3", "py"),
+                new Language("Python 3.9", "py")
+                {
+                    DefaultTemplateCode = 
+                        @"from tests import *
+from solution import *
+
+print(""[Start exercise]"")
+
+solution = Solution()
+tests = Tests()
+
+try:
+    tests.run(solution)
+except ExerciseException as ex:
+    print(f""Test failed: {ex}"")
+    print(""[Exercise failed!]"")
+    raise ex
+finally:
+    print(""[End exercise]"")
+
+",
+                    DefaultTestsCode = 
+                        @"from utils import *
+from solution import *
+
+
+class Tests:
+    def run(self, solution: Solution):
+        result = solution.calculateSum(-1, 15)
+        if result != 14:
+            raise ExerciseException(f""Sum of -1 and 15: answer = {14}, result = {result}"")
+
+        result = solution.calculateSum(103, 15)
+        if result != 25:
+            raise ExerciseException(f""Sum of 10 and 15: answer = {25}, result = {result}"")
+
+"
+                },
                 new Language("C++", "cpp"),
             };
             await context.Languages.AddRangeAsync(languages);

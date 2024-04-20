@@ -5,7 +5,7 @@ EXPOSE 3300
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["CsharpCompilerService/CsharpCompilerService.csproj", "CsharpCompilerService/"]
-RUN dotnet restore "CompilerService/CompilerService.csproj"
+RUN dotnet restore "CsharpCompilerService/CsharpCompilerService.csproj"
 COPY . .
 WORKDIR "/src/CsharpCompilerService"
 RUN dotnet build "CsharpCompilerService.csproj" -c "$MODE" -o /compiler/build
@@ -21,7 +21,7 @@ FROM base AS final
 RUN adduser runner --disabled-password --gecos ""
 
 WORKDIR /home/runner/exercise
-COPY --from=build /src/CompilerService/Exercise .
+COPY --from=build /src/CsharpCompilerService/Exercise .
 
 RUN chmod go-r /
 RUN chown -R runner /home/runner/

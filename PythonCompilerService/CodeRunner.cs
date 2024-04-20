@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Common.QueueStructures;
 
-namespace CsharpCompilerService;
+namespace PythonCompilerService;
 
 public class CodeRunner
 {
@@ -13,7 +13,7 @@ public class CodeRunner
 
     public CodeRunner()
     {
-        Console.WriteLine(RunCommand("dotnet", $"--list-sdks"));
+        Console.WriteLine(RunCommand("python3", $"--version"));
         Console.WriteLine("_____ run user inited _____");
     }
 
@@ -62,15 +62,15 @@ public class CodeRunner
     
     public async Task<QueueCompileResult> RunCode(QueueCompileRequest request)
     {
-        var solutionFilepath = Path.Join(Homedir, "exercise/Solution.cs");
-        var testsFilepath = Path.Join(Homedir, "exercise/Tests.cs");
-        var solutionPath = Path.Join(Homedir, "exercise/Exercise.csproj");
+        var solutionFilepath = Path.Join(Homedir, "exercise/solution.py");
+        var testsFilepath = Path.Join(Homedir, "exercise/tests.py");
+        var mainFilepath = Path.Join(Homedir, "exercise/main.py");
         await File.WriteAllTextAsync(solutionFilepath, request.Solution);
         await File.WriteAllTextAsync(testsFilepath, request.Tests);
         
         Console.WriteLine("[START WITH RUNNER USER PROJ]");
         var sw = Stopwatch.StartNew();
-        var (output, errors) = await RunCommand("unshare", $"-n runuser -u {Username} -- dotnet run --project {solutionPath}");
+        var (output, errors) = await RunCommand("unshare", $"-n runuser -u {Username} -- python3 {mainFilepath}");
         var duration = sw.Elapsed;
         Console.WriteLine("[STOP PROJ]");
 

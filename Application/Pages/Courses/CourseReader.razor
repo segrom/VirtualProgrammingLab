@@ -260,6 +260,8 @@
     {
         if(impl is null) return;
         _selectedImpl = impl;
+        _exerciseState = _exerciseStates.FirstOrDefault(x => x.ImplId == _selectedImpl.Id);
+        _isLoading = _exerciseState?.CompileRequests.Any(r => r.Status == CompileRequestStatus.Queued) ?? false;
         _startCode = _selectedImpl.TemplateCode;
         _code = _startCode;
         StateHasChanged();

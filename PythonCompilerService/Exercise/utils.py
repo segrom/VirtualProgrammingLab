@@ -1,0 +1,2 @@
+class ExerciseException(Exception):
+    pass
