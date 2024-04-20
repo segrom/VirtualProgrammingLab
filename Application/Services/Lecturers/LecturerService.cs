@@ -1,10 +1,9 @@
-﻿using Application.Data;
-using Application.Data.Account;
-using Application.Data.Courses;
-using Application.Data.Lecturers;
-using Application.Data.Students;
-using Application.Services.Students;
+﻿using Application.Services.Students;
 using Application.Services.Users;
+using Common;
+using Common.Courses;
+using Common.Lecturers;
+using Common.Students;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

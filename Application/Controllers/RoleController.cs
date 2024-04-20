@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Common.Account;
+using Microsoft.AspNetCore.Identity;
 
-namespace Application.Data.Account;
+namespace Application.Controllers;
 
 public class RoleController
 {

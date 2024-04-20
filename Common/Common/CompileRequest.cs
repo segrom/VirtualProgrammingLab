@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Application.Data.Account;
-using Application.Data.Courses;
+using Common.Account;
+using Common.Courses;
 
-namespace Application.Data.Common;
+namespace Common.Common;
 
 public enum CompileRequestStatus
 {

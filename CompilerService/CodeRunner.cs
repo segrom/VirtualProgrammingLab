@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Common.Structures;
+using Common.QueueStructures;
 
 namespace CompilerService;
 

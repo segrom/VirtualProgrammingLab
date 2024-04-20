@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Application.Data.Common;
-using Application.Data.Students;
+using Common.Common;
+using Common.Students;
 
-namespace Application.Data.Courses;
+namespace Common.Courses;
 
 public enum ExerciseStatus
 {

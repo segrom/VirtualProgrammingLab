@@ -13,7 +13,7 @@ services:
   rabbit:
     container_name: rabbitmq
     tty: true
-    hostname: rabbitmq
+    hostname: ${RABBITMQ_HOST}
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -73,6 +73,27 @@ services:
     networks:
       - db-network
 
+  compile-results-updater-service:
+    image: compile-results-updater-service
+    build:
+      context: .
+      no_cache: true
+      dockerfile: CompileResultsUpdaterService/Dockerfile
+    environment:
+      DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_NAME}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
+      MODE: ${MODE}
+      DB_CONNECTIONSTRING: ${DB_CONNECTIONSTRING}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      COMPILE_RESULTS_UPDATE_QUEUE_NAME: ${COMPILE_RESULTS_UPDATE_QUEUE_NAME}
+    restart: on-failure
+    depends_on:
+      - rabbit
+      - database
+    networks:
+      - rabbit-network
+      - db-network
+
   application:
     image: application
     ports:
@@ -85,10 +106,14 @@ services:
       DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
       MODE: ${MODE}
       DB_CONNECTIONSTRING: ${DB_CONNECTIONSTRING}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      INPUT_QUEUE_NAME_FORMAT: ${INPUT_QUEUE_NAME_FORMAT}
+      RESULTS_QUEUE_NAME_FORMAT: ${RESULTS_QUEUE_NAME_FORMAT}
     restart: on-failure
     depends_on:
       - rabbit
       - database
+      - compile-results-updater-service
     networks:
       - rabbit-network
       - db-network
@@ -103,12 +128,17 @@ services:
       DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_NAME}
       DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
       MODE: ${MODE}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      INPUT_QUEUE_NAME_FORMAT: ${INPUT_QUEUE_NAME_FORMAT}
+      RESULTS_QUEUE_NAME_FORMAT: ${RESULTS_QUEUE_NAME_FORMAT}
+      COMPILE_RESULTS_UPDATE_QUEUE_NAME: ${COMPILE_RESULTS_UPDATE_QUEUE_NAME}
     restart: on-failure
     privileged: true
     pid: "host"
     depends_on:
       - rabbit
       - database
+      - compile-results-updater-service
     networks:
       - rabbit-network
       - db-network

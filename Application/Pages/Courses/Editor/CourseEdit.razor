@@ -1,10 +1,11 @@
 ﻿@page "/course/edit/{id:int}"
-@using Application.Data.Account
-@using Application.Data.Courses
-@using Application.Data.Lecturers
 @using Application.Pages.Courses.Editor.Components
 @using Application.Services.Courses
 @using Application.Services.Lecturers
+@using Common.Account
+@using Common.Courses
+@using Common.Lecturers
+@using Application.Controllers
 @attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
 @inject ILecturerService LecturerService
 @inject ICourseService CourseService

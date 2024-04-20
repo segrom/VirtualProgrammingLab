@@ -1,7 +1,5 @@
 using Application.Areas.Identity;
-using Application.Data;
-using Application.Data.Account;
-using Application.Data.Common;
+using Application.Controllers;
 using Application.Middleware;
 using Application.Services.Admin;
 using Application.Services.Compile;
@@ -10,6 +8,9 @@ using Application.Services.Lecturers;
 using Application.Services.Search;
 using Application.Services.Students;
 using Application.Services.Users;
+using Common;
+using Common.Account;
+using Common.Common;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -93,20 +94,6 @@ app.UseMiddleware<BlazorCookieLoginMiddleware>();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            await context.Database.MigrateAsync();
-        }
-        
-    }
-    catch (Exception e)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(e, "An error occurred while seeding the database.");
-    }
 
     try
     {

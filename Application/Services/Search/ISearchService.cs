@@ -1,4 +1,4 @@
-﻿using Application.Data.Students;
+﻿using Common.Students;
 
 namespace Application.Services.Search;
 

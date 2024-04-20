@@ -1,6 +1,5 @@
-﻿using Application.Data;
-using Application.Data.Account;
-using Application.Data.Courses;
+﻿using Common;
+using Common.Courses;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

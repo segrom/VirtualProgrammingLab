@@ -1,7 +1,6 @@
-﻿using Application.Data.Account;
-using Application.Data.Courses;
-using Application.Data.Lecturers;
-using Application.Data.Students;
+﻿using Common.Courses;
+using Common.Lecturers;
+using Common.Students;
 
 namespace Application.Services.Lecturers;
 

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using Application.Data.Account;
+using Common.Account;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Middleware;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Application.Data.Account;
+namespace Common.Account;
 
 [Serializable]
 public class VplLoginModel

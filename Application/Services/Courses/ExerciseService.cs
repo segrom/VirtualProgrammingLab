@@ -1,9 +1,9 @@
-﻿using Application.Data;
-using Application.Data.Account;
-using Application.Data.Common;
-using Application.Data.Courses;
-using Application.Data.Students;
-using Common.Structures;
+﻿using Common;
+using Common.Account;
+using Common.Common;
+using Common.Courses;
+using Common.QueueStructures;
+using Common.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Courses;
@@ -74,34 +74,6 @@ public class ExerciseService: IExerciseService
         return request.Entity;
     }
 
-    public async Task<(CompileRequest, ExerciseState?)> UpdateCompileRequest(QueueCompileResult result)
-    {
-        await using var context = await _dbContextFactory.CreateDbContextAsync();
-        var request = await context.CompileRequests
-            .Include(r=>r.ExerciseState)
-            .FirstAsync(l=>l.Id == result.CompileRequestId);
-        
-        request.Status = string.IsNullOrEmpty(result.ResultErrors)
-            ? CompileRequestStatus.Finished
-            : CompileRequestStatus.FinishedWithErrors;
-        request.Output = result.ResultOutput;
-        request.Errors = result.ResultErrors;
-        request.FinishTime = result.FinishTime;
-        request.FinishTime = result.FinishTime;
-        request.Duration = result.Duration;
-        
-        if (request.ExerciseState != null && request.ExerciseState.Status != ExerciseStatus.Completed)
-        {
-            request.ExerciseState.Status = request.Status == CompileRequestStatus.Finished
-                ? ExerciseStatus.Completed
-                : ExerciseStatus.Failed;
-        }
-        
-        context.Update(request);
-        await context.SaveChangesAsync();
-        return (request, request.ExerciseState);
-    }
-
     public async Task DeleteImplAsync(Impl i)
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
@@ -110,7 +82,7 @@ public class ExerciseService: IExerciseService
         await context.SaveChangesAsync();
     }
 
-    public async Task<CompileRequest> NewCompileRequest(Impl i, ExerciseState? st, Student s, string? code)
+    public async Task<(CompileRequest, ExerciseState)> NewCompileRequest(Impl i, ExerciseState? st, Student s, string? code)
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
         var impl = await context.Impls
@@ -143,7 +115,7 @@ public class ExerciseService: IExerciseService
             });
         state.CompileRequests.Add(request.Entity);
         await context.SaveChangesAsync();
-        return request.Entity;
+        return (request.Entity, state);
     }
 
     private async Task<ExerciseState> CreateNewExerciseStateAsync(ApplicationDbContext context, Impl impl, Student student)

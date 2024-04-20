@@ -1,9 +1,10 @@
-﻿using Application.Data;
-using Application.Data.Account;
-using Application.Data.Common;
-using Application.Data.Students;
+﻿using Application.Controllers;
 using Application.Pages.Admin;
 using Application.Pages.Admin.Data;
+using Common;
+using Common.Account;
+using Common.Common;
+using Common.Students;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

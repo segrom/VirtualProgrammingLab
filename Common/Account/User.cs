@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Application.Data.Lecturers;
-using Application.Data.Students;
+using Common.Lecturers;
+using Common.Students;
 using Microsoft.AspNetCore.Identity;
 
-namespace Application.Data.Account;
+namespace Common.Account;
 
 public class User: IdentityUser
 {

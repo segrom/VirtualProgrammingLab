@@ -1,25 +1,25 @@
-﻿using Application.Data.Account;
+﻿using Common.Account;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Controllers;
 
-[Microsoft.AspNetCore.Components.Route("/logout")]
 [ApiController]
-public class LogoutController : Controller
+[Microsoft.AspNetCore.Components.Route("")]
+public class ProfileController : Controller
 {
     private readonly SignInManager<User> _signInManager;
 
-    public LogoutController(SignInManager<User> signInManager)
+    public ProfileController(SignInManager<User> signInManager)
     {
         _signInManager = signInManager;
     }
 
-    [HttpPost]
-    [Microsoft.AspNetCore.Mvc.Route("/")]
+    [HttpPost("logout")]
     public async Task<IActionResult> Post()
     {
+        Console.WriteLine($"Receivce post {Request.Path} | {Request.HttpContext.Session.Id} | {Request.Host}");
         await _signInManager.SignOutAsync();
         return new RedirectResult("/");
     }

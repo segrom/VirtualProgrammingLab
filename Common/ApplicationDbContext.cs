@@ -1,12 +1,12 @@
-﻿using Application.Data.Account;
-using Application.Data.Common;
-using Application.Data.Courses;
-using Application.Data.Lecturers;
-using Application.Data.Students;
+﻿using Common.Account;
+using Common.Common;
+using Common.Courses;
+using Common.Lecturers;
+using Common.Students;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Data;
+namespace Common;
 
 public sealed class ApplicationDbContext : IdentityDbContext<User> 
 {

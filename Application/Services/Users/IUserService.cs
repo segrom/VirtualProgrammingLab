@@ -1,4 +1,4 @@
-﻿using Application.Data.Account;
+﻿using Common.Account;
 
 namespace Application.Services.Users;
 

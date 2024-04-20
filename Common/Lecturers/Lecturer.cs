@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Application.Data.Account;
+using Common.Account;
 
-namespace Application.Data.Lecturers;
+namespace Common.Lecturers;
 
 public class Lecturer
 {

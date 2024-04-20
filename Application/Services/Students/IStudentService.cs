@@ -1,7 +1,5 @@
-﻿using Application.Data.Account;
-using Application.Data.Common;
-using Application.Data.Courses;
-using Application.Data.Students;
+﻿using Common.Courses;
+using Common.Students;
 
 namespace Application.Services.Students;
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Application.Data.Account;
-using Application.Data.Lecturers;
+using Common.Account;
+using Common.Lecturers;
 
 namespace Application.Pages.Admin.Data;
 

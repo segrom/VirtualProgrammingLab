@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Application.Data.Courses;
+using Common.Courses;
 
-namespace Application.Data.Students;
+namespace Common.Students;
 
 public class StudentGroup
 {

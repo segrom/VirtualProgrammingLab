@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Application.Data.Common;
+namespace Common.Common;
 
 public class Language
 {

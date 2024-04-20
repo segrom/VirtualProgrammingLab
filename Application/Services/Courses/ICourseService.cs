@@ -1,4 +1,4 @@
-﻿using Application.Data.Courses;
+﻿using Common.Courses;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services.Courses;

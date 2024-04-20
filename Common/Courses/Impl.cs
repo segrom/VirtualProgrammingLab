@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Application.Data.Common;
+using Common.Common;
 
-namespace Application.Data.Courses;
+namespace Common.Courses;
 
 public class Impl
 {

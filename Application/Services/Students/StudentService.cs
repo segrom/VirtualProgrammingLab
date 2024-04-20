@@ -1,8 +1,7 @@
-﻿using Application.Data;
-using Application.Data.Common;
-using Application.Data.Courses;
-using Application.Data.Students;
-using Application.Services.Users;
+﻿using Application.Services.Users;
+using Common;
+using Common.Courses;
+using Common.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Students;

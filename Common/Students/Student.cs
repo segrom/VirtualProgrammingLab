@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Application.Data.Account;
-using Application.Data.Courses;
+using Common.Account;
+using Common.Courses;
 
-namespace Application.Data.Students;
+namespace Common.Students;
 
 public class Student
 {

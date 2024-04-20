@@ -1,8 +1,8 @@
-﻿using Application.Data.Account;
-using Application.Data.Common;
-using Application.Data.Students;
-using Application.Pages.Admin;
+﻿using Application.Pages.Admin;
 using Application.Pages.Admin.Data;
+using Common.Account;
+using Common.Common;
+using Common.Students;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services.Admin;

@@ -1,12 +1,13 @@
 ﻿@page "/course/{id:int}"
-@using Application.Data.Courses
 @using Application.Services.Courses
-@using Application.Data.Account
-@using Application.Data.Common
-@using Application.Data.Students
 @using Application.Services.Compile
 @using Application.Services.Students
 @using Application.Pages.Courses.Components
+@using Common.Account
+@using Common.Common
+@using Common.Courses
+@using Common.Students
+@using Application.Controllers
 @attribute [Authorize(Roles = $"{RoleController.StudentRole}")]
 @inject IStudentService StudentService
 @inject ICourseService CourseService
@@ -268,15 +269,17 @@
     {
         if (_selectedImpl is null || _student is null || _isLoading) return;
         _isLoading = true;
-        var request = await ExerciseService.NewCompileRequest(_selectedImpl, _exerciseState, _student, _code);
+        var (request, state) = await ExerciseService.NewCompileRequest(_selectedImpl, _exerciseState, _student, _code);
+        _exerciseState = state;
         Logger.Log(LogLevel.Information, $"Create compileRequest [{request.Id}] \n with code: {request.Code} \n and tests: {request.Tests}");
         var result = await CompileService.QueueCompileRequest(request);
         _isLoading = false;
         _output = "";
         if (!string.IsNullOrEmpty(result.ResultOutput)) _output = $"Output: \n{result.ResultOutput}";
         if (!string.IsNullOrEmpty(result.ResultErrors)) _output += $"🚩Errors: \n{result.ResultErrors}";
-        Logger.Log(LogLevel.Information, $"CR_ID[{request.Id}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
-        (_, _exerciseState) = await ExerciseService.UpdateCompileRequest(result); // TODO: actually make independent service to process compile results and apply it to compile requests in db
+        Logger.Log(LogLevel.Information, $"CR_ID[{request.Id}] Results rec" +
+                                         $"eived: {result.ResultOutput} with errors {result.ResultErrors}");
+        _exerciseState.Status = string.IsNullOrEmpty(result.ResultErrors) ? ExerciseStatus.Completed : ExerciseStatus.Failed;
         StateHasChanged();
     }
 

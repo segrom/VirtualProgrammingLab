@@ -1,10 +1,11 @@
-﻿@using Application.Data.Account
-@using Application.Data.Lecturers
-@using Application.Data.Students
-@using Application.Services.Lecturers
+﻿@using Application.Services.Lecturers
 @using Application.Services.Students
 @using Application.Services.Users
+@using Common.Account
+@using Common.Lecturers
+@using Common.Students
 @using Microsoft.AspNetCore.Identity
+@using Application.Controllers
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject SignInManager<User> SignInManager
 @inject NavigationManager NavigationManager
@@ -48,7 +49,7 @@ else
                 <NavLink class="dropdown-item disabled" disabled href="/profile">Профиль</NavLink>
             </li>
             <li>
-                <form class="form-inline" href="/logout" method="post">
+                <form class="form-inline" action="@(NavigationManager.ToAbsoluteUri("logout"))" method="post">
                     <button type="submit" class="dropdown-item">Выйти</button>
                 </form>
             </li>

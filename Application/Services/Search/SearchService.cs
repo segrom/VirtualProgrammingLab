@@ -1,6 +1,6 @@
-﻿using Application.Data;
-using Application.Data.Students;
-using Application.Services.Admin;
+﻿using Application.Services.Admin;
+using Common;
+using Common.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Search;

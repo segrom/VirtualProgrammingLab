@@ -1,5 +1,5 @@
-﻿using Application.Data;
-using Application.Data.Account;
+﻿using Common;
+using Common.Account;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

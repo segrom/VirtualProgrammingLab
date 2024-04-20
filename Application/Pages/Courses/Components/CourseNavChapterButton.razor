@@ -1,6 +1,5 @@
-﻿@using Application.Data.Courses
-@using Application.Data.Students
-
+﻿@using Common.Courses
+@using Common.Students
 @if (Chapter != null)
 {
     <button @onclick="() => OnClick?.Invoke(Chapter)" class="nav-item btn btn-dark my-1 align-items-center d-flex justify-content-center @(SelectedChapter?.Id == Chapter.Id ? "active" : "")">

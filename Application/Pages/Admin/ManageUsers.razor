@@ -1,12 +1,13 @@
 ﻿@page "/admin/manage-users"
 @using Microsoft.AspNetCore.Identity
-@using Application.Data.Account
-@using Application.Data.Common
-@using Application.Data.Lecturers
-@using Application.Data.Students
 @using Application.Pages.Admin.Components
 @using Application.Services.Admin
+@using Common.Account
+@using Common.Common
+@using Common.Lecturers
+@using Common.Students
 @using Microsoft.EntityFrameworkCore
+@using Application.Controllers
 @attribute [Authorize(Roles = $"{RoleController.AdminRole}")]
 @inject UserManager<User> UserManager
 @inject IAdminService AdminService
