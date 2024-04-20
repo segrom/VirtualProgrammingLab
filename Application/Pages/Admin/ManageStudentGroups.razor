@@ -1,12 +1,13 @@
 ﻿@page "/admin/manage-student-groups"
-@using Application.Data.Account
-@using Application.Data.Students
 @using Application.Services.Admin
 @using Application.Shared.Utils
+@using Common.Account
+@using Common.Students
+@using Application.Controllers
 @attribute [Authorize(Roles = $"{RoleController.AdminRole}")]
 @inject IAdminService AdminService
 @inject ILogger<ManageUsers> Logger
-
+@namespace Application.Pages.Admin
 <div class="container">
     <h2 class="my-3">Управление группами</h2>
     <div class="row">

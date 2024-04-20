@@ -1,0 +1,286 @@
+﻿@page "/course/{id:int}"
+@using Application.Services.Courses
+@using Application.Services.Compile
+@using Application.Services.Students
+@using Application.Pages.Courses.Components
+@using Common.Account
+@using Common.Common
+@using Common.Courses
+@using Common.Students
+@using Application.Controllers
+@attribute [Authorize(Roles = $"{RoleController.StudentRole}")]
+@inject IStudentService StudentService
+@inject ICourseService CourseService
+@inject IExerciseService ExerciseService
+@inject ICompileService CompileService
+@inject NavigationManager NavigationManager
+@inject ILogger<CourseReader> Logger
+@inject IJSRuntime JsRuntime
+
+<div class="container-md d-grid mt-2">
+    <div class="row">
+        <div class="d-flex align-items-center justify-content-between">
+            <h1 class=" m-3">@(_course?.Title??"Course not found")</h1>
+            <div class="progress my-2" style="width: 20%">
+                <div class="progress-bar" role="progressbar" style="width: @(_courseProgress)%;" aria-valuenow="@(_courseProgress)" aria-valuemin="0" aria-valuemax="100">@(_courseProgress)%</div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-3">
+            <nav id="navbar" class="navbar flex-column align-items-stretch p-3">
+                <div class="navbar-brand d-flex align-items-center justify-content-between">
+                    <h4>Содержание</h4>
+                </div>
+                <nav class="nav nav-pills flex-column">
+                    
+                    @if (_course is {Chapters: not null})
+                    {
+                        @foreach (var chapter in _course.Chapters)
+                        {
+                            <CourseNavChapterButton Chapter="@chapter" 
+                                                    Student="@_student" 
+                                                    SelectedChapter="@_selectedChapter" 
+                                                    OnClick="@(c => SelectChapter(c))" />
+                        }
+                    }
+                    else
+                    {
+                        @: Chapters are nulll
+                    }
+                </nav>
+            </nav>
+        </div>
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center pt-3">
+                @if (_selectedChapter is null)
+                {
+                    <p class="lead text-secondary">Выберите главу</p>
+                }
+                else
+                {
+                    <h4><em class="text-secondary">Глава</em> "@(_selectedChapter.Title)"</h4>
+                }
+            </div>
+            @if (_selectedChapter is not null)
+            {
+                
+                <article id="articlemd">
+                </article>
+
+                @if (_selectedChapter.IsExercise && _selectedImpl != null)
+                {
+                    <p class="table-dark">Чтобы скомпилировать и проверить задание нажмите кнопку "Отправить"</p>
+                    <div class="col mb-3 py-1">
+                        <div class="btn-toolbar my-2 d-flex justify-content-between align-items-center" role="toolbar" aria-label="Toolbar with button groups">
+                            <div>
+                                <div class="btn-group me-2" role="group">
+
+                                    <button @onclick="Compile" disabled="@(_isLoading)" type="button" class="btn btn-primary">
+                                        @if (_isLoading)
+                                        {
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            @:Компиляция...
+                                        }
+                                        else
+                                        {
+                                            <span class="oi oi-play-circle" style="top: 0.13em" aria-hidden="true"></span>
+                                            @:Отправить
+                                        }
+                                    </button>
+                                </div>
+                                <div class="btn-group me-2" role="group">
+
+                                    <button @onclick="() => SelectImpl(_selectedImpl ?? null)" type="button" class="btn btn-outline-primary">Очистить</button>
+
+                                    <div class="btn-group" role="group">
+                                        <button id="languageDropdown" type="button"
+                                                class="btn btn-outline-primary dropdown-toggle"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                            @(_selectedImpl?.Language.Name??"Нет доступных языков")
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="languageDropdown">
+                                            @foreach (var impl in _availableImpls)
+                                            {
+                                                <li>
+                                                    <button class="dropdown-item" @onclick="() => SelectImpl(impl)">@impl.Language.Name</button>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (_exerciseStates?.Any(s=>s.StudentId == _student.Id && s.Status == ExerciseStatus.Completed) ?? false)
+                            {
+         
+                                        <div class="text-success">
+                                            <i class=" ph-fill ph-check-fat ms-1" style="padding-top: 0.2em; font-size: 1em;"></i>
+                                            <strong class=" mx-1">Выполнено</strong>
+                                        </div>
+                            }
+                            else if (_exerciseStates?.Any(s => s.StudentId == _student.Id && s.Status == ExerciseStatus.Failed) ?? false)
+                            {
+                                <div class="text-danger">
+                                    <i class=" ph-fill ph-x-circle ms-1" style="padding-top: 0.2em; font-size: 1em;"></i>
+                                    <strong class=" mx-1">Не выполнено</strong>
+                                </div>
+                            }
+                        </div>
+                        <div class="row">
+                            <div class="flex-fill my-2" style="height: 40vh">
+                                <CodeInput @bind-Code="_code" HeightInVh="40" StartCode="@_startCode" Language="@_selectedImpl.Language.HighlightLabel"/>
+                            </div>
+                            <div class="flex-fil" style="height: 20vh">
+                                <textarea @bind="_output" class="py-2 px-4 rounded-3  code" disabled readonly style="height: 100%; width: 100%; resize: none;">log here</textarea>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+            }
+            <div class="toolbar d-flex justify-content-between">
+                @if (_selectedChapterIndex > 0)
+                {
+                    <button @onclick="PrevChapter" class="btn btn-outline-secondary align-items-center d-flex justify-content-center">
+                        <i class="ph ph-caret-left me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        <span>Назад</span>
+                    </button>
+                }
+                else
+                {
+                    <div></div>
+                }
+
+                @if (_selectedChapter != null
+                     && _selectedChapterIndex < _course?.Chapters?.Count - 1)
+                {
+                    <button @onclick="NextChapter" class="btn btn-outline-primary align-items-center d-flex justify-content-center">
+                        <span>Далее</span>
+                        <i class="ph ph-caret-right ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                    </button>
+                }
+                else
+                {
+                    <div></div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    
+     private Student? _student;
+    private Course? _course;
+    private int? _courseProgress;
+    
+    private Chapter? _selectedChapter;
+    private int? _selectedChapterIndex;
+
+    // --Exercise-- //
+    private string? _startCode;
+    private string? _code;
+    private string? _output;
+    private Impl? _selectedImpl;
+    private List<Impl>? _availableImpls = new();
+    private Exercise? _exercise;
+    private ExerciseState? _exerciseState;
+    private List<ExerciseState> _exerciseStates;
+    private bool _isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _student = await StudentService.GetCurrentStudentAsync();
+        _course = await StudentService.GetStudentCourseAsync(Id, _student);
+        Logger.LogInformation($"Load course by student {_student.Id} {_student.User.GetFullName()} - {_course.Id} {_course.Title}, chapters count: {_course.Chapters.Count}");
+        if(_course is null || _student is null)
+        {
+            NavigationManager.NavigateTo("404");
+            return;
+        }
+        if (_course.Groups.All(x => x.Id != _student.GroupId)) throw new Exception("У вас нет доступа к этому курсу 📛");
+        if(_course.Chapters.Count > 0) SelectChapter(_course.Chapters.FirstOrDefault(c=>c.StudentState(_student) == null) ?? _course.Chapters.First());
+    }
+
+    private async void SelectChapter(Chapter chapter)
+    {
+        
+        (_selectedChapter, _) = await StudentService.UpdateChapterState(chapter, _student);
+        
+        _selectedChapterIndex = _course?.Chapters?.IndexOf(_course?.Chapters?.Find(c => c.Id == _selectedChapter.Id) ?? _selectedChapter);
+        _course.Chapters[_selectedChapterIndex.Value] = _selectedChapter;
+        
+        _courseProgress = (int)(StudentService.GetStudentCourseProgress(_student, _course) * 100);
+        
+        if (_selectedChapter.IsExercise)
+        {
+            _exercise = _selectedChapter.Exercise;
+            
+            _exerciseStates = await StudentService.GetExerciseStatesAsync(_exercise, _student);
+            _exerciseState = _exerciseStates.FirstOrDefault();
+            
+            _availableImpls = _exercise.Implementations;
+            _selectedImpl = _exerciseState != null ? _availableImpls.FirstOrDefault(x=>x.LanguageId == _exerciseState.Impl.LanguageId) : _availableImpls.First();
+            
+            Logger.LogInformation($"Load exercise {_exercise.Id} with impls: [{string.Join(", ", _availableImpls.Select(i=>i.Language.Name))}] selected is: {_selectedImpl.Language.Name}");
+
+            var lastCompileRequest = _exerciseState?.CompileRequests.LastOrDefault();
+            _output = lastCompileRequest?.Output ?? "logs";
+            _startCode = lastCompileRequest?.Code ?? _selectedImpl.TemplateCode;
+            
+            _code = _startCode;
+            _isLoading = _exerciseState?.CompileRequests.Any(r => r.Status == CompileRequestStatus.Queued) ?? false;
+        }
+        
+        StateHasChanged();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(_selectedChapter != null) 
+            JsRuntime.InvokeVoidAsync("codeFunctions.parseMarkArticle", _selectedChapter.Body, "articlemd");
+    }
+
+    private void NextChapter()
+    {
+        if (_course == null || _selectedChapter == null || !_selectedChapterIndex.HasValue || _selectedChapterIndex >= _course?.Chapters?.Count - 1) return;
+        SelectChapter(_course.Chapters[_selectedChapterIndex.Value + 1]);
+    }
+
+    private void PrevChapter()
+    {
+        if (_course == null || _selectedChapter == null || !_selectedChapterIndex.HasValue || _selectedChapterIndex <= 0) return;
+        SelectChapter(_course.Chapters[_selectedChapterIndex.Value - 1]);
+    }
+
+    private void SelectImpl(Impl impl)
+    {
+        if(impl is null) return;
+        _selectedImpl = impl;
+        _startCode = _selectedImpl.TemplateCode;
+        _code = _startCode;
+        StateHasChanged();
+    }
+
+    private async Task Compile()
+    {
+        if (_selectedImpl is null || _student is null || _isLoading) return;
+        _isLoading = true;
+        var (request, state) = await ExerciseService.NewCompileRequest(_selectedImpl, _exerciseState, _student, _code);
+        _exerciseState = state;
+        Logger.Log(LogLevel.Information, $"Create compileRequest [{request.Id}] \n with code: {request.Code} \n and tests: {request.Tests}");
+        var result = await CompileService.QueueCompileRequest(request);
+        _isLoading = false;
+        _output = "";
+        if (!string.IsNullOrEmpty(result.ResultOutput)) _output = $"Output: \n{result.ResultOutput}";
+        if (!string.IsNullOrEmpty(result.ResultErrors)) _output += $"🚩Errors: \n{result.ResultErrors}";
+        Logger.Log(LogLevel.Information, $"CR_ID[{request.Id}] Results rec" +
+                                         $"eived: {result.ResultOutput} with errors {result.ResultErrors}");
+        _exerciseState.Status = string.IsNullOrEmpty(result.ResultErrors) ? ExerciseStatus.Completed : ExerciseStatus.Failed;
+        StateHasChanged();
+    }
+
+}

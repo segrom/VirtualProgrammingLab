@@ -1,10 +1,10 @@
-﻿@using Application.Data.Students
-@using Application.Services.Admin
+﻿@using Application.Services.Admin
 @using Application.Services.Search
+@using Common.Students
 @inject IAdminService AdminService
 @inject ISearchService SearchService
 @inject ILogger<AdminStudentModal> Logger
-
+@namespace Application.Pages.Admin
 <!-- @ModalId Modal -->
 <div class="modal fade " id="@ModalId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

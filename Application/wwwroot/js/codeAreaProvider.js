@@ -24,7 +24,8 @@ window.codeFunctions = {
     },
     
     parseMarkArticle: function (rawBody, elementId) {
-            document.getElementById(elementId).innerHTML =
-            marked.parse(rawBody);
+        let el = document.getElementById(elementId);
+        if(el == null) return;
+        el.innerHTML = marked.parse(rawBody);
     }
 }

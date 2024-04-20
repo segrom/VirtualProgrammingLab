@@ -1,5 +1,5 @@
-﻿@using Application.Data.Students
-@using Application.Services.Search
+﻿@using Application.Services.Search
+@using Common.Students
 @inject ISearchService SearchService
 
 <div class="dropdown m-4 d-grid" style="min-width: 150px;">
@@ -8,14 +8,18 @@
             @onclick="DropdownClicked"
             data-bs-toggle="dropdown"
             aria-expanded="false">
-        @if (Selected is null)
+        @if (Text != null)
+        {
+            @Text
+        }
+        else if (Selected is null)
         {
             <i class="ph-bold ph-users me-1"></i>
             @:Выбор группы
         }
         else
         {
-            @Selected.Name 
+            @Selected.Name
             <span class="mx-2 badge text-bg-secondary align-items-center d-flex justify-content-center">
                 <i class="ph-fill ph-users-three me-2" style="padding-top: 0.12em; font-size: 1.2em;"></i>
                 <span>@Selected.Students.Count</span>
@@ -46,6 +50,7 @@
 @code {
     
     [Parameter] public StudentGroup? Selected { get; set; }
+    [Parameter] public string? Text { get; set; }
     [Parameter]public EventCallback<StudentGroup?> SelectedChanged { get; set; }
     
     private List<StudentGroup> _groups = new();

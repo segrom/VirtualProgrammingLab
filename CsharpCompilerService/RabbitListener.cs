@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using Common.Structures;
+using Common.QueueStructures;
 using Humanizer;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -15,20 +15,29 @@ public class RabbitListener : BackgroundService
     private readonly IConnection _connection;
     private readonly IModel _channel;
 
+    private readonly string _inputQueueName;
+    
     public RabbitListener(ILogger<RabbitListener> logger, IConfiguration configuration)
     {
         _logger = logger;
         _configuration = configuration;
         _logger.LogInformation("Login rabbit as {0}", Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"));
+        _inputQueueName = Environment.GetEnvironmentVariable("INPUT_QUEUE_NAME_FORMAT").FormatWith("csharp");
         var factory = new ConnectionFactory
         {
-            HostName = _configuration["RabbitMqSend:Hostname"],
+            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
             UserName = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"),
-            Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD")
+            Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD"),
+            Ssl = new SslOption()
+            {
+                ServerName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
+                Enabled = false,
+            }
         };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
-        _channel.QueueDeclare(queue: _configuration["RabbitMqSend:CompileQueueName"], durable: false, 
+        _channel.QueueDeclare(queue: _inputQueueName,
+            durable: false, 
             exclusive: false, autoDelete: false, arguments: null);
     }
 
@@ -52,14 +61,18 @@ public class RabbitListener : BackgroundService
             var result = await CodeRunner.Instance.RunCode(request);
             var data = JsonSerializer.SerializeToUtf8Bytes(result);
             _channel.BasicPublish(exchange: "",
-                routingKey: _configuration["RabbitMqSend:ResultsQueueNameFormat"].FormatWith(result.ServiceId),
+                routingKey: Environment.GetEnvironmentVariable("RESULTS_QUEUE_NAME_FORMAT").FormatWith(result.ServiceId),
+                basicProperties: null,
+                body: data);
+            _channel.BasicPublish(exchange: "",
+                routingKey: Environment.GetEnvironmentVariable("COMPILE_RESULTS_UPDATE_QUEUE_NAME"), // TODO: Make bg service for that
                 basicProperties: null,
                 body: data);
 
             _channel.BasicAck(ea.DeliveryTag, false);
         };
 
-        _channel.BasicConsume(_configuration["RabbitMqSend:CompileQueueName"], false, consumer);
+        _channel.BasicConsume(_inputQueueName, false, consumer);
 
         return Task.CompletedTask;
     }

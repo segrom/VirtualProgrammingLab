@@ -1,11 +1,12 @@
 ﻿@page "/course/edit/{id:int}/{chapterId:int}/{implId:int}"
-@using Application.Data.Courses
-@using Application.Data.Lecturers
 @using Application.Services.Courses
 @using Application.Services.Lecturers
-@using Application.Data.Account
 @using Application.Services.Compile
 @using Application.Shared.Utils
+@using Common.Account
+@using Common.Courses
+@using Common.Lecturers
+@using Application.Controllers
 @attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
 @inject ILecturerService LecturerService
 @inject ICourseService CourseService
@@ -237,7 +238,6 @@
         if (!string.IsNullOrEmpty(result.ResultOutput)) DebugProgramOutput = $"Output: \n{result.ResultOutput}";
         if (!string.IsNullOrEmpty(result.ResultErrors)) DebugProgramOutput += $"🚩Errors: \n{result.ResultErrors}";
         Logger.Log(LogLevel.Information, $"CR_ID[{request.Id}] Results received: {result.ResultOutput} with errors {result.ResultErrors}");
-        await ExerciseService.UpdateCompileRequest(result); // TODO: actually make independent service to process compile results and apply it to compile requests in db
     }
 
 }

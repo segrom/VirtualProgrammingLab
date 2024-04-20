@@ -1,8 +1,10 @@
-﻿using Application.Data;
-using Application.Data.Account;
-using Application.Data.Lecturers;
-using Application.Data.Students;
+﻿using Application.Controllers;
 using Application.Pages.Admin;
+using Application.Pages.Admin.Data;
+using Common;
+using Common.Account;
+using Common.Common;
+using Common.Students;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,7 +59,7 @@ public class AdminService: IAdminService
        
     }
     
-    public async Task<IdentityResult> CreateLecturerWithUserAsync(AdminLecturerModal.LecturerModel model)
+    public async Task<IdentityResult> CreateLecturerWithUserAsync(LecturerModel model)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var (res, u) = await CreatUserAsync(model.User, model.Password);
@@ -72,7 +74,7 @@ public class AdminService: IAdminService
         return res;
     }
 
-    public async Task<IdentityResult> UpdateLecturerWithUserAsync(AdminLecturerModal.LecturerModel model)
+    public async Task<IdentityResult> UpdateLecturerWithUserAsync(LecturerModel model)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         await _userManager.UpdateAsync(model.User);
@@ -82,7 +84,7 @@ public class AdminService: IAdminService
         return IdentityResult.Success;
     }
     
-    public async Task<IdentityResult> CreateStudentWithUserAsync(AdminStudentModal.StudentModel model)
+    public async Task<IdentityResult> CreateStudentWithUserAsync(StudentModel model)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var (res, u) = await CreatUserAsync(model.User, model.Password);
@@ -99,7 +101,7 @@ public class AdminService: IAdminService
         return res;
     }
 
-    public async Task<IdentityResult> UpdateStudentWithUserAsync(AdminStudentModal.StudentModel model)
+    public async Task<IdentityResult> UpdateStudentWithUserAsync(StudentModel model)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         await _userManager.UpdateAsync(model.User);
@@ -107,6 +109,12 @@ public class AdminService: IAdminService
         await dbContext.SaveChangesAsync();
         _logger.LogInformation("Lecturer {0} updated", model.Student.Id);
         return IdentityResult.Success;
+    }
+
+    public async Task<List<CompileRequest>> GetUserCompileRequests(User u)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        return await dbContext.CompileRequests.Where(c => c.UserId == u.Id).ToListAsync();
     }
 
     private async Task<(IdentityResult, User)> CreatUserAsync(User user, string passsword)

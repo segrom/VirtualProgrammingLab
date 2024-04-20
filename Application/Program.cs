@@ -1,7 +1,5 @@
 using Application.Areas.Identity;
-using Application.Data;
-using Application.Data.Account;
-using Application.Data.Common;
+using Application.Controllers;
 using Application.Middleware;
 using Application.Services.Admin;
 using Application.Services.Compile;
@@ -10,6 +8,9 @@ using Application.Services.Lecturers;
 using Application.Services.Search;
 using Application.Services.Students;
 using Application.Services.Users;
+using Common;
+using Common.Account;
+using Common.Common;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,9 +18,22 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+bool isLocal = Environment.GetEnvironmentVariable("MODE") is null;
+var connectionString = isLocal 
+    ? builder.Configuration.GetConnectionString("DefaultConnection") 
+    : Environment.GetEnvironmentVariable("DB_CONNECTIONSTRING");
+
+if (isLocal)
+{
+    Environment.SetEnvironmentVariable("DEFAULT_ADMIN_NAME", builder.Configuration.GetSection("env").GetValue<string>("DEFAULT_ADMIN_NAME"));
+    Environment.SetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD", builder.Configuration.GetSection("env").GetValue<string>("DEFAULT_ADMIN_PASSWORD"));
+}
+
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 {
+    if(isLocal)
+        options.UseSqlite(connectionString);
+    else
         options.UseNpgsql(connectionString);
 });
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -46,6 +60,8 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddSingleton<ICompileService, CompileService>();
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -69,23 +85,19 @@ app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<BlazorCookieLoginMiddleware>();
 
-app.MapControllers();
 app.MapBlazorHub();
+app.MapControllers();
 app.MapFallbackToPage("/_Host");
+app.UseMiddleware<BlazorCookieLoginMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+
     try
     {
         var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
-        /*await context.Database.EnsureCreatedAsync();
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            await context.Database.MigrateAsync();
-        }*/
         var userManager = services.GetRequiredService<UserManager<User>>();
         var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         await RoleController.InitializeAsync(userManager, rolesManager);
@@ -97,7 +109,7 @@ using (var scope = app.Services.CreateScope())
                 new Language("C#", "csharp")
                 {
                     DefaultTemplateCode = 
-@"namespace Exercise;
+                        @"namespace Exercise;
 
 public class Solution
 {
@@ -107,7 +119,7 @@ public class Solution
     }
 }",
                     DefaultTestsCode = 
-@"namespace Exercise;
+                        @"namespace Exercise;
 
 public class Tests
 {
@@ -129,10 +141,10 @@ public class Tests
             await context.SaveChangesAsync();
         }
     }
-    catch (Exception ex)
+    catch (Exception e)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        logger.LogError(e, "An error occurred while seeding the database.");
     }
 }
 

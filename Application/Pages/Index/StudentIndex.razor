@@ -1,8 +1,7 @@
 ﻿@using Application.Services.Students
+@using Common.Courses
+@using Common.Students
 @using Microsoft.AspNetCore.Identity
-@using Application.Data.Account
-@using Application.Data.Courses
-@using Application.Data.Students
 @using Microsoft.EntityFrameworkCore
 @inject IStudentService StudentService
 @inject NavigationManager NavManager
@@ -30,7 +29,8 @@
                     <td>@course.Author.User.GetShortName()</td>
                     <td>
                         <div class="progress my-2">
-                            <div class="progress-bar" role="progressbar" style="width: 78%;" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100">78%</div>
+                            @{ var progress = (int)_coursesProgresses[course];}
+                            <div class="progress-bar @(progress >= 100 ? "bg-success":"")" role="progressbar" style="width: @(progress)%;" aria-valuenow="@(progress)" aria-valuemin="0" aria-valuemax="100">@(progress)%</div>
                         </div>
                     </td>
                 </tr>
@@ -57,7 +57,7 @@
 
         foreach (var course in _courses)
         {
-            _coursesProgresses.Add(course, StudentService.GetStudentCourseProgressAsync(_student ,course));
+            _coursesProgresses.Add(course, StudentService.GetStudentCourseProgress(_student ,course) * 100);
         }
     }
 

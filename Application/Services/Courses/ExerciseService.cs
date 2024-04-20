@@ -1,8 +1,9 @@
-﻿using Application.Data;
-using Application.Data.Account;
-using Application.Data.Common;
-using Application.Data.Courses;
-using Common.Structures;
+﻿using Common;
+using Common.Account;
+using Common.Common;
+using Common.Courses;
+using Common.QueueStructures;
+using Common.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Courses;
@@ -73,27 +74,59 @@ public class ExerciseService: IExerciseService
         return request.Entity;
     }
 
-    public async Task UpdateCompileRequest(QueueCompileResult result)
-    {
-        await using var context = await _dbContextFactory.CreateDbContextAsync();
-        var request = await context.CompileRequests.FirstAsync(l=>l.Id == result.CompileRequestId);
-        request.Status = string.IsNullOrEmpty(result.ResultErrors)
-            ? CompileRequestStatus.Finished
-            : CompileRequestStatus.FinishedWithErrors;
-        request.Output = result.ResultOutput;
-        request.Errors = result.ResultErrors;
-        request.FinishTime = result.FinishTime;
-        request.FinishTime = result.FinishTime;
-        request.Duration = result.Duration;
-        context.Update(request);
-        await context.SaveChangesAsync();
-    }
-
     public async Task DeleteImplAsync(Impl i)
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
         var impl = await context.Impls.FirstAsync(x=>x.Id == i.Id);
         context.Impls.Remove(impl);
         await context.SaveChangesAsync();
+    }
+
+    public async Task<(CompileRequest, ExerciseState)> NewCompileRequest(Impl i, ExerciseState? st, Student s, string? code)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var impl = await context.Impls
+            .Include(x=>x.Language)
+            .Include(x=>x.Exercise)
+            .FirstAsync(x=>x.Id == i.Id);
+        var student = await context.Students
+            .Include(x=>x.User)
+            .FirstAsync(e=>e.Id == s.Id);
+
+        ExerciseState? state = null;
+        if(st != null)
+        {
+            state = await context.ExerciseStates
+                .FirstOrDefaultAsync(x => x.Id == st.Id);
+        }
+        
+        state ??= await CreateNewExerciseStateAsync(context, impl, student);
+
+        var request = await context.CompileRequests.AddAsync(
+            new CompileRequest
+            {
+                Code = code,
+                Language = impl.Language,
+                User = student.User,
+                Status = CompileRequestStatus.Queued,
+                Tests = impl.TestsCode,
+                ExerciseState = state,
+                CreationTime = DateTimeOffset.Now
+            });
+        state.CompileRequests.Add(request.Entity);
+        await context.SaveChangesAsync();
+        return (request.Entity, state);
+    }
+
+    private async Task<ExerciseState> CreateNewExerciseStateAsync(ApplicationDbContext context, Impl impl, Student student)
+    {
+        var state = await context.ExerciseStates.AddAsync(new ExerciseState()
+        {
+            Exercise = impl.Exercise,
+            Student = student,
+            Status = ExerciseStatus.Started,
+            Impl = impl
+        });
+        return state.Entity;
     }
 }

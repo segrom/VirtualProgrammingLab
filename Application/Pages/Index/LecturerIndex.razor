@@ -1,9 +1,10 @@
 ﻿@using Application.Services.Lecturers
-@using Application.Data.Lecturers
-@using Application.Data.Courses
-@using Application.Data.Account
 @using Application.Pages.Courses.Components
 @using Application.Services.Courses
+@using Common.Account
+@using Common.Courses
+@using Common.Lecturers
+@using Application.Controllers
 @attribute [Authorize(Roles = $"{RoleController.LecturerRole}")]
 @inject ILecturerService LecturerService
 @inject ICourseService CourseService
@@ -49,7 +50,7 @@
                         </td>
                         break;
                     case CourseStatus.Published:
-                        <td class="text-success">
+                        <td class="text-info">
                             <i class=" ph-fill ph-check-fat ms-1" style="padding-top: 0.2em; font-size: 1em;"></i>
                             <strong class=" mx-1">Опубликован</strong>
                         </td>

@@ -1,5 +1,5 @@
-﻿using Application.Data.Common;
-using Common.Structures;
+﻿using Common.Common;
+using Common.QueueStructures;
 
 namespace Application.Services.Compile;
 

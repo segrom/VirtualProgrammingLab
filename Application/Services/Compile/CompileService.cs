@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Application.Data;
-using Application.Data.Common;
-using Common.Structures;
+using Common;
+using Common.Common;
+using Common.QueueStructures;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
@@ -30,11 +30,11 @@ public class CompileService: ICompileService
         _configuration = configuration;
         _dbContextFactory = dbContextFactory;
         _serviceQueueId = Guid.NewGuid();
-        _resultsQueueName = _configuration["RabbitMqSend:ResultsQueueNameFormat"].FormatWith(_serviceQueueId);
+        _resultsQueueName = Environment.GetEnvironmentVariable("RESULTS_QUEUE_NAME_FORMAT").FormatWith(_serviceQueueId);
         _logger.LogInformation("Login rabbit as {0}", Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"));
         var factory = new ConnectionFactory()
         {
-            HostName = _configuration["RabbitMqSend:Hostname"],
+            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
             UserName = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"),
             Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD")
         };
@@ -57,11 +57,14 @@ public class CompileService: ICompileService
             compileRequest.Tests);
         var body = JsonSerializer.SerializeToUtf8Bytes(request);
 
+        var destinationQueue = Environment.GetEnvironmentVariable("INPUT_QUEUE_NAME_FORMAT")
+            .FormatWith(compileRequest.Language.HighlightLabel);
+        
         _channel.BasicPublish(exchange: "",
-            routingKey: _configuration["RabbitMqSend:CompileQueueName"],
+            routingKey: destinationQueue,
             basicProperties: null,
             body: body);
-        _logger.Log(LogLevel.Information,$"Send source code (to queue {_configuration["RabbitMqSend:CompileQueueName"]}) {body}");
+        _logger.Log(LogLevel.Information,$"Send source code (to queue {destinationQueue}) {body}");
 
         QueueCompileResult? result = null;
 

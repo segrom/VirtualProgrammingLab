@@ -16,6 +16,7 @@ catch (ExerciseException e)
 {
     Console.WriteLine($"Test failed: {e.Message}");
     Console.WriteLine("[Exercise failed!]");
+    throw;
 }
 finally
 {
