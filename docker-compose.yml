@@ -84,6 +84,7 @@ services:
       DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_NAME}
       DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
       MODE: ${MODE}
+      DB_CONNECTIONSTRING: ${DB_CONNECTIONSTRING}
     restart: on-failure
     depends_on:
       - rabbit

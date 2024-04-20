@@ -80,7 +80,7 @@
     </div>
 </div>
 
-<AddGroupsToCoursesModal ModalId="@AddGroupsModalId" Courses="@_selectedCourses"/>
+<AddGroupsToCoursesModal ModalId="@AddGroupsModalId" Courses="@_selectedCourses" Refresh="Refresh"/>
 
 <ConfirmationModal ModalId="@RemovingConfirmModalId" Title="Подтверждение" OnSuccess="RemoveSelected">
     <p> Вы уверены что хотите убрать:</p><br/>
@@ -144,6 +144,12 @@
             _selectedCourses.Remove(course);
         else
             _selectedCourses.Add(course);
+    }
+
+    private async void Refresh()
+    {
+        _courses = await LecturerService.GetLecturerCoursesIncludeGroupsAsync(_lecturer);
+        StateHasChanged();
     }
 
 }

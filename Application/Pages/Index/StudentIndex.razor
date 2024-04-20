@@ -31,7 +31,7 @@
                     <td>
                         <div class="progress my-2">
                             @{ var progress = (int)_coursesProgresses[course];}
-                            <div class="progress-bar" role="progressbar" style="width: @(progress)%;" aria-valuenow="@(progress)" aria-valuemin="0" aria-valuemax="100">@(progress)%</div>
+                            <div class="progress-bar @(progress >= 100 ? "bg-success":"")" role="progressbar" style="width: @(progress)%;" aria-valuenow="@(progress)" aria-valuemin="0" aria-valuemax="100">@(progress)%</div>
                         </div>
                     </td>
                 </tr>
@@ -58,7 +58,7 @@
 
         foreach (var course in _courses)
         {
-            _coursesProgresses.Add(course, StudentService.GetStudentCourseProgressAsync(_student ,course));
+            _coursesProgresses.Add(course, StudentService.GetStudentCourseProgress(_student ,course) * 100);
         }
     }
 

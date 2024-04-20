@@ -48,7 +48,7 @@ public class StudentService: IStudentService
             .ToListAsync();
     }
 
-    public float GetStudentCourseProgressAsync(Student student, Course course)
+    public float GetStudentCourseProgress(Student student, Course course)
     {
         var chaptersStatesCount =
             course.Chapters.Where(c => !c.IsExercise)
@@ -61,18 +61,25 @@ public class StudentService: IStudentService
         return (chaptersStatesCount + exerciseStatesCount) / (float) course.Chapters.Count;
     }
 
-    public async Task UpdateChapterState(Chapter c, Student s)
+    public async Task<(Chapter, ChapterStudentState)> UpdateChapterState(Chapter c, Student s)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var chapter = await dbContext.Chapters
             .Include(x=>x.StudentStates)
             .Include(x=>x.Exercise)
+                .ThenInclude(e=>e.Implementations)
+                    .ThenInclude(i=>i.Language)
+            .Include(x=>x.Exercise)
+                .ThenInclude(e=>e.States.Where(x=>x.StudentId == s.Id))
+                    .ThenInclude(x=>x.CompileRequests.Where(r=>r.User.Id == s.UserId))
             .FirstAsync(x => x.Id == c.Id);
 
-        if (chapter.StudentStates.All(x => x.StudentId != s.Id))
+        var state = chapter.StudentStates.FirstOrDefault(x => x.StudentId == s.Id);
+
+        if (state is null)
         {
             var student = await dbContext.Students.FirstAsync(x => x.Id == s.Id);
-            var newState = (await dbContext.ChapterStudentStates.AddAsync(new ChapterStudentState()
+            state = (await dbContext.ChapterStudentStates.AddAsync(new ChapterStudentState()
             {
                 Student = student,
                 Chapter = chapter,
@@ -80,16 +87,16 @@ public class StudentService: IStudentService
                 FirstOpenTime = DateTimeOffset.Now,
                 LastOpenTime = DateTimeOffset.Now,
             })).Entity;
-            chapter.StudentStates.Add(newState);
+            chapter.StudentStates.Add(state);
             await dbContext.SaveChangesAsync();
-            return;
+            return (chapter, state);
         }
         
-        var state = chapter.StudentStates.First(x => x.StudentId == s.Id);
         dbContext.Update(state);
         state.OpeningsCount++;
         state.LastOpenTime = DateTimeOffset.Now;
         await dbContext.SaveChangesAsync();
+        return (chapter, state);
     }
 
     public async Task<List<ExerciseState>> GetExerciseStatesAsync(Exercise e, Student s)
@@ -101,5 +108,21 @@ public class StudentService: IStudentService
             .Where(x => x.ExerciseId == e.Id && x.StudentId == s.Id)
             .OrderByDescending(x=>x.CompileRequests.OrderByDescending(r=>r.CreationTime).First())
             .ToListAsync();
+    }
+
+    public async Task<Course> GetStudentCourseAsync(int courseId, Student s)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var result = await context.Courses
+            .Include(c =>c.Author)
+            .Include(c =>c.Chapters)
+                .ThenInclude(c=> c.Exercise)
+                    .ThenInclude(e=>e.Implementations)
+                        .ThenInclude(i=>i.Language)
+            .Include(c =>c.Chapters)
+                .ThenInclude(c=>c.StudentStates.Where(x=>x.StudentId == x.Id))
+            .Include(c=>c.Groups.Where(g=>g.Id == s.GroupId))
+            .FirstAsync(c => c.Id == courseId);
+        return result;
     }
 }

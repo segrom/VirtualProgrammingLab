@@ -54,7 +54,7 @@
     <hr>
     @if (_exercise is null)
     {
-        <div class="row" style="height: 80vh; min-width: 500px;">
+        <div class="row  overflow-auto" style="height: 80vh; min-width: 500px;">
             <div class="col-6">
                 <CodeInput StartCode="@_startCode" Language="md" @bind-Code="RawBody"/>
             </div>

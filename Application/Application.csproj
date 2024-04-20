@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>aspnet-VirtualProgrammingLab-6B0E9DD8-52E1-4954-B256-374A1B9C0CA0</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UseRazorSourceGenerator>false</UseRazorSourceGenerator>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -93,6 +94,8 @@
       <_ContentIncludedByDefault Remove="Pages\Utils\BaseModal.razor" />
       <_ContentIncludedByDefault Remove="Pages\Utils\ConfirmationModal.razor" />
       <_ContentIncludedByDefault Remove="Pages\Utils\GroupSelectWithSearch.razor" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\LogOut.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Shared\_LoginPartial.cshtml" />
     </ItemGroup>
 
     <ItemGroup>

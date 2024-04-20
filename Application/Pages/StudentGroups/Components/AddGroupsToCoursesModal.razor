@@ -52,6 +52,9 @@
     [Parameter]
     public List<Course> Courses { get; set; } = new();
     
+    [Parameter]
+    public Action? Refresh { get; set; }
+    
     private List<StudentGroup> _groups = new();
 
     private void AddGroup(StudentGroup? group)
@@ -71,7 +74,7 @@
         {
             await LecturerService.AddCoursesToGroup(Courses, group);
         }
-        
+        Refresh?.Invoke();
     }
 
 }

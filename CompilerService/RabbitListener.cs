@@ -24,7 +24,12 @@ public class RabbitListener : BackgroundService
         {
             HostName = _configuration["RabbitMqSend:Hostname"],
             UserName = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"),
-            Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD")
+            Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD"),
+            Ssl = new SslOption()
+            {
+                ServerName = _configuration["RabbitMqSend:Hostname"],
+                Enabled = false,
+            }
         };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();

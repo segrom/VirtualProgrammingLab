@@ -3,7 +3,7 @@
 @using Application.Shared.Utils
 @inject UserManager<User> UserManager
 @inject ILogger<ManageUsers> Logger
-
+@namespace Application.Pages.Admin.Components
 <button class="btn btn-danger mx-1 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#@(ConfirmDeletionModalId + User.Id)">
     @if (_isLoading)
     {

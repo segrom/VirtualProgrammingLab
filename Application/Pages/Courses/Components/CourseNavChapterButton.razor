@@ -1,0 +1,56 @@
+﻿@using Application.Data.Courses
+@using Application.Data.Students
+
+@if (Chapter != null)
+{
+    <button @onclick="() => OnClick?.Invoke(Chapter)" class="nav-item btn btn-dark my-1 align-items-center d-flex justify-content-center @(SelectedChapter?.Id == Chapter.Id ? "active" : "")">
+
+        @if (Chapter.IsExercise)
+        {
+            @if (Chapter.Exercise.States
+                .Any(s => s.StudentId == Student.Id && s.Status == ExerciseStatus.Completed))
+            {
+                <i class="ph-fill ph-code text-success mx-1" style="padding-top: 0.1em; font-size: 1em;"></i>
+            }
+            else if (Chapter.Exercise.States
+                .Any(s => s.StudentId == Student.Id && s.Status == ExerciseStatus.Failed))
+            {
+                <i class="ph-fill ph-code text-warning mx-1" style="padding-top: 0.1em; font-size: 1em;"></i>
+            }
+            else
+            {
+                <i class="ph-fill ph-code text-secondary mx-1" style="padding-top: 0.1em; font-size: 1em;"></i>
+            }
+        }
+        else
+        {
+            @if (Chapter.StudentStates.Any(s => s.StudentId == Student.Id))
+            {
+                <i class="ph-fill ph-check-circle text-success me-1" style="padding-top: 0.1em; font-size: 1em;"></i>
+            }
+            else
+            {
+                <i class="ph ph-circle text-secondary me-1" style="padding-top: 0.1em; font-size: 1em;"></i>
+            }
+        }
+        <span>@Chapter.Title</span>
+    </button>
+}
+else
+{
+    <button  class="nav-item btn btn-dark placeholder-wave placeholder my-1 align-items-center d-flex justify-content-center"></button>
+}
+
+@code {
+    [Parameter]
+    public Chapter? Chapter { get; set; }
+    
+    [Parameter]
+    public Student Student { get; set; }
+    
+    [Parameter]
+    public Chapter? SelectedChapter { get; set; }
+    
+    [Parameter]
+    public Action<Chapter>? OnClick { get; set; }
+}

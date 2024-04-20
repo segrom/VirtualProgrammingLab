@@ -5,9 +5,10 @@
 @using Application.Shared.Utils
 @using Application.Services.Admin
 @using System.ComponentModel.DataAnnotations
+@using Application.Pages.Admin.Data
 @inject IAdminService AdminService
 @inject ILogger<AdminStudentModal> Logger
-
+@namespace Application.Pages.Admin
 <!--@ModalId -->
 <div class="modal fade " id="@ModalId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -58,15 +59,6 @@
 </div>
 
 @code {
-
-    public class StudentModel
-    {
-        public User User => Student.User;
-        [Required]
-        public Student Student { get; set; }
-        [StringLength(20, MinimumLength = 5 )]
-        public string Password { get; set; }
-    }
     
     [Parameter] public string ModalId { get; set; }
     [Parameter] public Action? OnSuccess { get; set; }
