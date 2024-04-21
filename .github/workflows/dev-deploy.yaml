@@ -54,6 +54,10 @@ jobs:
         run: |
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
+      - name: Remove old directory
+        run: |
+          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\
+          rm ${{ env.DEPLOY_DIRECTORY }} -Rf"
       - name: Create environment file on server
         run: |
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\
@@ -61,6 +65,7 @@ jobs:
           chmod 600 ${{ env.ENV_FILE_PATH }} && \
           echo 'MODE=${{ env.MODE }}' > ${{ env.ENV_FILE_PATH }} && \
           echo 'APP_PORT=${{ env.APP_PORT }}' >> ${{ env.ENV_FILE_PATH }} && \
+          echo 'DB_CONNECTIONSTRING=${{ env.DB_CONNECTIONSTRING }}' >> ${{ env.ENV_FILE_PATH }} && \
           echo 'RABBITMQ_HOST=${{ env.RABBITMQ_HOST }}' >> ${{ env.ENV_FILE_PATH }} && \
           echo 'INPUT_QUEUE_NAME_FORMAT=${{ env.INPUT_QUEUE_NAME_FORMAT }}' >> ${{ env.ENV_FILE_PATH }} && \
           echo 'RESULTS_QUEUE_NAME_FORMAT=${{ env.RESULTS_QUEUE_NAME_FORMAT }}' >> ${{ env.ENV_FILE_PATH }} && \
@@ -72,7 +77,7 @@ jobs:
       - name: Build the stack
         run: |
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\
-          docker compose -f ${{ env.DEPLOY_DIRECTORY }}/docker-compose.yml --env-file ${{ env.ENV_FILE_PATH }} build --no-cache "
+          docker compose -f ${{ env.DEPLOY_DIRECTORY }}/docker-compose.yml --env-file ${{ env.ENV_FILE_PATH }} build"
       - name: Run compose
         run: |
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\

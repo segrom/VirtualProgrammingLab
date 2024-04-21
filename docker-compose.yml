@@ -157,7 +157,7 @@ services:
       INPUT_QUEUE_NAME_FORMAT: ${INPUT_QUEUE_NAME_FORMAT}
       RESULTS_QUEUE_NAME_FORMAT: ${RESULTS_QUEUE_NAME_FORMAT}
       COMPILE_RESULTS_UPDATE_QUEUE_NAME: ${COMPILE_RESULTS_UPDATE_QUEUE_NAME}
-#    restart: on-failure
+    restart: on-failure
     privileged: true
     pid: "host"
     depends_on:
