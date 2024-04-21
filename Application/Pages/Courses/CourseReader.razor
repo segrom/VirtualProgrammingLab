@@ -285,6 +285,16 @@
         Logger.Log(LogLevel.Information, $"CR_ID[{request.Id}] Results rec" +
                                          $"eived: {result.ResultOutput} with errors {result.ResultErrors}");
         _exerciseState.Status = string.IsNullOrEmpty(result.ResultErrors) ? ExerciseStatus.Completed : ExerciseStatus.Failed;
+
+        var oldState = _exerciseStates.FirstOrDefault(x => x.Id == _exerciseState.Id);
+        if (oldState is null)
+        {
+            _exerciseStates.Add(_exerciseState);
+        }
+        else
+        {
+            _exerciseStates[_exerciseStates.IndexOf(oldState)] = _exerciseState;
+        }
         StateHasChanged();
     }
 

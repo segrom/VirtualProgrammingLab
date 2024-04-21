@@ -17,7 +17,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 bool isLocal = Environment.GetEnvironmentVariable("MODE") is null;
 var connectionString = isLocal 
     ? builder.Configuration.GetConnectionString("DefaultConnection") 
@@ -93,11 +92,12 @@ app.UseMiddleware<BlazorCookieLoginMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-
+    var services = scope.ServiceProvider; 
+    var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
+    _ = services.GetRequiredService<ICompileService>();
     try
     {
-        var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
+        
         var userManager = services.GetRequiredService<UserManager<User>>();
         var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         await RoleController.InitializeAsync(userManager, rolesManager);
@@ -137,24 +137,10 @@ public class Tests
                 new Language("Python 3.9", "py")
                 {
                     DefaultTemplateCode = 
-                        @"from tests import *
-from solution import *
-
-print(""[Start exercise]"")
-
-solution = Solution()
-tests = Tests()
-
-try:
-    tests.run(solution)
-except ExerciseException as ex:
-    print(f""Test failed: {ex}"")
-    print(""[Exercise failed!]"")
-    raise ex
-finally:
-    print(""[End exercise]"")
-
-",
+                        @"
+class Solution:
+    def calculateSum(self, x, y):
+        return x + y",
                     DefaultTestsCode = 
                         @"from utils import *
 from solution import *

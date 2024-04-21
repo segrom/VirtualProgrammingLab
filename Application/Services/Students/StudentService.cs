@@ -119,10 +119,11 @@ public class StudentService: IStudentService
                     .ThenInclude(e=>e.Implementations)
                         .ThenInclude(i=>i.Language)
             .Include(c =>c.Chapters)
-            .ThenInclude(c=> c.Exercise)
-                .ThenInclude(e=>e.States.Where(s=>s.StudentId == s.Id))
+                .ThenInclude(c=> c.Exercise)
+                    .ThenInclude(e=>e.States.Where(x=>x.StudentId == s.Id))
+                        .ThenInclude(s=>s.CompileRequests)
             .Include(c =>c.Chapters)
-                .ThenInclude(c=>c.StudentStates.Where(x=>x.StudentId == x.Id))
+                .ThenInclude(c=>c.StudentStates.Where(x=>x.StudentId == s.Id))
             .Include(c=>c.Groups.Where(g=>g.Id == s.GroupId))
             .FirstAsync(c => c.Id == courseId);
         return result;

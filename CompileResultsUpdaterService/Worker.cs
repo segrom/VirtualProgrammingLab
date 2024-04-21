@@ -60,9 +60,9 @@ public class Worker : BackgroundService
                 return;
             }
 
-            await UpdateCompileResult(result);
+            var cr = await UpdateCompileResult(result);
             
-            _logger.Log(LogLevel.Information,$"Receive results {result.ServiceId}:{result.CompileRequestId}");
+            _logger.Log(LogLevel.Information,$"Receive results {result.ServiceId}:{result.CompileRequestId} [{cr.Status} Exercise State:{cr.ExerciseState?.Status}]");
             _channel.BasicAck(ea.DeliveryTag, false);
         };
 
@@ -71,7 +71,7 @@ public class Worker : BackgroundService
         return Task.CompletedTask;
     }
 
-    private async Task UpdateCompileResult(QueueCompileResult result)
+    private async Task<CompileRequest> UpdateCompileResult(QueueCompileResult result)
     {
         var context = await _contextFactory.CreateDbContextAsync();
         var request = await context.CompileRequests
@@ -95,6 +95,7 @@ public class Worker : BackgroundService
         
         context.Update(request);
         await context.SaveChangesAsync();
+        return request;
     }
 
     public override void Dispose()
