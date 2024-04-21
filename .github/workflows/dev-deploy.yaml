@@ -11,11 +11,16 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
     env:
       HOST: root@94.228.117.181
+      RABBITMQ_HOST: rabbitmq
       DEPLOY_DIRECTORY: /root/apps/vpl
       ENV_FILE_PATH: /root/apps/vpl/config.env
       MODE: Release
       APP_PORT: 9090
       DEFAULT_ADMIN_EMAIL: admin@segrom.ru
+      INPUT_QUEUE_NAME_FORMAT: CompileQueue[{0}]
+      RESULTS_QUEUE_NAME_FORMAT: ResultsQueue[{0}]
+      COMPILE_RESULTS_UPDATE_QUEUE_NAME: ResultsUpdateQueue
+      DB_CONNECTIONSTRING: Username=application;Password=AppP4SS_wrd;Host=database;Port=5432;Database=applicationdb;Connection Lifetime=0;
 
     steps:
       - name: Checkout repository
@@ -56,6 +61,10 @@ jobs:
           chmod 600 ${{ env.ENV_FILE_PATH }} && \
           echo 'MODE=${{ env.MODE }}' > ${{ env.ENV_FILE_PATH }} && \
           echo 'APP_PORT=${{ env.APP_PORT }}' >> ${{ env.ENV_FILE_PATH }} && \
+          echo 'RABBITMQ_HOST=${{ env.RABBITMQ_HOST }}' >> ${{ env.ENV_FILE_PATH }} && \
+          echo 'INPUT_QUEUE_NAME_FORMAT=${{ env.INPUT_QUEUE_NAME_FORMAT }}' >> ${{ env.ENV_FILE_PATH }} && \
+          echo 'RESULTS_QUEUE_NAME_FORMAT=${{ env.RESULTS_QUEUE_NAME_FORMAT }}' >> ${{ env.ENV_FILE_PATH }} && \
+          echo 'COMPILE_RESULTS_UPDATE_QUEUE_NAME=${{ env.COMPILE_RESULTS_UPDATE_QUEUE_NAME }}' >> ${{ env.ENV_FILE_PATH }} && \
           echo 'DEFAULT_ADMIN_EMAIL=${{ env.DEFAULT_ADMIN_EMAIL }}' >> ${{ env.ENV_FILE_PATH }} && \
           echo 'DEFAULT_ADMIN_NAME=${{ secrets.DEFAULT_ADMIN_NAME }}' >> ${{ env.ENV_FILE_PATH }} && \
           echo 'DEFAULT_ADMIN_PASSWORD=${{ secrets.DEFAULT_ADMIN_PASSWORD }}' >> ${{ env.ENV_FILE_PATH }}"
