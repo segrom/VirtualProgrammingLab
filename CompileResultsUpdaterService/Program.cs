@@ -13,7 +13,8 @@ var builder = Host.CreateDefaultBuilder(args)
         
         services.AddDbContextFactory<ApplicationDbContext>(options =>
             {
-                options.UseNpgsql(connectionString!);
+                options.UseNpgsql(connectionString!, b => 
+                    b.MigrationsAssembly("CompileResultsUpdaterService"));
             }
             );
         
