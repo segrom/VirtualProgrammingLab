@@ -1,5 +1,6 @@
 ﻿FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
-WORKDIR /app
+WORKDIR /python-compiler
+EXPOSE 3300
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
@@ -7,10 +8,10 @@ COPY ["PythonCompilerService/PythonCompilerService.csproj", "PythonCompilerServi
 RUN dotnet restore "PythonCompilerService/PythonCompilerService.csproj"
 COPY . .
 WORKDIR "/src/PythonCompilerService"
-RUN dotnet build "PythonCompilerService.csproj" -c Release -o /app/build
+RUN dotnet build "PythonCompilerService.csproj" -c "$MODE" -o /python-compiler/build
 
 FROM build AS publish
-RUN dotnet publish "PythonCompilerService.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "PythonCompilerService.csproj" -c "$MODE" -o /python-compiler/publish /p:UseAppHost=false
 
 FROM base AS final
 
@@ -26,6 +27,6 @@ COPY --from=build /src/PythonCompilerService/Exercise .
 RUN chmod go-r /
 RUN chown -R runner /home/runner/
 
-WORKDIR /app
-COPY --from=publish /app/publish .
+WORKDIR /python-compiler
+COPY --from=publish /python-compiler/publish .
 ENTRYPOINT ["dotnet", "PythonCompilerService.dll"]

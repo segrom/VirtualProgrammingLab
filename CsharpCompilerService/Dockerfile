@@ -1,5 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:6.0 AS base
-WORKDIR /compiler
+WORKDIR /csharp-compiler
 EXPOSE 3300
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
@@ -8,10 +8,10 @@ COPY ["CsharpCompilerService/CsharpCompilerService.csproj", "CsharpCompilerServi
 RUN dotnet restore "CsharpCompilerService/CsharpCompilerService.csproj"
 COPY . .
 WORKDIR "/src/CsharpCompilerService"
-RUN dotnet build "CsharpCompilerService.csproj" -c "$MODE" -o /compiler/build
+RUN dotnet build "CsharpCompilerService.csproj" -c "$MODE" -o /csharp-compiler/build
 
 FROM build AS publish
-RUN dotnet publish "CsharpCompilerService.csproj" -c "$MODE" -o /compiler/publish /p:UseAppHost=false
+RUN dotnet publish "CsharpCompilerService.csproj" -c "$MODE" -o /csharp-compiler/publish /p:UseAppHost=false
 
 FROM base AS final
 
@@ -27,7 +27,7 @@ RUN chmod go-r /
 RUN chown -R runner /home/runner/
 
 
-WORKDIR /compiler
-COPY --from=publish /compiler/publish .
+WORKDIR /csharp-compiler
+COPY --from=publish /csharp-compiler/publish .
 
 ENTRYPOINT ["dotnet", "CsharpCompilerService.dll"]

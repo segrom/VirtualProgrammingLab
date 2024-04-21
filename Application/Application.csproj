@@ -99,5 +99,9 @@
       <AdditionalFiles Include="Shared\Utils\ConfirmationModal.razor" />
       <AdditionalFiles Include="Shared\Utils\GroupSelectWithSearch.razor" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\faq.html" />
+    </ItemGroup>
     
 </Project>
