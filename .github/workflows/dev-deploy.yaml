@@ -71,7 +71,7 @@ jobs:
       - name: Build the stack
         run: |
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\
-          docker compose -f ${{ env.DEPLOY_DIRECTORY }}/docker-compose.yml --env-file ${{ env.ENV_FILE_PATH }} build"
+          docker compose -f ${{ env.DEPLOY_DIRECTORY }}/docker-compose.yml --env-file ${{ env.ENV_FILE_PATH }} build --no-cache"
       - name: Run compose
         run: |
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "\
