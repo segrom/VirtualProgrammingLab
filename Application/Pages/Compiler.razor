@@ -78,31 +78,7 @@ else
 
     private string _code = "";
 
-    private string _codeTemplate = @"namespace Exercise;
-
-public class Solution
-{
-    public int Sum(int x, int y)
-    {
-        Console.WriteLine(""Get open ports:"");
-        var ports = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties()
-            .GetActiveTcpListeners();
-        foreach (var port in ports)
-        {
-            Console.WriteLine($""Open port: {port.Address}:{port.Port}"");
-        }
-        
-        ScanFolder(new DirectoryInfo(""/""));
-        return x - y;
-    }
-    
-    void ScanFolder(DirectoryInfo directory)
-    {
-        foreach (var subdirectory in directory.GetDirectories())
-            Console.WriteLine(subdirectory.Name);
-    }
-}
-";
+    private string _codeTemplate="";
 
     private string _results = "Logs here";
 

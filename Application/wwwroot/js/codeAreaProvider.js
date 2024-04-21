@@ -27,5 +27,6 @@ window.codeFunctions = {
         let el = document.getElementById(elementId);
         if(el == null) return;
         el.innerHTML = marked.parse(rawBody);
+        Prism.highlightAll();
     }
 }

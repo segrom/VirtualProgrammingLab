@@ -139,12 +139,11 @@
     private void SelectChapter(Chapter chapter)
     {
         _selectedChapter = chapter;
-        JsRuntime.InvokeVoidAsync("codeFunctions.parseMarkArticle", chapter.Body, "articlemd");
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender && _selectedChapter != null) 
+        if(_selectedChapter != null) 
             JsRuntime.InvokeVoidAsync("codeFunctions.parseMarkArticle", _selectedChapter.Body, "articlemd");
     }
 
