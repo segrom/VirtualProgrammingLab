@@ -3,15 +3,15 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-danger" id="@(ModalId)Label">@Title</h5>
+                <h5 class="modal-title @(TitleStyle) d-flex align-items-lg-center justify-content-between" id="@(ModalId)Label">@Title</h5>
                 <button @onclick="OnDeny"  type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @ChildContent
+                @Body
             </div>
             <div class="modal-footer">
                 <button @onclick="() => OnDeny?.Invoke()" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
-                <button @onclick="() => OnSuccess?.Invoke()" type="submit" class="btn btn-danger" data-bs-dismiss="modal">Да</button>
+                <button @onclick="() => OnSuccess?.Invoke()" type="submit" class="btn @(SubmitStyle)" data-bs-dismiss="modal">Да</button>
             </div>
         </div>
     </div>
@@ -19,10 +19,16 @@
 
 
 @code {
-    [Parameter] public string Title { get; set; }
     
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment Title { get; set; }
+    [Parameter]
+    public RenderFragment Body { get; set; }
+
+    [Parameter]
+    public string TitleStyle { get; set; } = "text-primary";
+    [Parameter]
+    public string SubmitStyle { get; set; } = "btn-primary";
     
     [Parameter] public string ModalId { get; set; }
     [Parameter] public Action? OnSuccess { get; set; }

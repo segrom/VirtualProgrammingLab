@@ -28,5 +28,19 @@ window.codeFunctions = {
         if(el == null) return;
         el.innerHTML = marked.parse(rawBody);
         Prism.highlightAll();
+    },
+
+    
+    showModal: function (elementId) {
+        let modal = new bootstrap.Modal(document.getElementById(elementId),  {
+            focus: true
+        })
+        modal.show()
+    },
+    hideModal: function (elementId) {
+        let modal = new bootstrap.Modal(document.getElementById(elementId),  {
+            focus: true
+        })
+        modal.hide()
     }
 }

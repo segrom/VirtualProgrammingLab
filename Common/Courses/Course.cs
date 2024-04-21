@@ -14,9 +14,10 @@ public class Course
 {
     [Key] public int Id { get; set; }
 
-    [Required][MinLength(4)]
+    [Required(ErrorMessage = "Курсу небходимо название")]
+    [MinLength(3, ErrorMessage = "Название не может быть короче 3х символов")]
     public string Title { get; set; }
-    [Required]
+    [Required(ErrorMessage = "Описание тоже не должно быть пустым")]
     public string Desc { get; set; }
     public CourseStatus Status { get; set; }
     

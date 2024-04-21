@@ -45,11 +45,17 @@ pre[class*="language-"] {
 }
 
 .invalid {
-    outline: 1px solid red;
+    outline: 1px solid #dc3545;;
 }
 
 .validation-message {
-    color: red;
+    color: #ea868f;
+    background-color: #2c0b0e;
+    border-radius: 0.375rem;
+    border: 1px solid #842029;
+    padding: 1rem;
+    position:  relative;
+    margin: 1rem 0;
 }
 
 #blazor-error-ui {
@@ -77,6 +83,6 @@ pre[class*="language-"] {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}

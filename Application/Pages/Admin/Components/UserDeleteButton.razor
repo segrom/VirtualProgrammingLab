@@ -18,8 +18,13 @@
     }
 </button>
 
-<ConfirmationModal ModalId="@(ConfirmDeletionModalId + User.Id)" Title="Подтверждение удаления" OnSuccess="DeleteUser" >
+<ConfirmationModal ModalId="@(ConfirmDeletionModalId + User.Id)" OnSuccess="DeleteUser">
+    <Title>
+        <span>Подтверждение удаления</span>
+    </Title>
+    <Body>
     Вы уверены что хотите удалить пользователя <strong>@User.Code</strong>?
+    </Body>
 </ConfirmationModal>
 
 @code {

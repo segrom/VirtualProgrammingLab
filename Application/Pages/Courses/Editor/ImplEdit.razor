@@ -16,6 +16,8 @@
 @inject ILogger<ImplEdit> Logger
 @inject IJSRuntime JsRuntime
 
+<PageTitle>@(_chapter?.Title??"Глава") (@(_impl?.Language.Name))</PageTitle>
+
 <div class="container-md d-grid mt-2">
     <div class="row">
         <div class="d-flex align-items-lg-center justify-content-between">

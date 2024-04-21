@@ -61,8 +61,13 @@
         </tbody>
     </table>
 </div>
-<ConfirmationModal ModalId="@ConfirmGroupDeletionModalId" Title="Подтверждение удаления" OnSuccess="OnDeletionConfirmationSuccess" OnDeny="OnDeletionConfirmationDeny" >
+<ConfirmationModal ModalId="@ConfirmGroupDeletionModalId" OnSuccess="OnDeletionConfirmationSuccess" OnDeny="OnDeletionConfirmationDeny">
+    <Title>
+        <span>Подтверждение удаления</span>
+    </Title>
+    <Body>
     Вы уверены что хотите удалить группу <strong>@_selectedGroup?.Name</strong>?
+    </Body>
 </ConfirmationModal>
 <AdminGroupModal ModalId="@GroupModalId" Group="@_selectedGroup" OnSuccess="Refresh"/>
 

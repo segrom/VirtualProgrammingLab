@@ -2,7 +2,7 @@
 @using Application.Pages.Courses.Editor.Components
 @using Application.Services.Courses
 @using Application.Services.Lecturers
-@using Common.Account
+@using Application.Shared.Utils
 @using Common.Courses
 @using Common.Lecturers
 @using Application.Controllers
@@ -13,6 +13,8 @@
 @inject ILogger<CourseEdit> Logger
 @inject IJSRuntime JsRuntime
 
+<PageTitle>@(_course?.Title??"Глава")</PageTitle>
+
 <div class="container-md d-grid mt-2">
     <div class="row">
         <div class="d-flex align-items-lg-center justify-content-between">
@@ -22,8 +24,8 @@
                 <em> Не рекомендуется редактировать этот курс, т.к. он <strong class="text-info">опубликован</strong> </em>
             }
             <div>
-                <button class="btn btn-dark align-items-center d-flex justify-content-center"  
-                        data-bs-toggle="modal" data-bs-target="#@CourseSettingsModalId">
+                <button class="btn btn-dark align-items-center d-flex justify-content-center"  @onclick="() => ShowModal(CourseSettingsModalId)" >
+                        @* data-bs-toggle="modal" data-bs-target="#@CourseSettingsModalId"> *@
                     <i class="ph-fill ph-gear me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                     <span>Настройки</span>
                 </button>
@@ -87,11 +89,7 @@
                         <i class="ph-fill ph-pencil-simple me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                         <span>Редактировать</span>
                     </button>
-                    <button class="btn btn-outline-primary align-items-center d-flex justify-content-center disabled" disabled>
-                        <i class="ph-fill ph-textbox me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
-                        <span>Переименовать</span>
-                    </button>
-                    <button class="btn btn-outline-danger align-items-center d-flex justify-content-center disabled" disabled>
+                    <button @onclick="() => ShowModal(DeleteChapterModalId)" class="btn btn-outline-danger align-items-center d-flex justify-content-center">
                         <i class="ph-fill ph-trash me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                         <span>Удалить</span>
                     </button>
@@ -107,13 +105,24 @@
     </div>
 </div>
 
-<CourseSettingsModal ModalId="@CourseSettingsModalId" Course="@_course" OnRefresh="() => StateHasChanged()"/>
-<NewChapterModal ModalId="@NewChapterModalId" Course="@_course" OnRefresh="() => UpdateChapters()" />
+<CourseSettingsModal ModalId="@CourseSettingsModalId" Course="@_course" OnRefresh="() => UpdateChapters()"/>
+<NewChapterModal ModalId="@NewChapterModalId" Course="@_course" OnRefresh="() => UpdateChapters(true)" />
+<ConfirmationModal ModalId="@DeleteChapterModalId" OnSuccess="() => DeleteChapter()"
+                       TitleStyle="text-danger" SubmitStyle="btn-danger">
+        <Title>
+            <i class="ph ph-trash me-1" style="font-size: 1.5em;"></i>
+            <span>Удаление</span>
+        </Title>
+        <Body>
+        <h4> Вы уверены что хотите удалить главу <strong>@_selectedChapter?.Title</strong>?</h4>
+        </Body>
+    </ConfirmationModal>
 
 @code {
 
         private const string NewChapterModalId = "NewChapterModal";
         private const string CourseSettingsModalId = "CourseSettingsModal";
+        private const string DeleteChapterModalId = "DeleteChapterModal";
 
     [Parameter]
     public int Id { get; set; }
@@ -147,10 +156,10 @@
             JsRuntime.InvokeVoidAsync("codeFunctions.parseMarkArticle", _selectedChapter.Body, "articlemd");
     }
 
-    private async void UpdateChapters()
+    private async void UpdateChapters(bool changeSelected = false)
     {
         _course = await CourseService.GetCourseAsync(Id);
-        _selectedChapter = _course?.Chapters.Count > 0 ? _course.Chapters.Last() : null;
+        if(changeSelected) _selectedChapter = _course?.Chapters.Count > 0 ? _course.Chapters.Last() : null;
         StateHasChanged();
     }
 
@@ -158,6 +167,18 @@
     {
         if(_selectedChapter is null) return;
         NavigationManager.NavigateTo($"/course/edit/{Id}/{_selectedChapter.Id}");
+    }
+
+    private async Task ShowModal(string modalId)
+    {
+        await JsRuntime.InvokeVoidAsync("codeFunctions.showModal", modalId);
+    }
+
+    private void DeleteChapter()
+    {
+        if(_selectedChapter is null) return;
+        LecturerService.DeleteChapterAsync(_selectedChapter);
+        UpdateChapters(true);
     }
 
 }

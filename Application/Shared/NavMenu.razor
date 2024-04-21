@@ -3,7 +3,10 @@
 @using Application.Controllers
 <nav class="navbar navbar-expand-lg navbar-dark bg-black">
     <div class="container-fluid">
-        <a class="navbar-brand  bold" href="">Виртуальная лаборатория программирования</a>
+        <a class="navbar-brand  bold" href="">
+            @* ВИРТУАЛЬНАЯ ЛАБОРАТОРИЯ ПРОГРАММИРОВАНИЯ *@
+            <img id="vpl-logo" src="vpl.svg" alt="ВИРТУАЛЬНАЯ ЛАБОРАТОРИЯ ПРОГРАММИРОВАНИЯ" height="24">
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -12,20 +15,20 @@
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <NavLink class="nav-link d-flex align-items-center justify-content-center" href="" aria-current="page" Match="NavLinkMatch.All">
-                        <i class="ph-fill ph-house mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                        <i class="ph-fill ph-house mx-1" style="padding-top: 0.1em; font-size: 1.2em;"></i>
                         <span>Главная</span>
                     </NavLink>
                 </li>
                 <li class="nav-item">
                     <NavLink class="nav-link d-flex align-items-center justify-content-center" aria-current="page" href="compiler">
-                        <i class="ph-fill ph-terminal mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                        <i class="ph-fill ph-terminal mx-1" style="padding-top: 0.1em; font-size: 1.2em;"></i>
                         <span>Компилятор</span>
                     </NavLink>
                 </li>
                 <AuthorizeView Roles="@(RoleController.StudentRole)">
                     <li class="nav-item">
                         <NavLink class="nav-link d-flex align-items-center justify-content-center disabled" disabled aria-current="page" href="mygroup">
-                            <i class="ph-fill ph-users-three mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                            <i class="ph-fill ph-users-three mx-1" style="padding-top: 0.1em; font-size: 1.2em;"></i>
                             <span>Моя группа</span>
                         </NavLink>
                     </li>
@@ -33,7 +36,7 @@
                 <AuthorizeView Roles="@(RoleController.LecturerRole)">
                     <li class="nav-item">
                         <NavLink class="nav-link d-flex align-items-center justify-content-center" aria-current="page" href="assignments">
-                            <i class="ph-fill ph-users-three mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                            <i class="ph-fill ph-users-three mx-1" style="padding-top: 0.1em; font-size: 1.2em;"></i>
                             <span>Группы</span>
                         </NavLink>
                     </li>
@@ -46,19 +49,19 @@
                         <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarAdminDropdown">
                             <li>
                                 <NavLink class="dropdown-item d-flex align-items-center justify-content-center" href="/admin/manage-users">
-                                    <i class="ph ph-user mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                                    <i class="ph ph-user mx-1" style="padding-top: 0.1em; font-size: 1.2em;"></i>
                                     <span>Пользователи</span>
                                 </NavLink>
                             </li>
                             <li>
                                 <NavLink class="dropdown-item d-flex align-items-center justify-content-center" href="/admin/manage-student-groups">
-                                    <i class="ph ph-users-three mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                                    <i class="ph ph-users-three mx-1" style="padding-top: 0.1em; font-size: 1.2em;"></i>
                                     <span>Группы</span>
                                 </NavLink>
                             </li>
                             <li>
                                 <NavLink class="dropdown-item d-flex align-items-center justify-content-center disabled" href="/admin/manage-courses" disabled>
-                                    <i class="ph ph-graduation-cap mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                                    <i class="ph ph-graduation-cap mx-1" style="padding-top: 0.1em; font-size: 1.2em;"></i>
                                     <span>Курсы</span>
                                 </NavLink>
                             </li>
@@ -67,7 +70,7 @@
                             </li>
                             <li>
                                 <NavLink class="dropdown-item d-flex align-items-center justify-content-center disabled" href="/admin/stats" disabled>
-                                    <i class="ph ph-chart-line mx-1" style="padding-top: 0.2em; font-size: 1.2em;"></i>
+                                    <i class="ph ph-chart-line mx-1" style="padding-top: 0.1em; font-size: 1.2em;"></i>
                                     <span>Статистика</span>
                                 </NavLink>
                             </li>

@@ -17,6 +17,8 @@
 @inject ILogger<CourseReader> Logger
 @inject IJSRuntime JsRuntime
 
+<PageTitle>@(_course?.Title??"Курс")</PageTitle>
+
 <div class="container-md d-grid mt-2">
     <div class="row">
         <div class="d-flex align-items-center justify-content-between">

@@ -68,8 +68,9 @@ public class LecturerService : ILecturerService
 
     public async Task AddCoursesToGroup(List<Course> c, StudentGroup g)
     {
-        var ids = c.Select(c => c.Id);
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        
+        var ids = c.Select(c => c.Id);
         var courses = await dbContext.Courses.Where(x=> ids.Contains(x.Id)).ToListAsync();
         var group = await dbContext.StudentGroups.FirstAsync(x=>x.Id == g.Id);
         
@@ -81,6 +82,14 @@ public class LecturerService : ILecturerService
         group.Courses.AddRange(courses);
         
         dbContext.Update(group);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteChapterAsync(Chapter c)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var chapter = await dbContext.Chapters.FirstAsync(x=>x.Id == c.Id);
+        dbContext.Chapters.Remove(chapter);
         await dbContext.SaveChangesAsync();
     }
 

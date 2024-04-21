@@ -12,4 +12,5 @@ public interface ILecturerService
     Task RemoveCourseFromGroup(Course course, StudentGroup group);
     Task AddCourseToGroup(Course course, StudentGroup group);
     Task AddCoursesToGroup(List<Course> courses, StudentGroup group);
+    Task DeleteChapterAsync(Chapter chapter);
 }

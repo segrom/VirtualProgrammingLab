@@ -2,6 +2,7 @@
 @using Application.Shared.Utils
 @using Common.Courses
 @inject ICourseService CourseService
+@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
 @if (Course is not null)
@@ -17,16 +18,16 @@
                 <div class="modal-body">
                     <DataAnnotationsValidator/>
                     <div class="mb-3">
-                        <label for="titleInput" class="form-label">Название курса</label>
+                        <label for="titleInput" class="form-label">Название</label>
                         <input type="text" class="form-control" id="titleInput" aria-describedby="titleHelp" @bind="Course.Title">
                         <div id="titleHelp" class="form-text">Тут должно быть сочное и привлекательное название курса. Типа "Гига питон, от малого к большему"...</div>
-                        <ValidationMessage For="() => Course.Title"></ValidationMessage>
+                        <ValidationMessage For="() => Course.Title"/>
                     </div>
                     <div class="mb-3">
-                        <label for="descInput" class="form-label">Описание курса</label>
+                        <label for="descInput" class="form-label">Описание</label>
                         <textarea type="text" class="form-control" id="descInput" @bind="Course.Desc"></textarea>
                         <div id="descHelp" class="form-text">А тут можно расписать, насколько крут данный курс!</div>
-                        <ValidationMessage For="() => Course.Desc"></ValidationMessage>
+                        <ValidationMessage For="() => Course.Desc"/>
                     </div>
                     <hr>
                     <div class="mb-3 d-grid">
@@ -59,7 +60,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
-                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Сохранить</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
                 </div>
             </EditForm>
         </div>
@@ -67,7 +68,7 @@
     <!-- Delete Modal -->
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <EditForm Model="Course" OnValidSubmit="DeleteCourse" class="modal-content">
+            <EditForm Model="Course" OnValidSubmit="() => ChangeCourseStatus(CourseStatus.Deleted)" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-danger" id="confirmModalLabel">Внимание!</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -83,17 +84,31 @@
         </div>
     </div>
 
-    <ConfirmationModal ModalId="@PublishModalId" Title="Публикация" OnSuccess="PublishCourse">
+    <ConfirmationModal ModalId="@PublishModalId" OnSuccess="() => ChangeCourseStatus(CourseStatus.Published)"
+                       TitleStyle="text-info" SubmitStyle="btn-info">
+        <Title>
+            <i class="ph ph-rocket-launch me-1" style="font-size: 1.5em;"></i>
+            <span>Публикация</span>
+        </Title>
+        <Body>
         <h4> Вы уверены что хотите опубликовать курс <strong>@Course.Title</strong>?</h4>
         <br/>
         Он станет виден всем назначеным на него группам!
+        </Body>
     </ConfirmationModal>
     
-    <ConfirmationModal ModalId="@HideModalId" Title="Подтверждение" OnSuccess="HideCourse">
+    <ConfirmationModal ModalId="@HideModalId" OnSuccess="() => ChangeCourseStatus(CourseStatus.InDevelop)"
+                       TitleStyle="text-warning" SubmitStyle="btn-warning">
+        <Title>
+            <i class="ph ph-prohibit me-1" style="font-size: 1.5em;"></i>
+            <span>Подтверждение</span>
+        </Title>
+        <Body>
         <h4>Вы уверены что хотите скрыть курс <strong>@Course.Title</strong>?</h4>
         <br/>
         Он будет недоступен для всех студентов.
         Потом вы сможете опрубликовать его заново.
+        </Body>
     </ConfirmationModal>
 }
 @code {
@@ -110,26 +125,14 @@
         if(Course is null) return;
         await CourseService.UpdateCourseAsync(Course);
         OnRefresh?.Invoke();
+        await JsRuntime.InvokeVoidAsync("codeFunctions.hideModal", ModalId);
     }
 
-    private async Task DeleteCourse()
+    private async void ChangeCourseStatus(CourseStatus status)
     {
         if(Course is null) return;
-        await CourseService.ChangeCourseState(Course, CourseStatus.Deleted);
-        //await CourseService.DeleteCourse(Course);
+        await CourseService.ChangeCourseState(Course, status);
         NavigationManager.NavigateTo("/");
-    }
-
-    private async void PublishCourse()
-    {
-        if(Course is null) return;
-        await CourseService.ChangeCourseState(Course, CourseStatus.Published);
-    }
-
-    private async void HideCourse()
-    {
-        if(Course is null) return;
-        await CourseService.ChangeCourseState(Course, CourseStatus.InDevelop);
     }
 
 }
