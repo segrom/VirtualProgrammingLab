@@ -214,6 +214,8 @@
         if (_impl is null) throw new Exception("Такой реализации не существует ¯\\_(ツ)_/¯");
         _templateStart = _impl.TemplateCode;
         _testsStart = _impl.TestsCode;
+        _templateCode = _templateStart;
+        _testsCode = _testsStart;
     }
 
     private async Task SaveChanges()

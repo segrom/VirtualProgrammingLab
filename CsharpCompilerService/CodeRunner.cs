@@ -10,6 +10,7 @@ public class CodeRunner
 
     private const string Username = "runner";
     private const string Homedir = "/home/runner/";
+    private const int Timeout = 10000;
 
     public CodeRunner()
     {
@@ -17,7 +18,7 @@ public class CodeRunner
         Console.WriteLine("_____ run user inited _____");
     }
 
-    private async Task<(string, string)> RunCommand(string file, string args, string workdir = null)
+    private async Task<(string, string)> RunCommand(string file, string args, string workdir = null, CancellationToken cancellationToken = default)
     {
         var output = "";
         var errors = "";
@@ -36,7 +37,7 @@ public class CodeRunner
 
             var process = new Process
             {
-                StartInfo = desc
+                StartInfo = desc,
             };
 
             process.Start();
@@ -44,7 +45,7 @@ public class CodeRunner
             errors = await process.StandardError.ReadToEndAsync(); 
             output = await process.StandardOutput.ReadToEndAsync();
             
-            await process.WaitForExitAsync();
+            await process.WaitForExitAsync(cancellationToken);
         }
         catch (Exception e)
         {
@@ -60,6 +61,8 @@ public class CodeRunner
         if(e.InnerException != null) LogError(e.InnerException, ++deep);
     }
     
+    private async Task Timer(int timeout, CancellationToken cancellationToken = default) => await Task.Delay(timeout, cancellationToken);
+    
     public async Task<QueueCompileResult> RunCode(QueueCompileRequest request)
     {
         var solutionFilepath = Path.Join(Homedir, "exercise/Solution.cs");
@@ -67,13 +70,31 @@ public class CodeRunner
         var solutionPath = Path.Join(Homedir, "exercise/Exercise.csproj");
         await File.WriteAllTextAsync(solutionFilepath, request.Solution);
         await File.WriteAllTextAsync(testsFilepath, request.Tests);
+
+        string envErrors = "";
+        var ct = new CancellationTokenSource();
         
         Console.WriteLine("[START WITH RUNNER USER PROJ]");
         var sw = Stopwatch.StartNew();
-        var (output, errors) = await RunCommand("unshare", $"-n runuser -u {Username} -- dotnet run --project {solutionPath}");
+        Task<(string, string)> solutionTask = RunCommand("unshare", $"-n runuser -u {Username} -- dotnet run --project {solutionPath}", 
+            cancellationToken: ct.Token);
+        var timerTask = Timer(Timeout, ct.Token);
+
+        await Task.WhenAny(solutionTask, timerTask);
+        
+        
+        if (solutionTask.Status == TaskStatus.Running)
+        {
+            envErrors = $"Timeout error: program running more than {Timeout}ms \n";
+            Console.WriteLine("[TIMEOUT]");
+        }
+        ct.Cancel();
         var duration = sw.Elapsed;
         Console.WriteLine("[STOP PROJ]");
 
+        var (output, errors) = solutionTask.Result;
+        errors = envErrors + errors;
+        
         return new QueueCompileResult(request.ServiceId, request.CompileRequestId, output, errors, DateTimeOffset.Now, duration);
 
     }

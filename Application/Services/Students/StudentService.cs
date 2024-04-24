@@ -102,14 +102,14 @@ public class StudentService: IStudentService
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         return await dbContext.ExerciseStates
-            .Include(x => x.CompileRequests)
+            .Include(x => x.CompileRequests.Where(x=>x.UserId == s.UserId))
             .Include(x => x.Impl)
             .Where(x => x.ExerciseId == e.Id && x.StudentId == s.Id)
             .OrderByDescending(x=>x.CompileRequests.OrderByDescending(r=>r.CreationTime).First())
             .ToListAsync();
     }
 
-    public async Task<Course> GetStudentCourseAsync(int courseId, Student s)
+    public async Task<Course> GetStudentCourseAsync(int courseId, Student student)
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
         var result = await context.Courses
@@ -120,11 +120,11 @@ public class StudentService: IStudentService
                         .ThenInclude(i=>i.Language)
             .Include(c =>c.Chapters)
                 .ThenInclude(c=> c.Exercise)
-                    .ThenInclude(e=>e.States.Where(x=>x.StudentId == s.Id))
-                        .ThenInclude(s=>s.CompileRequests)
+                    .ThenInclude(e=>e.States.Where(x=>x.StudentId == student.Id))
+                        .ThenInclude(s=>s.CompileRequests.Where(x=>x.UserId == student.UserId))
             .Include(c =>c.Chapters)
-                .ThenInclude(c=>c.StudentStates.Where(x=>x.StudentId == s.Id))
-            .Include(c=>c.Groups.Where(g=>g.Id == s.GroupId))
+                .ThenInclude(c=>c.StudentStates.Where(x=>x.StudentId == student.Id))
+            .Include(c=>c.Groups.Where(g=>g.Id == student.GroupId))
             .FirstAsync(c => c.Id == courseId);
         return result;
     }
