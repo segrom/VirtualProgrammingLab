@@ -108,5 +108,9 @@
       <None Include="wwwroot\Assignments.html" />
       <None Include="wwwroot\faq.html" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Pages\StudentGroups\Components\" />
+    </ItemGroup>
     
 </Project>

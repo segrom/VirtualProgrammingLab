@@ -10,6 +10,7 @@
         <thead>
         <tr class="align-middle">
             <th scope="col">Название</th>
+            <th scope="col">Назначил</th>
             <th scope="col">Автор</th>
             <th scope="col">Завершенность</th>
         </tr>
@@ -26,6 +27,7 @@
                             <i class="ph ph-caret-right ms-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                         </button>
                     </th>
+                    <td>@course.GroupCourseAssignments.First(x=>x.GroupId == _student.GroupId).Assigner.GetShortName()</td>
                     <td>@course.Author.User.GetShortName()</td>
                     <td>
                         <div class="progress my-2">

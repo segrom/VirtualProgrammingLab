@@ -26,7 +26,7 @@ public class Course
     public Lecturer Author { get; set; }
     
     public List<Chapter> Chapters { get; set; } = new();
-    public List<StudentGroup> Groups { get; set; } = new();
+    public List<GroupCourseAssignment> GroupCourseAssignments { get; set; } = new();
 
     public Course() {}
 

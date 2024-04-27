@@ -35,7 +35,7 @@ public class StudentService: IStudentService
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         return await dbContext.Courses.Where(c => 
-                c.Groups.Any(g => g.Id == student.GroupId) 
+                c.GroupCourseAssignments.Any(g => g.GroupId == student.GroupId) 
                 && c.Status == CourseStatus.Published)
             .Include(c=>c.Chapters)
                 .ThenInclude(c=>c.StudentStates)
@@ -44,6 +44,10 @@ public class StudentService: IStudentService
                     .ThenInclude(c=>c.States.Where(s=>s.StudentId == student.Id))
             .Include(c=>c.Author)
                 .ThenInclude(a=>a.User)
+            .Include(c=>c.GroupCourseAssignments)
+                .ThenInclude(c=>c.Assigner)
+            .Include(c=>c.GroupCourseAssignments)
+                .ThenInclude(a=>a.Group)
             .ToListAsync();
     }
 
@@ -133,7 +137,10 @@ public class StudentService: IStudentService
                         .ThenInclude(s=>s.CompileRequests.Where(x=>x.UserId == student.UserId))
             .Include(c =>c.Chapters)
                 .ThenInclude(c=>c.StudentStates.Where(x=>x.StudentId == student.Id))
-            .Include(c=>c.Groups.Where(g=>g.Id == student.GroupId))
+            .Include(c=>c.GroupCourseAssignments.Where(g=>g.GroupId == student.GroupId))
+                .ThenInclude(a=>a.Assigner)
+            .Include(c=>c.GroupCourseAssignments.Where(g=>g.GroupId == student.GroupId))
+                .ThenInclude(a=>a.Group)
             .FirstAsync(c => c.Id == courseId);
         return result;
     }

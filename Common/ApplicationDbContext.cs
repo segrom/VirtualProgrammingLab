@@ -22,6 +22,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Exercise> Exercises { get; set; } = null!;
     public DbSet<ExerciseState> ExerciseStates { get; set; } = null!;
     public DbSet<Impl> Impls { get; set; } = null!;
+    public DbSet<GroupCourseAssignment> Assignments { get; set; } = null!;
     
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)

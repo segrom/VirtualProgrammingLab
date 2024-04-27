@@ -204,7 +204,7 @@
             NavigationManager.NavigateTo("404");
             return;
         }
-        if (_course.Groups.All(x => x.Id != _student.GroupId)) throw new Exception("У вас нет доступа к этому курсу 📛");
+        if (_course.GroupCourseAssignments.All(x => x.GroupId != _student.GroupId)) throw new Exception("У вас нет доступа к этому курсу 📛");
         if(_course.Chapters.Count > 0) SelectChapter(_course.Chapters.FirstOrDefault(c=>c.StudentState(_student) == null) ?? _course.Chapters.First());
     }
 

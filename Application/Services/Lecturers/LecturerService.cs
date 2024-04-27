@@ -49,41 +49,42 @@ public class LecturerService : ILecturerService
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         return await dbContext.Courses.Where(c => c.Status == CourseStatus.Published)
             .Include(c=>c.Author)
-            .Include(c=>c.Groups)
-                .ThenInclude(g=>g.Students)
-                    .ThenInclude(s=>s.User)
+            .Include(c=>c.GroupCourseAssignments)
+                .ThenInclude(a=>a.Group)
+                    .ThenInclude(g=>g.Students)
+                        .ThenInclude(s=>s.User)
+            .Include(c=>c.GroupCourseAssignments)
+                .ThenInclude(a=>a.Assigner)
             .ToListAsync();
     }
 
-    public async Task AddCourseToGroup(Course c, StudentGroup g)
+    public async Task<GroupCourseAssignment> AddCourseToGroup(Course c, StudentGroup g, Lecturer l)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var course = await dbContext.Courses.FirstAsync(x=>x.Id == c.Id);
         var group = await dbContext.StudentGroups.FirstAsync(x=>x.Id == g.Id);
-        
-        group.Courses.Add(course);
-        
-        dbContext.Update(group);
-        await dbContext.SaveChangesAsync();
-    }
+        var lecturer = await dbContext.Lecturers
+            .Include(x=>x.User)
+            .FirstAsync(x=>x.Id == l.Id);
 
-    public async Task AddCoursesToGroup(List<Course> c, StudentGroup g)
-    {
-        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        
-        var ids = c.Select(c => c.Id);
-        var courses = await dbContext.Courses.Where(x=> ids.Contains(x.Id)).ToListAsync();
-        var group = await dbContext.StudentGroups.FirstAsync(x=>x.Id == g.Id);
-        
-        for (int i = 0; i < courses.Count; i++)
+        var assignment =
+            await dbContext.Assignments.FirstOrDefaultAsync(a => a.GroupId == group.Id && a.CourseId == course.Id);
+        if (assignment is null)
         {
-            if (group.Courses.Contains(courses[i])) courses.Remove(courses[i]);
+            
+            assignment = new GroupCourseAssignment()
+            {
+                Group = group,
+                Course = course,
+                CreationDate = DateTimeOffset.Now
+            };
+            await dbContext.Assignments.AddAsync(assignment);
         }
+        assignment.Assigner = lecturer.User;
+        assignment.ChangeDate = DateTimeOffset.Now;
         
-        group.Courses.AddRange(courses);
-        
-        dbContext.Update(group);
         await dbContext.SaveChangesAsync();
+        return assignment;
     }
 
     public async Task DeleteChapterAsync(Chapter c)
@@ -103,18 +104,9 @@ public class LecturerService : ILecturerService
     public async Task RemoveCourseFromGroup(Course c, StudentGroup g)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        var course = await dbContext.Courses
-            .Include(x=>x.Groups)
-            .FirstAsync(x=>x.Id == c.Id);
-        var group = await dbContext
-            .StudentGroups
-            .Include(x=>x.Courses)
-            .FirstAsync(x=>x.Id == g.Id);
+        var assignments = await dbContext.Assignments.Where(x => x.CourseId == c.Id && x.GroupId == g.Id).ToListAsync();
         
-        dbContext.Update(group);
-        
-        group.Courses.Remove(course);
-        
+        dbContext.Assignments.RemoveRange(assignments);
         await dbContext.SaveChangesAsync();
     }
 }

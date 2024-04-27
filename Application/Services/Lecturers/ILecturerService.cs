@@ -11,8 +11,7 @@ public interface ILecturerService
     Task<List<Course>> GetLecturerCoursesAsync(Lecturer lecturer);
     Task<List<Course>> GetLecturerCoursesIncludeGroupsAsync(Lecturer lecturer);
     Task RemoveCourseFromGroup(Course course, StudentGroup group);
-    Task AddCourseToGroup(Course course, StudentGroup group);
-    Task AddCoursesToGroup(List<Course> courses, StudentGroup group);
+    Task<GroupCourseAssignment> AddCourseToGroup(Course course, StudentGroup group, Lecturer lecturer);
     Task DeleteChapterAsync(Chapter chapter);
     Task<List<StudentGroup>> GetAllGroups();
 }

@@ -38,7 +38,10 @@ public class CourseService: ICourseService
                 .ThenInclude(e=>e.Implementations)
                 .ThenInclude(i=>i.Language)
             .Include(c =>c.Chapters)
-            .Include(c=>c.Groups)
+            .Include(c=>c.GroupCourseAssignments)
+                .ThenInclude(a=>a.Assigner)
+            .Include(c=>c.GroupCourseAssignments)
+                .ThenInclude(a=>a.Group)
             .FirstAsync(c => c.Id == id);
         return result;
     }

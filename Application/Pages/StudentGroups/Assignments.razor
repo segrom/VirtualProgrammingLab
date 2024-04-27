@@ -35,11 +35,11 @@
                         <strong class="me-2">@course.Title</strong>
                         <span class="mx-2 badge text-bg-secondary align-items-center d-flex justify-content-center">
                             <i class="ph-bold ph-users-three me-1" style="padding-top: 0.12em; font-size: 1.2em;"></i>
-                            <span>@course.Groups.Count</span>
+                            <span>@course.GroupCourseAssignments.Count</span>
                         </span>
                         <span class="mx-2 badge text-bg-secondary align-items-center d-flex justify-content-center">
                             <i class="ph-bold ph-user me-1" style="padding-top: 0.12em; font-size: 1.2em;"></i>
-                            <span>@course.Groups.Sum(g=>g.Students.Count)</span>
+                            <span>@course.GroupCourseAssignments.Sum(g=>g.Group.Students.Count)</span>
                         </span>
                     </button>
                 }
@@ -77,17 +77,17 @@
                         </div>
                     </div>
                     <ul class="list-group  mt-2">
-                        @foreach (var group in _selectedCourse.Groups)
+                        @foreach (var assignment in _selectedCourse.GroupCourseAssignments)
                         {
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div class="d-flex justify-content-start align-items-center">
-                                    <span>@group.Name</span>
+                                    <span>@assignment.Group.Name</span>
                                     <span class="mx-2 badge text-bg-secondary align-items-center d-flex justify-content-center">
                                         <i class="ph-bold ph-user me-1" style="padding-top: 0.12em; font-size: 1.2em;"></i>
-                                        <span>@group.Students.Count</span>
+                                        <span>@assignment.Group.Students.Count</span>
                                     </span>
                                 </div>
-                                <button @onclick="() => RemoveGroupFromCourse(group, _selectedCourse)" class="btn btn-outline d-flex justify-content-between align-items-center">
+                                <button @onclick="() => RemoveGroupFromCourse(assignment.Group, _selectedCourse)" class="btn btn-outline d-flex justify-content-between align-items-center">
                                     <i class="ph ph-x my-1"></i>
                                 </button>
                             </li>
@@ -106,29 +106,29 @@
                         </div>
                     </div>
                     <div class="accordion mt-2" id="accordionExample">
-                        @foreach (var group in _selectedCourse.Groups)
+                        @foreach (var assignment in _selectedCourse.GroupCourseAssignments)
                         {
                             <div class="accordion-item">
                             <h2 class="accordion-header ">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapse@(group.Id)" aria-expanded="false" aria-controls="collapse@(group.Id)">
-                                    <span>@group.Name</span>
+                                        data-bs-target="#collapse@(assignment.GroupId)" aria-expanded="false" aria-controls="collapse@(assignment.GroupId)">
+                                    <span>@assignment.Group.Name</span>
                                     <span class="mx-2 badge text-bg-secondary align-items-center d-flex justify-content-center">
                                         <i class="ph-bold ph-user me-1" style="padding-top: 0.12em; font-size: 1.2em;"></i>
-                                        <span>@group.Students.Count</span>
+                                        <span>@assignment.Group.Students.Count</span>
                                     </span>
                                     @{ var groupFinishedStudents = _studentsProgress
-                                           .Where(s => s.Key.GroupId == group.Id)
+                                           .Where(s => s.Key.GroupId == assignment.GroupId)
                                            .Count(s => s.Value.Finished == s.Value.All); }
                                     <div class="progress w-50 ms-3" role="progressbar" aria-label="Example with label"
-                                         aria-valuenow="@((int)(groupFinishedStudents / (float) group.Students.Count * 100f))" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar @(groupFinishedStudents == group.Students.Count ? "bg-success" : "")" style="width: @((int)(groupFinishedStudents / (float) group.Students.Count * 100f))%">@(groupFinishedStudents)/@(group.Students.Count)</div>
+                                         aria-valuenow="@((int)(groupFinishedStudents / (float) assignment.Group.Students.Count * 100f))" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar @(groupFinishedStudents == assignment.Group.Students.Count ? "bg-success" : "")" style="width: @((int)(groupFinishedStudents / (float) assignment.Group.Students.Count * 100f))%">@(groupFinishedStudents)/@(assignment.Group.Students.Count)</div>
                                     </div>
                                 </button>
                             </h2>
-                            <div id="collapse@(group.Id)" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                            <div id="collapse@(assignment.GroupId)" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                                 <div class="accordion-body">
-                                    @foreach (var student in group.Students)
+                                    @foreach (var student in assignment.Group.Students)
                                     {
                                         <div class="my-1 d-flex justify-content-between align-items-center">
                                             <span>@student.User.GetFullName()</span>
@@ -208,7 +208,7 @@
 
     private async Task AddGroupToCourse(StudentGroup group, Course selectedCourse)
     {
-        await LecturerService.AddCourseToGroup(selectedCourse, group);
+        await LecturerService.AddCourseToGroup(selectedCourse, group, _lecturer);
         Refresh();
     }
 
@@ -216,9 +216,9 @@
     {
         _studentsProgress.Clear();
         _selectedCourse = course;
-        foreach (var group in _selectedCourse.Groups)
+        foreach (var assignment in _selectedCourse.GroupCourseAssignments)
         {
-            foreach (var student in group.Students)
+            foreach (var student in assignment.Group.Students)
             {
                 _studentsProgress[student] = await StudentService.GetStudentCourseProgress(student, _selectedCourse);
             }

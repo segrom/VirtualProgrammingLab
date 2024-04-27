@@ -12,7 +12,7 @@ public class StudentGroup
     public string Name { get; set; }
 
     public List<Student> Students { get; set; } = new();
-    public List<Course> Courses { get; set; } = new();
+    public List<GroupCourseAssignment> GroupCourseAssignments { get; set; } = new();
 
     public StudentGroup() {}
 
