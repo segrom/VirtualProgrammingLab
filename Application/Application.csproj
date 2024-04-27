@@ -75,6 +75,10 @@
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
+      <Content Update="HtmlPages\faq.html">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
@@ -101,6 +105,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Include="wwwroot\Assignments.html" />
       <None Include="wwwroot\faq.html" />
     </ItemGroup>
     

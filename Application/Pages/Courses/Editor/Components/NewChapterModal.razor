@@ -64,6 +64,7 @@
     {
         await CourseService.AddChapterToCourse(Course, _model);
         OnRefresh?.Invoke();
+        _model = new();
     }
 
 }

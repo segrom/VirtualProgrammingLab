@@ -24,7 +24,8 @@
         <div class="d-flex align-items-center justify-content-between">
             <h1 class=" m-3">@(_course?.Title??"Course not found")</h1>
             <div class="progress my-2" style="width: 20%">
-                <div class="progress-bar @(_courseProgress >= 100 ? "bg-success" : "")" role="progressbar" style="width: @(_courseProgress)%;" aria-valuenow="@(_courseProgress)" aria-valuemin="0" aria-valuemax="100">@(_courseProgress)%</div>
+                <div class="progress-bar @(_courseProgress.Finished == _courseProgress.All ? "bg-success" : "")" role="progressbar" style="width: @((int)(_courseProgress.Finished / (float)_courseProgress.All * 100f))%;" 
+                     aria-valuenow="@((int)(_courseProgress.Finished / (float)_courseProgress.All * 100f))" aria-valuemin="0" aria-valuemax="100">@(_courseProgress.Finished)/@(_courseProgress.All) </div>
             </div>
         </div>
     </div>
@@ -177,7 +178,7 @@
     
      private Student? _student;
     private Course? _course;
-    private int? _courseProgress;
+    private (int Finished,int All) _courseProgress;
     
     private Chapter? _selectedChapter;
     private int? _selectedChapterIndex;
@@ -216,7 +217,7 @@
         _course.Chapters[_selectedChapterIndex.Value] = _selectedChapter;
         
         
-        _courseProgress = (int)(StudentService.GetStudentCourseProgress(_student, _course) * 100);
+        _courseProgress = await StudentService.GetStudentCourseProgress(_student, _course);
         
         if (_selectedChapter.IsExercise)
         {

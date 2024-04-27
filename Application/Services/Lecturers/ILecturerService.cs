@@ -1,4 +1,5 @@
-﻿using Common.Courses;
+﻿using System.Text.RegularExpressions;
+using Common.Courses;
 using Common.Lecturers;
 using Common.Students;
 
@@ -13,4 +14,5 @@ public interface ILecturerService
     Task AddCourseToGroup(Course course, StudentGroup group);
     Task AddCoursesToGroup(List<Course> courses, StudentGroup group);
     Task DeleteChapterAsync(Chapter chapter);
+    Task<List<StudentGroup>> GetAllGroups();
 }

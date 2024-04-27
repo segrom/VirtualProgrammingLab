@@ -47,8 +47,17 @@ public class StudentService: IStudentService
             .ToListAsync();
     }
 
-    public float GetStudentCourseProgress(Student student, Course course)
+    public async Task<(int Finished,int All)> GetStudentCourseProgress(Student student, Course c)
     {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var course = await dbContext.Courses
+            .Include(x => x.Chapters)
+                .ThenInclude(x => x.Exercise)
+                    .ThenInclude(exercise => exercise.States)
+            .Include(course => course.Chapters)
+                .ThenInclude(chapter => chapter.StudentStates)
+            .FirstAsync(x => x.Id == c.Id);
+        
         var chaptersStatesCount =
             course.Chapters.Where(c => !c.IsExercise)
                 .Count(c => c.StudentStates.Any(s => s.StudentId == student.Id));
@@ -57,7 +66,7 @@ public class StudentService: IStudentService
                 .Count(c=>c.Exercise.States.Any(s=>
                     s.StudentId == student.Id 
                     && s.Status == ExerciseStatus.Completed));
-        return (chaptersStatesCount + exerciseStatesCount) / (float) course.Chapters.Count;
+        return (chaptersStatesCount + exerciseStatesCount, course.Chapters.Count);
     }
 
     public async Task<(Chapter, ChapterStudentState)> UpdateChapterState(Chapter c, Student s)

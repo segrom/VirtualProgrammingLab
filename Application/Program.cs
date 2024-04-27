@@ -31,7 +31,7 @@ if (isLocal)
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 {
     if(isLocal)
-        options.UseSqlite(connectionString);
+        options.UseSqlite(connectionString, b => b.MigrationsAssembly("Application"));
     else
         options.UseNpgsql(connectionString);
 });
@@ -57,7 +57,11 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
-builder.Services.AddSingleton<ICompileService, CompileService>();
+
+if(isLocal)
+    builder.Services.AddSingleton<ICompileService, LocalCompileService>();
+else
+    builder.Services.AddSingleton<ICompileService, CompileService>();
 
 builder.Services.AddControllers();
 
@@ -94,7 +98,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider; 
     var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
-    _ = services.GetRequiredService<ICompileService>();
+    if(!isLocal) _ = services.GetRequiredService<ICompileService>();
     try
     {
         

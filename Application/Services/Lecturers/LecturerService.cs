@@ -1,4 +1,5 @@
-﻿using Application.Services.Students;
+﻿using System.Text.RegularExpressions;
+using Application.Services.Students;
 using Application.Services.Users;
 using Common;
 using Common.Courses;
@@ -46,11 +47,11 @@ public class LecturerService : ILecturerService
     public async Task<List<Course>> GetLecturerCoursesIncludeGroupsAsync(Lecturer lecturer)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        return await dbContext.Courses.Where(c => 
-                c.AuthorId == lecturer.Id && c.Status != CourseStatus.Deleted)
+        return await dbContext.Courses.Where(c => c.Status == CourseStatus.Published)
             .Include(c=>c.Author)
             .Include(c=>c.Groups)
                 .ThenInclude(g=>g.Students)
+                    .ThenInclude(s=>s.User)
             .ToListAsync();
     }
 
@@ -93,15 +94,27 @@ public class LecturerService : ILecturerService
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task<List<StudentGroup>> GetAllGroups()
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        return await dbContext.StudentGroups.ToListAsync();
+    }
+
     public async Task RemoveCourseFromGroup(Course c, StudentGroup g)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        var course = await dbContext.Courses.FirstAsync(x=>x.Id == c.Id);
-        var group = await dbContext.StudentGroups.FirstAsync(x=>x.Id == g.Id);
+        var course = await dbContext.Courses
+            .Include(x=>x.Groups)
+            .FirstAsync(x=>x.Id == c.Id);
+        var group = await dbContext
+            .StudentGroups
+            .Include(x=>x.Courses)
+            .FirstAsync(x=>x.Id == g.Id);
+        
+        dbContext.Update(group);
         
         group.Courses.Remove(course);
         
-        dbContext.Update(group);
         await dbContext.SaveChangesAsync();
     }
 }

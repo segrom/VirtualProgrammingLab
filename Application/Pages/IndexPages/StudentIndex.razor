@@ -29,8 +29,10 @@
                     <td>@course.Author.User.GetShortName()</td>
                     <td>
                         <div class="progress my-2">
-                            @{ var progress = (int)_coursesProgresses[course];}
-                            <div class="progress-bar @(progress >= 100 ? "bg-success":"")" role="progressbar" style="width: @(progress)%;" aria-valuenow="@(progress)" aria-valuemin="0" aria-valuemax="100">@(progress)%</div>
+                            @{ var progress = _coursesProgresses[course];}
+                            <div class="progress-bar @(progress.Finished == progress.All ? "bg-success" : "")" role="progressbar" style="width: @((int)(progress.Finished / (float)progress.All * 100f))%;" aria-valuenow="@((int)(progress.Finished / (float)progress.All * 100f))" aria-valuemin="0" aria-valuemax="100">
+                                @(progress.Finished)/@(progress.All)
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -48,7 +50,7 @@
 
     Student? _student;
     List<Course> _courses = new();
-    Dictionary<Course, float> _coursesProgresses = new();
+    Dictionary<Course, (int Finished,int All)> _coursesProgresses = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,7 +59,7 @@
 
         foreach (var course in _courses)
         {
-            _coursesProgresses.Add(course, StudentService.GetStudentCourseProgress(_student ,course) * 100);
+            _coursesProgresses.Add(course, await StudentService.GetStudentCourseProgress(_student ,course));
         }
     }
 
