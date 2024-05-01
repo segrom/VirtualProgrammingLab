@@ -25,7 +25,9 @@ class Tests:
     
     public CodeRunner()
     {
-        Console.WriteLine(RunCommand("python3", $"--version"));
+        var pyv = RunCommand("python3", $"--version");
+        pyv.Wait();
+        Console.WriteLine(pyv.Result.Item1);
         Console.WriteLine("_____ run user inited _____");
     }
 
