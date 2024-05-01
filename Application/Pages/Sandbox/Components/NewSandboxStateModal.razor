@@ -1,0 +1,78 @@
+﻿@using Common.Common
+@using Application.Services.Compile.Sandbox
+@using System.ComponentModel.DataAnnotations
+@using Application.Services.Courses
+@namespace Application.Pages.Sandbox.Components
+@inject ISandboxService SandboxService
+@inject IExerciseService ExerciseService
+@inject IJSRuntime JsRuntime
+
+<!-- @ModalId -->
+<div class="modal fade" id="@ModalId" tabindex="-1" aria-labelledby="@(ModalId)Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <EditForm Model="Model" OnValidSubmit="Submit" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="@(ModalId)Label">Новый черновик</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="exampleInput" class="form-label">Название</label>
+                    <input @bind="Model.Name" type="text" class="form-control" id="exampleInput">
+                    <ValidationMessage For="() => Model.Name"/>
+                </div>
+                <label for="exampleInput2" class="form-label">Язык</label>
+                <InputSelect class="form-select" @bind-Value="Model.LanguageId">
+                    @foreach (var language in _languages)
+                    {
+                        <option value="@language.Id">@language.Name</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Model.LanguageId"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private class NewSandboxStateForm
+    {
+        [Required(ErrorMessage = "Черновику необходимо название")]
+        [MinLength(3, ErrorMessage = "Название недолжно быть короче 3х симовлов")]
+        public string Name { get; set; }
+        [Required]
+        public int LanguageId { get; set; }
+    }
+    
+    [Parameter]
+    public string ModalId { get; set; }
+    
+    [Parameter]
+    public string UserId { get; set; }
+    
+    [Parameter]
+    public Action<int> OnSuccess { get; set; }
+
+    private Language[] _languages = Array.Empty<Language>();
+
+    private NewSandboxStateForm Model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _languages = await ExerciseService.GetAllLanguagesAsync();
+        Model.LanguageId = _languages.First().Id;
+    }
+
+    private async Task Submit()
+    {
+        var state = await SandboxService.CreateState(UserId, Model.Name, Model.LanguageId);
+        OnSuccess?.Invoke(state.Id);
+        await JsRuntime.InvokeVoidAsync("codeFunctions.hideModal", ModalId);
+        Model = new();
+    }
+
+}

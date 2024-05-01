@@ -13,6 +13,7 @@
 @inject ILecturerService LecturerService
 @inject IStudentService StudentService
 @inject IUserService UserService;
+@inject IJSRuntime JsRuntime;
 
 @if (_isLoading || _user is null)
 {
@@ -45,7 +46,7 @@ else
         </button>
 
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="userDropDown">
-            <li>
+            <li data-bs-toggle="tooltip" data-bs-title="В активной разработке" data-bs-placement="left" data-bs-custom-class="custom-tooltip">
                 <NavLink class="dropdown-item disabled" disabled href="/profile">Профиль</NavLink>
             </li>
             <li>
@@ -75,4 +76,10 @@ else
         
         _isLoading = false;
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JsRuntime.InvokeVoidAsync("codeFunctions.enableTooltips");
+    }
+
 }

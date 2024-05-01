@@ -32,15 +32,20 @@ window.codeFunctions = {
 
     
     showModal: function (elementId) {
-        let modal = new bootstrap.Modal(document.getElementById(elementId),  {
-            focus: true
+        var modal =  bootstrap.Modal.getInstance('#'+elementId);
+        if(modal == null) modal = new bootstrap.Modal(document.getElementById(elementId), {
+            focus: true,
         })
-        modal.show()
+        modal.show();
     },
+    
     hideModal: function (elementId) {
-        let modal = new bootstrap.Modal(document.getElementById(elementId),  {
-            focus: true
-        })
-        modal.hide()
+        var modal = bootstrap.Modal.getInstance('#'+elementId);
+        modal.hide();
+    },
+
+    enableTooltips: function () {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))  
     }
 }

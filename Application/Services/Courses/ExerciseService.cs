@@ -110,6 +110,7 @@ public class ExerciseService: IExerciseService
                 User = student.User,
                 Status = CompileRequestStatus.Queued,
                 Tests = impl.TestsCode,
+                IsExercise = true,
                 ExerciseState = state,
                 CreationTime = DateTimeOffset.Now
             });

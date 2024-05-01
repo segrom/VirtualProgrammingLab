@@ -11,6 +11,7 @@ public class Language
     [Required]
     public string HighlightLabel { get; set; }
     
+    public string? SandboxTemplateCode { get; set; }
     public string? DefaultTemplateCode { get; set; }
     public string? DefaultTestsCode { get; set; }
 

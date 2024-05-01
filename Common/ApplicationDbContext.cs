@@ -24,6 +24,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Impl> Impls { get; set; } = null!;
     public DbSet<GroupCourseAssignment> Assignments { get; set; } = null!;
     
+    public DbSet<SandboxState> SandboxStates { get; set; } = null!;
+    
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {

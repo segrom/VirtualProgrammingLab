@@ -3,6 +3,7 @@ using Application.Controllers;
 using Application.Middleware;
 using Application.Services.Admin;
 using Application.Services.Compile;
+using Application.Services.Compile.Sandbox;
 using Application.Services.Courses;
 using Application.Services.Lecturers;
 using Application.Services.Search;
@@ -56,6 +57,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ISandboxService, SandboxService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 
 if(isLocal)
@@ -112,6 +114,16 @@ using (var scope = app.Services.CreateScope())
             {
                 new Language("C#", "csharp")
                 {
+                    SandboxTemplateCode = 
+                        @"namespace Exercise;
+
+public class Solution
+{
+    public void Run()
+    {
+        // code here
+    }
+}",
                     DefaultTemplateCode = 
                         @"namespace Exercise;
 
@@ -140,6 +152,11 @@ public class Tests
                 },
                 new Language("Python 3.9", "py")
                 {
+                    SandboxTemplateCode = 
+                        @"
+class Solution:
+    def run(self):
+        pass",
                     DefaultTemplateCode = 
                         @"
 class Solution:

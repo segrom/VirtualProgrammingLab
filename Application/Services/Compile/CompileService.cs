@@ -36,7 +36,8 @@ public class CompileService: ICompileService
         {
             HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
             UserName = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"),
-            Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD")
+            Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD"),
+            Port = 5672
         };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
@@ -54,7 +55,8 @@ public class CompileService: ICompileService
             _serviceQueueId, 
             compileRequest.Id, 
             compileRequest.Code,
-            compileRequest.Tests);
+            compileRequest.Tests,
+            compileRequest.IsExercise);
         var body = JsonSerializer.SerializeToUtf8Bytes(request);
 
         var destinationQueue = Environment.GetEnvironmentVariable("INPUT_QUEUE_NAME_FORMAT")

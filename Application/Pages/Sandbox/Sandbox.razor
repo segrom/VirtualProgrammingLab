@@ -1,0 +1,208 @@
+﻿@page "/sandbox"
+@using Application.Services.Compile
+@using Application.Services.Compile.Sandbox
+@using Application.Shared.Utils
+@using Common.Account
+@using Common.Common
+@using Common.QueueStructures
+@using Application.Pages.Sandbox.Components
+@using Microsoft.AspNetCore.Identity
+@attribute [Authorize]
+@inject ILogger<Sandbox> Logger
+@inject UserManager<User> UserManager
+@inject ICompileService CompileService
+@inject ISandboxService SandboxService
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Песочница</PageTitle>
+
+@if (_currentState is null)
+{
+    <div class="d-flex align-items-center justify-content-center mt-5 text-secondary ">
+        <h4 class="text-secondary">У вас пока нет ни одного черновика 🌏 
+            <button class="btn btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#@(NewStateModalId)">
+                Создать
+            </button>
+            </h4>
+    </div>
+}
+else
+{
+    <p>Чтобы компилировать и исполнить программу нажмите кнопку "Запустить"</p>
+    <div class="col gy-1">
+
+        <div class="btn-toolbar my-2 d-flex align-items-center justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group me-2" role="group">
+
+                <button @onclick="Compile" disabled="@(_isLoading || _isSaving)" type="button" class="btn btn-primary d-flex align-items-center justify-content-center"> 
+                    @if (_isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        @:Компиляция...
+                    }
+                    else
+                    {
+                        <i class="ph-fill ph-play me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                        @:Отправить
+                    }
+                </button>
+                <button @onclick="Save" disabled="@(_isLoading || _isSaving || !_isDirty)" type="button" class="btn btn-primary d-flex align-items-center justify-content-center">
+                    @if (_isSaving)
+                    {
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        @:Сохранение...
+                    }
+                    else
+                    {
+                        <i class="ph ph-floppy-disk me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                        @:Сохранить
+                    }
+                </button>
+            </div>
+            <div class="btn-group me-2" role="group">
+                <button class="btn btn-outline-primary align-items-center d-flex justify-content-center"
+                        @onclick="() => ShowModal(NewStateModalId)" >
+                    <i class="ph ph-plus me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                    <span>Новый</span>
+                </button>
+                <div class="btn-group" role="group">
+                    <button id="btnGroupDrop1" type="button" class="btn btn-outline-primary dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        @_currentState.Name
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" style="max-width: 300px" aria-labelledby="btnGroupDrop1">
+                        @foreach (var state in _states)
+                        {
+                            <li>
+                                <button @onclick="() => SelectState(state)" class="dropdown-item text-truncate d-inline-block"><span class="badge text-bg-secondary">@state.Language.Name</span> @state.Name</button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <button class="btn btn-outline-danger align-items-center d-flex justify-content-center"
+                        data-bs-toggle="modal" data-bs-target="#@(DeleteStateModalId)">
+                    <i class="ph ph-trash me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                    <span>Удалить</span>
+                </button>
+            </div>
+        </div>
+        <div class="row gx-6">
+            <div class="flex-fill my-2" style="height: 60vh">
+                
+                <CodeInput CodeChanged="s => { _code = s; _isDirty = true; }" StartCode="@_codeTemplate" />
+               
+            </div>
+            <div class="flex-fil" style="height: 20vh">
+                <textarea @bind="_output" class="py-2 px-4 rounded-3  code" disabled readonly style="height: 100%; width: 100%; resize: none;">log here</textarea>
+            </div>
+        </div>
+    </div>
+}
+
+<NewSandboxStateModal UserId="@_user.Id" ModalId="@NewStateModalId" OnSuccess="@OnNewState" />
+
+<ConfirmationModal ModalId="@DeleteStateModalId" OnSuccess="() => DeleteCurrentState()"
+                       TitleStyle="text-danger" SubmitStyle="btn-danger">
+        <Title>
+            <i class="ph ph-trash me-1" style="font-size: 1.5em;"></i>
+            <span>Удаление</span>
+        </Title>
+        <Body>
+        <h4> Вы уверены что хотите удалить черновик <strong>@(_currentState?.Name)</strong>?</h4>
+        </Body>
+    </ConfirmationModal>
+
+@code {
+    
+        const string NewStateModalId = "NewStateModal";
+        const string DeleteStateModalId = "DeleteStateModal";
+    
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthStat { get; set; }
+
+    private User _user;
+    private SandboxState? _currentState;
+    private List<SandboxState> _states;
+    
+    
+    private string _code = "";
+
+    private string _codeTemplate="";
+
+    private string _output = "Logs here";
+
+    private bool _isLoading;
+    private bool _isSaving;
+    private bool _isDirty;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var claimsPrincipal = (await AuthStat).User;
+
+        _user = await UserManager.GetUserAsync(claimsPrincipal);
+        _states = await SandboxService.GetStatesForUser(_user);
+        if(_states.Count > 0)
+        {
+            SelectState(_states.First());
+        }
+    }
+    
+    private async void Compile()
+    {
+        if (_currentState is null || _user is null || _isLoading) return;
+        _isLoading = true;
+        var (request, state) = await SandboxService.NewCompileRequest(_user.Id, _currentState.Id, _code);
+        _currentState = state;
+        Logger.Log(LogLevel.Information, $"Create compileRequest [{request.Id}] \n with code: {request.Code} \n and tests: {request.Tests}");
+        var result = await CompileService.QueueCompileRequest(request);
+        _isLoading = false;
+        _output = "";
+        if (!string.IsNullOrEmpty(result.ResultOutput)) _output = $"Output: \n{result.ResultOutput}";
+        if (!string.IsNullOrEmpty(result.ResultErrors)) _output += $"🚩Errors: \n{result.ResultErrors}";
+        Logger.Log(LogLevel.Information, $"CR_ID[{request.Id}] Results rec" +
+                                         $"received: {result.ResultOutput} with errors {result.ResultErrors}");
+        StateHasChanged();
+    }
+
+    private void SelectState(SandboxState state)
+    {
+        _currentState = state;
+        _codeTemplate = _currentState.Code;
+        _code = _codeTemplate;
+        StateHasChanged();
+    }
+
+    private async void OnNewState(int newStateId)
+    {
+        _states = await SandboxService.GetStatesForUser(_user);
+        SelectState(_states.First(s => s.Id == newStateId));
+    }
+
+    private async void DeleteCurrentState()
+    {
+        if(_currentState is null) return;
+        await SandboxService.DeleteState(_currentState.Id);
+        _states = await SandboxService.GetStatesForUser(_user);
+        _currentState = _states.Count > 0 ? _states.First() : null;
+        StateHasChanged();
+    }
+
+    private async Task ShowModal(string modalId)
+    {
+        await JsRuntime.InvokeVoidAsync("codeFunctions.showModal", modalId);
+    }
+    
+    private async Task Save()
+    {
+        _isSaving = true;
+
+        _currentState.Code = _code;
+        await SandboxService.UpdateState(_currentState.Id, _code);
+        _isDirty = false;
+        
+        _isSaving = false;
+        StateHasChanged();
+    }
+
+}

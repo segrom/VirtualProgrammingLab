@@ -20,7 +20,7 @@ public class RabbitListener : BackgroundService
     {
         _logger = logger;
         _configuration = configuration;
-        _logger.LogInformation("Login rabbit as {0}", Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"));
+        _logger.LogInformation("Login rabbit as {0} to host: {1}", Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME"), Environment.GetEnvironmentVariable("RABBITMQ_HOST"));
         _inputQueueName = Environment.GetEnvironmentVariable("INPUT_QUEUE_NAME_FORMAT").FormatWith("csharp");
         var factory = new ConnectionFactory
         {
@@ -31,7 +31,8 @@ public class RabbitListener : BackgroundService
             {
                 ServerName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
                 Enabled = false,
-            }
+            },
+            Port = 5672,
         };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();

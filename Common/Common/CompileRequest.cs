@@ -34,9 +34,14 @@ public class CompileRequest
     [Required][ForeignKey("LanguageId")] 
     public Language Language { get; set; }
     
+    public bool IsExercise { get; set; }
     public int? ExerciseStateId { get; set; }
     [ForeignKey("ExerciseStateId")] 
     public ExerciseState? ExerciseState { get; set; }
+    
+    public int? SandboxStateId { get; set; }
+    [ForeignKey("SandboxStateId")] 
+    public SandboxState? SandboxState { get; set; }
 
     public CompileRequest()
     {

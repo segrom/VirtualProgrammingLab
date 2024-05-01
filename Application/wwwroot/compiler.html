@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>C# Compiler</title>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+            integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+            integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+            crossorigin="anonymous"></script>
+    <link href="css/prism.css" rel="stylesheet" />
+    <link href="css/themes/prism-vsc-dark-plus.css" rel="stylesheet" />
+    <link href="css/autocomplete.min.css" rel="stylesheet" />
+    <script src="js/code-input.min.js"></script>
+    <script src="js/plugins/indent.min.js"></script>
+    <script src="js/plugins/autocomplete.min.js"></script>
+    <script src="js/plugins/auto-close-brackets.min.js"></script>
+    <link rel="stylesheet" href="css/code-input.min.css">
+    <link href="css/prism-line-numbers.css" rel="stylesheet" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-black">
+    <div class="container-fluid">
+        <a class="navbar-brand  bold" href="#">Виртуальная лабаратория программирования</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link disabled " disabled aria-current="page" href="#">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Компилятор</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" disabled href="#">Курсы</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</nav>
+<!--<div class="overflow-hidden justify-content-center  align-items-end p-3" style="display: flex; height: 50vh;">
+<div class="d-flex align-items-center justify-content-between gx-4">
+ 
+        <span class="spinner-border btn-dark spinner-border-lg mx-2" style="width: 3rem; height: 3rem;" role="status"
+              aria-hidden="true"></span>
+        <h3 class="table-dark display-6 mx-2">Loading Editor...</h3>
+
+</div>
+</div>-->
+<div class="container overflow-hidden p-3">
+    <p class="table-dark">Чтобы компилировать и исполнить программу нажмите кнопку "Запустить"</p>
+    <div class="col gy-1">
+       
+        <div class="btn-toolbar my-2 d-flex align-items-center justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+
+            <div class="d-flex align-items-center justify-content-start">
+                
+                <div class="btn-group ms-2" role="group">
+                    <button class="btn btn-primary align-items-center d-flex justify-content-center">
+                        <i class="ph-fill ph-play me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                        <span>Запустить</span>
+                    </button>
+                    <button class="btn btn-primary align-items-center d-flex justify-content-center">
+                        <i class="ph ph-floppy-disk me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                        <span>Сохранить</span>
+                    </button>
+                    
+                </div>
+
+            </div>
+            <div class="btn-group me-2" role="group">
+                <button class="btn btn-outline-primary align-items-center d-flex justify-content-center"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <i class="ph ph-plus me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                    <span>Новый</span>
+                </button>
+                <div class="btn-group" role="group">
+                    <button id="btnGroupDrop1" type="button" class="btn btn-outline-primary dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Name
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" style="max-width: 300px" aria-labelledby="btnGroupDrop1">
+                        <li><button class="dropdown-item text-truncate d-inline-block" ><span class="badge text-bg-secondary">C#</span> Name 1 sad asdas d asd asdsad asdasd as asd</button></li>
+                        <li><button class="dropdown-item text-truncate d-inline-block" ><span class="badge text-bg-secondary">Python 3</span> Name 2</button></li>
+                        <li><button class="dropdown-item text-truncate d-inline-block" ><span class="badge text-bg-secondary">C++</span> Nas</button></li>
+                    </ul>
+                </div>
+                <button class="btn btn-outline-danger align-items-center d-flex justify-content-center">
+                    <i class="ph ph-trash me-2" style="padding-top: 0.13em; font-size: 1em;"></i>
+                    <span>Удалить</span>
+                </button>
+            </div>
+            
+        </div>
+        <div class="row gx-6">
+            <div class="flex-fill my-2" style="height: 60vh">
+                <code-input  class="container-fluid p-0 m-0 rounded-3 line-numbers " style="height: 100%" language="csharp" placeholder="Type code here" template="syntax-highlighted">// code here</code-input>
+            </div>
+           <div class="flex-fil" style="height: 20vh">
+                <textarea class="py-2 px-4 rounded-3  code" disabled readonly style="height: 100%; width: 100%; resize: none;">log here</textarea>
+           </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Новый черновик</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Название</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                </div>
+                <label for="exampleInputEmail1" class="form-label">Язык</label>
+                <select class="form-select" aria-label="Default select example">
+                    <option selected>C#</option>
+                    <option value="1">Python</option>
+
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" type="submit">Создать</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="js/prism.js"></script>
+<script src="js/plugins/prism-line-numbers.js"></script>
+<script src="../wwwroot/js/vpl.js"></script>
+</body>
+</html>

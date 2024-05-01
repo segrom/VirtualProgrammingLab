@@ -29,11 +29,12 @@ using (var scope = host.Services.CreateScope()) // TODO: obviously, i think we n
     try
     {
         var context = services.GetRequiredService<IDbContextFactory<ApplicationDbContext>>().CreateDbContext();
-        if (context.Database.GetPendingMigrations().Any())
+        context.Database.EnsureCreated();
+        /*if (context.Database.GetPendingMigrations().Any())
         {
             await context.Database.MigrateAsync();
-        }
-        
+        }*/
+
     }
     catch (Exception e)
     {
