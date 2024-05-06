@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
     env:
-      HOST: root@94.228.117.181
+      HOST: root@176.57.218.200
       RABBITMQ_HOST: rabbitmq
       DEPLOY_DIRECTORY: /root/apps/vpl
       ENV_FILE_PATH: /root/apps/vpl/config.env
