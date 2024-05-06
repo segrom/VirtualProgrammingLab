@@ -136,18 +136,24 @@ else
     private bool _isSaving;
     private bool _isDirty;
     
+    private bool _isFirstInitialized;
+    
     protected override async Task OnInitializedAsync()
     {
         var claimsPrincipal = (await AuthStat).User;
 
         _user = await UserManager.GetUserAsync(claimsPrincipal);
         _states = await SandboxService.GetStatesForUser(_user);
-        if(_states.Count > 0)
-        {
-            SelectState(_states.First());
-        }
     }
-    
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_isFirstInitialized || _states is not {Count: > 0 }) return;
+        
+        SelectState(_states.First());
+        _isFirstInitialized = true;
+    }
+
     private async void Compile()
     {
         if (_currentState is null || _user is null || _isLoading) return;
