@@ -11,7 +11,7 @@ public class CodeRunner
 
     private const string Username = "runner";
     private const string Homedir = "/home/runner/";
-    private const int Timeout = 5000;
+    private const int Timeout = 15000;
 
     private const string SandboxTestsMock = @"
     namespace Exercise;
