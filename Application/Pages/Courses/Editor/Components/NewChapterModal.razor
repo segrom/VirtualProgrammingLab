@@ -2,6 +2,7 @@
 @using System.Collections.Concurrent
 @using Common.Courses
 @inject ICourseService CourseService
+@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
 
@@ -40,7 +41,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Сохранить</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
             </div>
         </EditForm>
     </div>
@@ -65,6 +66,7 @@
         await CourseService.AddChapterToCourse(Course, _model);
         OnRefresh?.Invoke();
         _model = new();
+        await JsRuntime.InvokeVoidAsync("codeFunctions.hideModal", ModalId);
     }
 
 }

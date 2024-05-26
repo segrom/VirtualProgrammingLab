@@ -5,6 +5,7 @@
 @using Application.Services.Courses
 @using Common.Courses
 @using Common.Lecturers
+@inject IJSRuntime JsRuntime
 @inject ICourseService CourseService
 @inject NavigationManager NavigationManager
 @inject ILogger<NewCourseModal> Logger
@@ -43,7 +44,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
-                    <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit" data-bs-dismiss="modal">
+                    <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit">
                         @if (_isLoading)
                         {
                             <div class="spinner-border spinner-border-sm" role="status">
@@ -86,6 +87,7 @@
         var result = await CourseService.CreateCourseAsync(_model);
         _isLoading = false;
         NavigationManager.NavigateTo($"/course/edit/{result.Id}");
+        await JsRuntime.InvokeVoidAsync("codeFunctions.hideModal", ModalId);
     }
 
 }

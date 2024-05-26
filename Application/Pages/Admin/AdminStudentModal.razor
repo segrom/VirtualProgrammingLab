@@ -6,6 +6,7 @@
 @using Common.Account
 @using Common.Students
 @inject IAdminService AdminService
+@inject IJSRuntime JsRuntime
 @inject ILogger<AdminStudentModal> Logger
 @namespace Application.Pages.Admin
 <!--@ModalId -->
@@ -51,7 +52,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button class="btn btn-primary" type="submit" data-bs-dismiss="modal">Сохранить</button>
+                <button class="btn btn-primary" type="submit">Сохранить</button>
             </div>
         </EditForm>
     </div>
@@ -80,13 +81,14 @@
     
     StudentModel _model;
     private bool _isNew;
-
+    
     private async Task Submit()
     {
         var result =  _isNew 
             ? await AdminService.CreateStudentWithUserAsync(_model) 
             : await AdminService.UpdateStudentWithUserAsync(_model);
         OnSuccess?.Invoke();
+        await JsRuntime.InvokeVoidAsync("codeFunctions.hideModal", ModalId);
     }
 
 }
