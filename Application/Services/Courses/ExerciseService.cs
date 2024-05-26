@@ -69,6 +69,7 @@ public class ExerciseService: IExerciseService
                 User = user,
                 Status = CompileRequestStatus.Queued,
                 Tests = impl.TestsCode,
+                IsExercise = true
             });
         await context.SaveChangesAsync();
         return request.Entity;
