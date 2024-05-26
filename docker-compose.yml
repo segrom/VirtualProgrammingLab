@@ -167,5 +167,30 @@ services:
     networks:
       - rabbit-network
       - db-network
+        
+  cpp-compiler-service:
+    image: cpp-compiler-service
+    build:
+      context: .
+      no_cache: true
+      dockerfile: CppCompilerService/Dockerfile
+    environment:
+      DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_NAME}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
+      MODE: ${MODE}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      INPUT_QUEUE_NAME_FORMAT: ${INPUT_QUEUE_NAME_FORMAT}
+      RESULTS_QUEUE_NAME_FORMAT: ${RESULTS_QUEUE_NAME_FORMAT}
+      COMPILE_RESULTS_UPDATE_QUEUE_NAME: ${COMPILE_RESULTS_UPDATE_QUEUE_NAME}
+    restart: on-failure
+    privileged: true
+    pid: "host"
+    depends_on:
+      - rabbit
+      - database
+      - compile-results-updater-service
+    networks:
+      - rabbit-network
+      - db-network
     
     

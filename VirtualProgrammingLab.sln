@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompileResultsUpdaterServic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PythonCompilerService", "PythonCompilerService\PythonCompilerService.csproj", "{08B102F4-BAE7-4CA9-BB0A-988BE86B2A91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CppCompilerService", "CppCompilerService\CppCompilerService.csproj", "{0657E767-01FD-48D2-A65E-B5FA160A297F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,5 +43,9 @@ Global
 		{08B102F4-BAE7-4CA9-BB0A-988BE86B2A91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08B102F4-BAE7-4CA9-BB0A-988BE86B2A91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08B102F4-BAE7-4CA9-BB0A-988BE86B2A91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0657E767-01FD-48D2-A65E-B5FA160A297F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0657E767-01FD-48D2-A65E-B5FA160A297F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0657E767-01FD-48D2-A65E-B5FA160A297F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0657E767-01FD-48D2-A65E-B5FA160A297F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
