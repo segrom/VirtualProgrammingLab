@@ -39,10 +39,10 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddIdentity<User, IdentityRole>(options =>
     {
-        options.Password.RequireDigit = false;
+        options.Password.RequireDigit = true;
         options.Password.RequiredLength = 5;
         options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireUppercase = false;
+        options.Password.RequireUppercase = true;
         options.User.RequireUniqueEmail = false;
         options.SignIn.RequireConfirmedEmail = false;
     })
