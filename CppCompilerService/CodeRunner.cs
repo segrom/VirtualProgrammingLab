@@ -2,7 +2,7 @@
 using System.Text;
 using Common.QueueStructures;
 
-namespace CsharpCompilerService;
+namespace PythonCompilerService;
 
 public class CodeRunner
 {
@@ -11,26 +11,21 @@ public class CodeRunner
 
     private const string Username = "runner";
     private const string Homedir = "/home/runner/";
-    private const int Timeout = 15000;
+    private const int Timeout = 5000;
 
-    private const string SandboxTestsMock = @"
-    namespace Exercise;
+    private const string SandboxTestsMock = @"#include ""Tests.h""
+#include ""ExerciseException.h""
 
-public class Tests
-{
-    // use ExerciseException
-    public void Run(Solution solution)
-    {
-        solution.Run();
-    }
+void Tests::Run(Solution* solution) {
+    solution->Run();
 }
 ";
     
     public CodeRunner()
     {
-        var sdks = RunCommand("dotnet", $"--list-sdks");
-        sdks.Wait();
-        Console.WriteLine(sdks.Result.Item1);
+        var pyv = RunCommand("g++", $"--version");
+        pyv.Wait();
+        Console.WriteLine(pyv.Result.Item1);
         Console.WriteLine("_____ run user inited _____");
     }
 
@@ -56,7 +51,7 @@ public class Tests
 
             process = new Process
             {
-                StartInfo = desc,
+                StartInfo = desc
             };
 
             process.Start();
@@ -81,7 +76,7 @@ public class Tests
                     output.AppendLine(l);
                 }
             }, cr.Token);
-
+            
             await process.WaitForExitAsync(cancellationToken);
             cr.Cancel();
         }
@@ -124,41 +119,42 @@ public class Tests
     
     public async Task<QueueCompileResult> RunCode(QueueCompileRequest request)
     {
-        var binFolder = Path.Join(Homedir, "exercise/bin");
-        var objFolder = Path.Join(Homedir, "exercise/obj");
-        
-        if(Directory.Exists(binFolder))
-        {
-            Directory.Delete(binFolder, true);
-            Console.WriteLine($"Delete {binFolder}");
-        }
-        if(Directory.Exists(objFolder))
-        {
-            Directory.Delete(objFolder, true);
-            Console.WriteLine($"Delete {objFolder}");
-        }
-        
-        var solutionFilepath = Path.Join(Homedir, "exercise/Solution.cs");
-        var testsFilepath = Path.Join(Homedir, "exercise/Tests.cs");
-        var solutionPath = Path.Join(Homedir, "exercise/Exercise.csproj");
+        var solutionFilepath = Path.Join(Homedir, "exercise/Solution.h");
+        var testsFilepath = Path.Join(Homedir, "exercise/Tests.cpp");
+        var mainFilepath = Path.Join(Homedir, "exercise/main.cpp");
+        var executableFilepath = Path.Join(Homedir, "exercise/solution");
         await File.WriteAllTextAsync(solutionFilepath, request.Solution);
-        await File.WriteAllTextAsync(testsFilepath, request.IsExercise 
+        await File.WriteAllTextAsync(testsFilepath, request.IsExercise
             ? request.Tests
             : SandboxTestsMock);
-
+        
         string envErrors = "";
         var ct = new CancellationTokenSource();
         
-        Console.WriteLine("[START WITH RUNNER USER PROJ]");
         Console.WriteLine($"Request [{request.CompileRequestId}:{request.ServiceId}] with code: \n {request.Solution}");
-        var sw = Stopwatch.StartNew();
-        Task<(string, string)> solutionTask = RunCommand("unshare", $"-n runuser -u {Username} -- dotnet run --project {solutionPath}", 
-            cancellationToken: ct.Token);
-        Task timerTask = Timer(Timeout, ct.Token);
+
+        Console.WriteLine("[START BUILD]");
         
-        //Console.WriteLine($"awaiting tasks solutionStatus:{solutionTask.Status} timerStatus:{timerTask.Status}");
+        Task<(string, string)> buildTask = RunCommand("g++", $"{mainFilepath} -o {executableFilepath}",
+            cancellationToken: ct.Token);
+        await buildTask;
+        var (buildOutput, buildErrors) = buildTask.Result;
+        Console.WriteLine(buildOutput);
+        if (!string.IsNullOrEmpty(buildErrors))
+        {
+            Console.WriteLine(buildErrors);
+            return new QueueCompileResult(request.ServiceId, request.CompileRequestId, buildOutput, buildErrors, DateTimeOffset.Now, new TimeSpan(0));
+        }
+        
+        Console.WriteLine("[BUILD COMPLETED]");
+        
+        Console.WriteLine("[START WITH RUNNER USER PROJ]");
+        var sw = Stopwatch.StartNew();
+        Task<(string, string)> solutionTask = RunCommand("unshare", $"-n runuser -u {Username} -- {executableFilepath}",
+            cancellationToken: ct.Token);
+        var timerTask = Timer(Timeout, ct.Token);
+        
         await Task.WhenAny(solutionTask, timerTask);
-        //Console.WriteLine($"some task finished solutionStatus:{solutionTask.Status} timerStatus:{timerTask.Status}");
         
         ct.Cancel();
         var duration = sw.Elapsed;
@@ -166,7 +162,6 @@ public class Tests
 
         var (output, errors) = solutionTask.Result;
         errors = envErrors + errors;
-        
         Console.WriteLine($"duration [{duration:g}] out: {(output.Length > 1000? $"(output too long ({output.Length}))" : output)} \n err: {errors} \n");
         
         return new QueueCompileResult(request.ServiceId, request.CompileRequestId, output, errors, DateTimeOffset.Now, duration);

@@ -18,11 +18,29 @@
         max-width: 300px;
         color: var(--bs-danger);
     }
+    .custom-bg {
+            mix-blend-mode: lighten;
+            z-index: -10;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            justify-content: flex-end;
+            align-items: center;
+    }
+    .custom-bg img {
+            width: 1250px;
+            max-width: 80%;
+            height: fit-content;
+            opacity: 0.3;
+    }
 </style>
 
 <div class="d-flex vh-100 align-items-center justify-content-center">
 <div class="d-grid justify-content-center">
-    <h2 class="my-3">Виртуальная <br> Лабаратория <br> Программирования</h2>
+    <h2 class="my-3">Виртуальная <br> Лаборатория <br> Программирования</h2>
     <EditForm class="d-grid w-100" id="loginForm" method="post" OnValidSubmit="Submit" EditContext="_editContext">
         <DataAnnotationsValidator />
         @if (_errors.Count > 0)
@@ -57,7 +75,7 @@
     </EditForm>
 </div>
 </div>
-
+<div class="custom-bg"><img src="custom_bg.jpg"/></div>
 @code {
     private bool _isLoading;
 
