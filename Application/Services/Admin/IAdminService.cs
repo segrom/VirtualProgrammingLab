@@ -17,4 +17,6 @@ public interface IAdminService
     Task<IdentityResult> CreateStudentWithUserAsync(StudentModel model);
     Task<IdentityResult> UpdateStudentWithUserAsync(StudentModel model);
     Task<List<CompileRequest>> GetUserCompileRequests(User u);
+    Task CreateStudents(StudentGroup g, AdminImportModal.StudentRecord[] students);
+    Task ChangePassword(User user, string newPassword);
 }

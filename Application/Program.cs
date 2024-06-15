@@ -46,6 +46,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
         options.User.RequireUniqueEmail = false;
         options.SignIn.RequireConfirmedEmail = false;
     })
+    .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddSession();
 builder.Services.AddRazorPages();

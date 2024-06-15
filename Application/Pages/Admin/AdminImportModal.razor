@@ -1,0 +1,101 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Application.Shared.Utils
+@using System.ComponentModel.DataAnnotations
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using Application.Pages.Admin.Data
+@using Application.Services.Admin
+@using Common.Account
+@using Common.Lecturers
+@using Common.Students
+@inject IAdminService AdminService
+@inject ILogger<AdminStudentModal> Logger
+@namespace Application.Pages.Admin
+
+<!-- Modal -->
+<div class="modal fade " id="@ModalId" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <EditForm OnValidSubmit="Submit" class="modal-content" Model="_model">
+            <DataAnnotationsValidator/>
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Импорт студентов</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                                    <GroupSelectWithSearch @bind-Selected="_model.Group"/>
+                                    <ValidationMessage For="() => _model.Group"></ValidationMessage>
+                                </div>
+                <div class="mb-3">
+                    <label for="data" class="form-label">Список студентов</label>
+                    <textarea type="text" class="form-control" style="min-height: 400px" id="data" aria-describedby="data" placeholder="@_placeholder" @bind="_model.Data"></textarea>
+                    <div id="emailHelp" class="form-text">Вставте список студентов в формате JSON Пример:<br/><code>@_placeholder</code>  </div>
+                    <ValidationMessage For="() => _model.Data"></ValidationMessage>
+                    @if (_error != null)
+                    {
+                        <div class="text-danger">@_error</div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button class="btn btn-primary" type="submit" data-bs-dismiss="modal">Сохранить</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    public class StudentRecord
+    {
+        [JsonPropertyName("code")] public string Code { get; set; }
+        [JsonPropertyName("password")] public string Password { get; set; }
+        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonPropertyName("surname")] public string Surname { get; set; }
+        [JsonPropertyName("patronymic")] public string Patronymic { get; set; }
+    }
+    
+    public class ImportModel
+    {
+        [Required]
+        public StudentGroup? Group { get; set; }
+
+        [Required]
+        [MinLength(1)]
+        public string Data { get; set; } = "";
+    }
+    
+    [Parameter] public string ModalId { get; set; }
+    [Parameter] public Action? OnSuccess { get; set; }
+    
+    ImportModel _model = new();
+    
+    private string? _error;
+    private string _placeholder = 
+@"[
+    {
+    ""code"": ""КОД"",
+    ""password"": ""ПАРОЛЬ"",
+    ""name"": ""ИМЯ"",
+    ""surname"": ""ФАМИЛИЯ"",
+    ""patronymic"": ""ОТЧЕСТВО""
+    },
+]";
+
+    private async Task Submit()
+    {
+        _error = null;
+        var students = JsonSerializer.Deserialize<StudentRecord[]>(_model.Data);
+        if (students is null)
+        {
+            _error = "Ошибка форматирования данных.";
+            return;
+        }
+
+        await AdminService.CreateStudents(_model.Group, students);
+        OnSuccess?.Invoke();
+        _model = new ImportModel();
+    }
+
+}

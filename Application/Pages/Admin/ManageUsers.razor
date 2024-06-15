@@ -20,8 +20,7 @@
 
         <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group me-2" role="group">
-                
-                <div class="dropdown">
+                <div class="dropdown mx-1">
                     <button class="dropdown-toggle btn btn-primary align-items-center d-flex justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="ph ph-plus me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
                         <span>Новый</span>
@@ -35,6 +34,20 @@
                         </li>
                         <li>
                             <button class="dropdown-item disabled" disabled>Админ</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dropdown mx-1">
+                    <button class="dropdown-toggle btn btn-primary align-items-center d-flex justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ph ph-plus me-1" style="padding-top: 0.13em; font-size: 1.2em;"></i>
+                        <span>Импорт</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button class="dropdown-item" data-bs-toggle="modal" @onclick="() => {ShowModal(ImportStudentsModalId); }">Студенты</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item disabled" disabled >Преподаватели</button>
                         </li>
                     </ul>
                 </div>
@@ -106,9 +119,13 @@
                     <td>@user.CompileRequests.Count</td>
                     <td>@user.Base.ActivityDate.LocalDateTime.ToString("u")</td>
                     <td class="d-flex align-items-center justify-content-center">
-                        <button class="btn btn-outline-primary mx-1" data-bs-toggle="modal"
+                        <button class="btn btn-outline-primary mx-1"
                                 @onclick="() => { if (user.Base.Lecturer != null) _selectedLecturer = user.Base.Lecturer; else _selectedStudent = user.Base.Student; ShowModal(user.Base.Lecturer != null ? LecturerModalId : StudentModalId); }">
                             Изменить
+                        </button>
+                        <button class="btn btn-outline-warning  mx-1"
+                                @onclick="() => { _selectedUser = user.Base; ShowModal(ChangePasswordModalId); }">
+                            Пароль
                         </button>
                         <UserDeleteButton User="@user.Base" OnSuccess="Refresh"/>
                     </td>
@@ -121,11 +138,15 @@
 
 <AdminStudentModal ModalId="@StudentModalId" Student="@_selectedStudent" OnSuccess="Refresh"/>
 <AdminLecturerModal ModalId="@LecturerModalId" Lecturer="@_selectedLecturer" OnSuccess="Refresh"/>
+<AdminImportModal ModalId="@ImportStudentsModalId" OnSuccess="Refresh"/>
+<AdminChangePasswordModal ModalId="@ChangePasswordModalId" User="@_selectedUser" OnSuccess="Refresh"/>
 
 @code {
 
         public const string LecturerModalId = "LecturerModal";
         public const string StudentModalId = "StudentModal";
+        public const string ImportStudentsModalId = "ImportStudentsModal";
+        public const string ChangePasswordModalId = "ChangePasswordModal";
     
     public struct UserWithRoles
     {
@@ -136,6 +157,7 @@
 
     private Student? _selectedStudent;
     private Lecturer? _selectedLecturer;
+    private User? _selectedUser;
     
     private UserWithRoles[]? _users;
 

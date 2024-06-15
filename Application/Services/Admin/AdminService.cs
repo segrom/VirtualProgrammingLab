@@ -117,6 +117,38 @@ public class AdminService: IAdminService
         return await dbContext.CompileRequests.Where(c => c.UserId == u.Id).ToListAsync();
     }
 
+    public async Task CreateStudents(StudentGroup g, AdminImportModal.StudentRecord[] students)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var group = await dbContext.StudentGroups.FirstAsync(x => x.Id == g.Id);
+        foreach (var record in students)
+        {
+            var user = new User
+            {
+                UserName = record.Code,
+                Name = record.Name,
+                Surname = record.Surname,
+                Patronymic = record.Patronymic
+            };
+            await CreateStudentWithUserAsync(new StudentModel()
+            {
+                Password = record.Password,
+                Student = new Student(user, group),
+            });
+        }
+    }
+
+    public async Task ChangePassword(User user, string newPassword)
+    {
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        if (token is null) 
+            throw new Exception("Error generate reset password token");
+        
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+        if(!result.Succeeded) 
+            throw new Exception($"Error reset password: {string.Join(", ", result.Errors.Select(e=>$"[{e.Code}] {e.Description}"))}");
+    }
+
     private async Task<(IdentityResult, User)> CreatUserAsync(User user, string passsword)
     {
         var result = await _userManager.CreateAsync(user,passsword);
